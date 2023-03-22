@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+      <meta charset="utf-8">
+      <title>{% if row[30] == 1 %}SprinxTraffic {% elif row[30]==2 %}SadraTraffic{% endif %}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      {% if row[30] == 1 %}
+           <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SprinX/favicon.ico'      ) }}">
+      {% elif row[30]==2 %}
+           <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SADRA/favicon_sadra.ico' ) }}">
+      {% endif %}
+     <!-- Bootstrap core CSS -->
+       <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
+       <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
+       <!-- <link href="{{ url_for('static', filename='css/material-icons.css') }}" rel="stylesheet">   -->
+       <link href="{{ url_for('static', filename='ion.rangeSlider/css/ion.rangeSlider.min.css') }}" rel="stylesheet">  
+       <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+
+       <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script>   
+        
+       <script type="text/javascript" src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
+       <script type="text/javascript" src="{{ url_for('static', filename='ion.rangeSlider/js/ion.rangeSlider.min.js') }}"></script>
+     <!-- Bootstrap core JavaScript -->
+     
+       
+        <!-- Optional JavaScript -->
+        <!-- Popper.js, then Bootstrap JS -->
+        <script src="{{ url_for('static', filename='bootstrap_4/js2/bootstrap.min.js') }}" ></script>
+
+    
+    <script type="text/javascript">
+      $(document).ready(function (){
+        $("[data-toggle=tooltip]").tooltip()
+      })
+    </script>
+       
+</head>
+<header>
+  {% if row[30] == 1 %}
+  
+      <!-- # ch_v0r91  added -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SprinX/sprinx-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp Sprinx </div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(255, 255, 255, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-dark" id="menu-toggle" ><i class="fa fa-arrows-h"  ></i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('home') }}" >           <i class="fa fa-wrench fa-lg">         </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action list-group-item-dark" style="color: rgba(0, 0, 0, 1);      " href="{{ url_for('analytic') }}">        <i class="fa fa-cubes ">               </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('counting') }}">        <i class="fa fa-car">                  </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('event') }}">           <i class="fa fa-list">                 </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('statistic') }}">       <i class="fa fa-area-chart">           </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('info') }}">            <i class="fa fa-info-circle fa-lg">    </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        
+  {% elif row[30]==2 %}
+      <!-- # ch_v0r91  added -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SADRA/sadra-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(47, 110, 0, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp SADRA</div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" style="color: rgba(47, 110, 0, 1);" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-light" id="menu-toggle" style="color: rgba(47, 110, 0, 1);" ><i class="fa fa-arrows-h"  >                                   </i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-white border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-light"             style="color: rgba(0, 0, 0, 1);" href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action list-group-item-dark" style="color: rgba(15, 97, 0, 1);" href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action bg-light"             style="color: rgba(0, 0, 0, 1);" href="{{ url_for('counting') }}"> <i class="fa fa-car">                                </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"             style="color: rgba(0, 0, 0, 1);" href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"             style="color: rgba(0, 0, 0, 1);" href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"             style="color: rgba(0, 0, 0, 1);" href="{{ url_for('info') }}"><i class="fa fa-info-circle fa-lg">                       </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+  {% endif %}
+    <!-- ------------------------- Page Content -------------------------  -->
+    <div id="page-content-wrapper">
+          
+          
+          <!-- ------------------------- url_for Content -------------------------  -->
+          <div class="container-fluid"  align="center">
+                 <h3 class="mt-4"><i class="fa fa-cubes" style="font-size: 25px;"></i> &nbsp; Analytics setting</h3>
+                 <div class="card" id='mycard' style="width:{{w_rsz}}px; font-size: 15px;" align="left" >
+                      <div class="card-header bg-light" style="color: rgba(15, 97, 0, 1);" >
+                           <i class="fa fa-video-camera"></i>&nbsp;Live View
+                      </div>
+                </div>
+                      <canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
+                      <img src="{{ url_for('static', filename='images/vp1_demo2.png') }}" width={{w_rsz}} height={{h_rsz}} id='theImg' >
+          </div>
+          
+          <!-- ------------------------- settings Content -------------------------  -->
+           
+          <!-- <div class="container mt-3"> -->
+              <div class="card" style="width: 95%;margin:0 auto ;" id='mycard2'>
+              
+              
+                  <div class="card-header bg-light" style="color: rgba(15, 97, 0, 1);" >
+                        <i class="fa fa-cogs"></i>&nbsp;settings
+                  </div>
+                  
+                  
+                  
+    
+           
+                  <!-- Nav tabs -->
+                  <ul class="nav nav-tabs nav-justified" role="tablist">
+                        <li class="nav-item " >
+                          <a class="nav-link active" data-toggle="tab" href="#stop" id="Stop" style="font-size: 15px; font-weight:bold; "><i class="fa fa-exclamation-triangle"></i> &nbsp;Stop</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#traffic" id="Traffic" style="font-size: 15px; font-weight:bold;"><i class="fa fa-car"></i>  &nbsp;Traffic</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#wrong" id="Wrong" style="font-size: 15px; font-weight:bold;"><i class="fa fa-ban"></i>&nbsp;Wrong Way</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#pedestrian" id="Pedestrian" style="font-size: 15px; font-weight:bold;"> <i class="fa fa-male"></i>  &nbsp;Pedestrian</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#smoke" id="Smoke" style="font-size: 15px; font-weight:bold;"><i class="fa fa-cloud"></i> &nbsp;Smoke</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#counting" id="Counting" style="font-size: 15px; font-weight:bold;"><i class="fa fa-tachometer"></i> &nbsp;Counting</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#lost" id="Lost" style="font-size: 15px; font-weight:bold;"><i class="fa fa-cube"></i> &nbsp;Lost Cargo</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                          <a class="nav-link"        data-toggle="tab" href="#detection" id="Detection" style="font-size: 15px; font-weight:bold;"><i class="fa fa-search"></i> &nbsp;Detection</a>
+                        </li>
+                  </ul>
+                  
+  
+                  
+                  <!-- -------------------------  Tab panes ------------------------- find_in_page  directions_car-->
+                  <div class="tab-content">
+                        <!-- ___________________________________________________________________________________________________________________ -->
+                        <div id="stop" class="container tab-pane active" align="center"><br>
+                                <div class="card" style=style="width: 90%;margin:0 auto ; align="left">
+                                    <div class="card-body" style="font-size: 15px;">
+                                            <form class="was-validated"  name="stop_form" id="stop_form" action="" method="post">
+                                              
+                                              <div class="form-group row align-items-start">
+                                              
+                                                   <div class="col-sm-5"><b> ROI </b></div> <!-- Enable drawing the Road Region of Interest -->
+                                                        <div class="col-sm-6">
+                                                            <div class="form-check">
+                                                                <input id="stop_roi" name="stop_roi" type="checkbox" class="form-check-input"  > <!-- # ch_v0r89 (required removed) -->
+                                                                <label for="stop_roi" >
+                                                                    Enable drawing The Road Region of Interest 
+                                                                </label>
+                                                                <div class="invalid-feedback">Please check this box and select ROI (9 points)</div>
+                                                       </div>
+                                                  </div>
+                                                  
+                                                  <div class="col-sm-5"><b> Show ROI </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
+                                                        <div class="col-sm-6">
+                                                            <div class="form-check">
+                                                                <input id="disp_stop_roi" name="disp_stop_roi" type="checkbox" class="form-check-input" {% if row[23]==1 %} checked {% endif %}>
+                                                                <label for="disp_stop_roi" >
+                                                                    Displaying The Road Region of Interest 
+                                                                </label>                                                                
+                                                       </div>
+                                                  </div>
+                                              
+                                                   <div class="col-sm-5"> <b> Vehicle Stopping Time Delay (0 - 10 s) </b></div> 
+                                                    <div class="col-sm-4">
+                                                        <div class="input-group mb-3">
+                                                            <input id="stop_vehicle_th" name="stop_vehicle_th" type="number" min="0" max="10" class="form-control" placeholder="{{stop_vehicle_th}}" required>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text" id="basic-addon2">s</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-sm-5"> <b> Vehicle Stopping Time Duration (5 - 60 s) </b></div> 
+                                                    <div class="col-sm-4">
+                                                        <div class="input-group mb-3">
+                                                            <input id="stop_vehicle_dur_th" name="stop_vehicle_dur_th" type="number" min="5" max="60" class="form-control" placeholder="{{stop_vehicle_dur_th}}" required>
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text" id="basic-addon2">s</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    
+                                              </div>
+                                              
+                                            
+                                              
+                                              <div class="form-group row"> <!-- submit -->
+                                                <div class="col-sm-10">
+                                                  <button type="submit" class="btn btn-success">Apply</button>
+                                                </div>
+                                              </div>
+                                              
+                                            </form>
+                                   </div> <!-- card-body -->
+                            </div><!-- card -->        
+                        </div> <!-- stop -->
+
+                        <!-- __________________________________ Slow vehicle _________________________________________________________________________________ -->
+                        <div id="traffic" class="container tab-pane fade" align="center"><br>
+                          <div class="card" style="width: 90%;margin:0 auto ;" align="left">
+                                    <div class="card-body" style="font-size: 15px;">
+                                            <form class="was-validated"  name="traffic_form" id="traffic_form" action="" method="post">
+                                                  <div class="form-group row align-items-start">
+                                                  
+                                                       <div class="col-sm-5"> <b> Slow vehicle Threshold  (10 - 40 km/h) </b></div> <!-- Enable drawing the Road Region of Interest-->
+                                                       
+                                                        <div class="col-sm-4">
+                                                            <div class="input-group mb-3">
+                                                                <input id="slow_vehicle_th" name="slow_vehicle_th" type="number" min="10" max="40" class="form-control" placeholder={{slow_vehicle_th}} (10 - 40)" required>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" id="basic-addon2">km/h</span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                  </div>       
+                                                      
+                                                      <div class="form-group row justify-content-md-center" > <!-- submit -->
+                                                        <div class="col-sm-10">
+                                                          <button type="submit" class="btn btn-success">Apply</button>
+                                                        </div>
+                                                      </div>
+                                              
+                                              
+                                            </form>
+                                            
+                                   </div> <!-- card-body -->
+                            </div><!-- card --> 
+                        </div>  <!-- traffic -->
+                        <!-- __________________________ wrong way _________________________________________________________________________________________ -->
+                        <div id="wrong" class="container tab-pane fade"><br>
+                          <h3>Menu 2</h3>
+                          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        </div>
+                        <!-- __________________________ pedestrian _________________________________________________________________________________________ -->
+                        <div id="pedestrian" class="container tab-pane fade"><br>
+                          <h3>Menu 3</h3>
+                          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        </div>
+                        <!-- ___________________________ smoke ________________________________________________________________________________________ -->
+                        <!-- # ch_v0r92 (added -> Displaying The Road Region of Interest) -->
+                        <div id="smoke" class="container tab-pane fade"><br>
+                          <div class="card" style="width: 90%;margin:0 auto ;" align="left">
+                                    <div class="card-body" style="font-size: 15px;">
+                                            <form class="was-validated" name="smoke_form" id="smoke_form" action="" method="post">
+                                                  <div class="form-group row align-items-start">
+                                                      <div class="col-sm-5"><b> Smoke ROI </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
+                                                            <div class="col-sm-4">
+                                                                <div class="form-check">
+                                                                    <input id="draw_smoke" name="draw_smoke" type="checkbox" class="form-check-input" >
+                                                                    <label for="draw_smoke" >
+                                                                        Enable drawing The Smoke Region of Interest  
+                                                                    </label>                                                                
+                                                           </div>
+                                                      </div>
+                                                  </div>
+                                              
+                                              <div class="form-group row"> <!-- submit -->
+                                                <div class="col-sm-10">
+                                                  <button type="submit" class="btn btn-success">Apply</button>
+                                                </div>
+                                              </div>
+                                            </form>
+                                            
+                                  </div> <!-- card-body -->
+                            </div><!-- card -->        
+                        </div>
+                        <!-- __________________________ counting _________________________________________________________________________________________ -->
+                        <div id="counting" class="container tab-pane fade"><br>
+                            <div class="card" style="width: 90%;margin:0 auto ;" align="left">
+                                    <div class="card-body" style="font-size: 15px;">
+
+                                        <form class="was-validated"  name="counting_form" id="counting_form" action="" method="post">
+                                            <div class="form-group row align-items-start">
+
+                                               <div class="col-sm-5"><b> Display dimensions </b></div> <!-- Enable drawing the Road Region of Interest -->
+                                                    <div class="col-sm-6">
+                                                        <div class="form-check">
+                                                            <input id="disp_dim" name="disp_dim" type="checkbox" class="form-check-input" {% if row[29]==1 %} checked {% endif %} > <!-- # ch_v0r89 (required removed) -->
+                                                            <label for="disp_dim" >
+                                                                Display vehicle detected dimensions 
+                                                            </label>
+                                                            <div class="invalid-feedback">Please check this box in order to display vehicle detected dimensions</div>
+                                                   </div>
+                                              </div>
+                            
+                                               <div class="col-sm-5"> <b> RoI upper horizontal line (50 - 75 % of H)</b></div> <!-- Enable drawing the Road Region of Interest-->
+                                                <div class="col-sm-4">
+                                                    <div class="input-group mb-3">
+                                                        <input id="roi_up_line" name="roi_up_line" type="number" onchange="roi_up_low_line_draw()"  min="50" max="75" class="form-control"  value="{{counting_list[3][0]}}" placeholder="{{counting_list[3][0]}}" required>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" id="basic-addon12">% of H</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-5"> <b> RoI lower horizontal line (25 - 50 % of H)</b></div> <!-- Enable drawing the Road Region of Interest-->
+                                                <div class="col-sm-4">
+                                                    <div class="input-group mb-3">
+                                                        <input id="roi_low_line" name="roi_low_line" type="number" onchange="roi_up_low_line_draw()" min="25" max="50" class="form-control" value="{{counting_list[3][1]}}" placeholder="{{counting_list[3][1]}}" required>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" id="basic-addon13">% of H</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                            <!-- =================================================================== -->
+                                            <div class="form-row">
+                                                <div class="col-sm-10"> <b> Dimention Limits  of a Motorbike in Meter:</b></div> <!-- Enable drawing the Road Region of Interest-->
+                                            </div>
+                                        
+                                            <!-- ================================ Motorbike =================================== -->
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="W_low_bike" name="W_low_bike" type="number" step="0.1" min="0.1" max="0.7" class="form-control" value="{{counting_list[7][0]}}" placeholder="{{counting_list[7][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon14" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">W</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon15" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="W_hi_bike" name="W_hi_bike" onchange="W_hi_bike_2_W_low_car()" type="number" step="0.1" min="0.8" max="1.5" class="form-control" value="{{counting_list[7][1]}}" placeholder="{{counting_list[7][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="L_low_bike" name="L_low_bike" type="number" step="0.1" min="0.1" max="0.8" class="form-control" value="{{counting_list[8][0]}}" placeholder="{{counting_list[8][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon16" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">L</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon17" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="L_hi_bike" name="L_hi_bike" type="number" step="0.1" min="2" max="3.5" class="form-control" value="{{counting_list[8][1]}}" placeholder="{{counting_list[8][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="H_low_bike" name="H_low_bike" type="number" step="0.1" min="1" max="1.5" class="form-control" value="{{counting_list[9][0]}}" placeholder="{{counting_list[9][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon18" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold"> H </span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon19" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="H_hi_bike" name="H_hi_bike" type="number" step="0.1" min="3" max="7.5" class="form-control" value="{{counting_list[9][1]}}" placeholder="{{counting_list[9][1]}}" required>
+                                                    </div>
+                                                </div> 
+                                            </div> 
+                                            <!-- =================================================================== -->
+                                            <!-- =================================================================== -->
+                                            <div class="form-row">
+                                                <div class="col-sm-10"> <b> Dimention Limits  of a Car in Meter:</b></div> <!-- Enable drawing the Road Region of Interest-->
+                                            </div>
+                                        
+                                            <!-- ================================ Car =================================== -->
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="W_low_car" name="W_low_car" type="number" step="0.1"  min="0.8" max="1.5" class="form-control" data-toggle="tooltip" data-placement="top" title="Min width of a car should be equal to Max width of a motorbike to avoid overlapping conflicts" value="{{counting_list[0][0]}}" placeholder="{{counting_list[0][0]}}" disabled>
+                                                        <div class="input-group-append" align="center">  
+                                                            <span class="input-group-text" id="basic-addon20" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">W</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon21" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="W_hi_car" name="W_hi_car" type="number" step="0.1" min="2.5" max="3.5" class="form-control" value="{{counting_list[0][1]}}" placeholder="{{counting_list[0][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="L_low_car" name="L_low_car" type="number" step="0.1" min="1.1" max="1.8" class="form-control" value="{{counting_list[1][0]}}" placeholder="{{counting_list[1][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon22" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">L</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon23" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="L_hi_car" name="L_hi_car" onchange="L_hi_car_2_L_low_truck()" type="number" step="0.1" min="5.5" max="7" class="form-control" value="{{counting_list[1][1]}}" placeholder="{{counting_list[1][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="H_low_car" name="H_low_car" type="number" step="0.1" min="0.5" max="1" class="form-control" value="{{counting_list[2][0]}}" placeholder="{{counting_list[2][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon24" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold"> H </span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon25" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="H_hi_car" name="H_hi_car" type="number" step="0.1" min="2.5" max="4.5" class="form-control" value="{{counting_list[2][1]}}" placeholder="{{counting_list[2][1]}}" required>
+                                                    </div>
+                                                </div> 
+                                            </div> 
+                                            <!-- =================================================================== -->
+                                            <!-- =================================================================== -->
+                                            <div class="form-row">
+                                                <div class="col-sm-10"> <b> Dimention Limits  of a Truck in Meter:</b></div> <!-- Enable drawing the Road Region of Interest-->
+                                            </div>
+                                        
+                                            <!-- ================================ Truck =================================== -->
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="W_low_truck" name="W_low_truck" type="number" step="0.1" min="1.5" max="2.5" class="form-control" value="{{counting_list[4][0]}}" placeholder="{{counting_list[4][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon26" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">W</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon27" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="W_hi_truck" name="W_hi_truck" type="number" step="0.1" min="2.5" max="3.7" class="form-control" value="{{counting_list[4][1]}}" placeholder="{{counting_list[4][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="L_low_truck" name="L_low_truck" type="number" step="0.1" min="5.5" max="7" class="form-control" data-toggle="tooltip" data-placement="top" title="Min Length of a Truck should be equal to Max Length of a Car to avoid overlapping conflicts" value="{{counting_list[5][0]}}" placeholder="{{counting_list[5][0]}}" disabled>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon28" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold">L</span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon29" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="L_hi_truck" name="L_hi_truck" type="number" step="0.1" min="15" max="25" class="form-control" value="{{counting_list[5][1]}}" placeholder="{{counting_list[5][1]}}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form row justify-content-md-center">
+                                                <div class="col-sm-3">
+                                                     <div class="input-group mb-3">
+                                                        <input id="H_low_truck" name="H_low_truck" type="number" step="0.1" min="2" max="4" class="form-control" value="{{counting_list[6][0]}}" placeholder="{{counting_list[6][0]}}" required>
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon30" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-" align="center">
+                                                   <span style="font-weight:bold"> H </span> 
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-append" align="center">
+                                                            <span class="input-group-text" id="basic-addon31" style="font-weight:bold"> < </span>
+                                                        </div>
+                                                        <input id="H_hi_truck" name="H_hi_truck" type="number" step="0.1" min="4" max="8" class="form-control" value="{{counting_list[6][1]}}" placeholder="{{counting_list[6][1]}}" required>
+                                                    </div>
+                                                </div> 
+                                            </div> 
+                                            <!-- =================================================================== -->
+
+                                                  
+                                                      
+                                          <div class="form-group row justify-content-md-center" > <!-- submit -->
+                                            <div class="col-sm-10">
+                                              <button type="submit" class="btn btn-success">Apply</button>
+                                            </div>
+                                          </div>
+                                              
+                                        </form>
+                                    </div> <!-- card-body -->
+                            </div><!-- card --> 
+
+                        </div>
+                        
+                        <div id="lost" class="container tab-pane fade"><br>
+                          <h3>Menu 6</h3>
+                          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        </div>
+                        
+                        <div id="detection" class="container tab-pane fade" align="center"><br>
+                            <div class="card" style="width: 90%;margin:0 auto ;" align="left">
+                                    <div class="card-body" style="font-size: 15px;">
+                                            <form class="was-validated" name="detection_form" id="detection_form" action="" method="post">
+                                                  <div class="form-group row align-items-start">
+                                                      <div class="col-sm-5"><b> Show 3D Detection </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
+                                                            <div class="col-sm-4">
+                                                                <div class="form-check">
+                                                                    <input id="draw_3d" name="draw_3d" type="checkbox" class="form-check-input" {% if row[24]==1 %} checked {% endif %}>
+                                                                    <label for="draw_3d" >
+                                                                        Displaying 3D Object 
+                                                                    </label>                                                                
+                                                           </div>
+                                                      </div>
+                                                  </div>
+                                                    
+                                                  <div class="form-group row"> <!-- Password -->
+                                                    <label for="range_slide" class="col-sm-3 col-form-label"><b> Detection Condition</b></label>
+                                                    <div class="col-sm-8">
+                                                       <input  id="range_slide" type="text" class="js-range-slider" name="my_range" value="" />
+                                                       <!--  <span class="badge badge-warning" id="filter">Warning</span> -->
+                                                    </div>
+                                                  </div>
+                                              
+                                              
+                                              
+                                              <div class="form-group row"> <!-- submit -->
+                                                <div class="col-sm-10">
+                                                  <button type="submit" class="btn btn-success">Apply</button>
+                                                </div>
+                                              </div>
+                                            </form>
+                                            
+                                  </div> <!-- card-body -->
+                            </div><!-- card -->        
+                        </div> <!-- detection -->
+                    </div> <!-- tab-content -->
+                     <!-- <p class="act"><b>Active Tab</b>: <span></span></p>  -->
+                    <!-- <p class="prev"><b>Active Tab</b>: <span></span></p>  -->
+            </div> <!-- card--> 
+         <!--</div> /#Toggleable Tabs container -->
+    </div> <!-- /#page-content-wrapper -->
+  </div> <!-- /#wrapper -->
+
+  
+  
+</header>
+
+
+<body>
+
+</body>
+  
+    
+    <script>
+
+   
+
+    
+
+  
+
+    /*
+    $(document).ready(function(){
+          $(".nav-tabs a").click(function(){
+            $(this).tab('show');
+          });
+    });
+    */
+    var custom_values = ["Very Low <br /> (Very low light condition or very blurry image)", "Low <br />(Low light condition or blurry image)", "Default <br />(Normal light with normal image quality)", "High <br />(High light condition and sharp image)"];
+    
+    // be careful! FROM and TO should be index of values array
+    var my_from = {{detect_type_ind}}; 
+    var my_to = custom_values.indexOf("High (High light condition and sharp image)");
+    // document.getElementById("filter").innerHTML=custom_values[my_from];
+    
+    $(".js-range-slider").ionRangeSlider({
+    skin: "big",
+    grid: true,
+    values: custom_values,
+    from: my_from,
+    hide_min_max: true,
+    hide_from_to: true,
+    
+    onStart: function (data) {
+            
+            // Called right after range slider instance initialised
+            console.log(data.input);        // jQuery-link to input
+            console.log(data.slider);       // jQuery-link to range sliders container
+            console.log(data.min);          // MIN value
+            console.log(data.max);          // MAX values
+            console.log(data.from);         // FROM value
+            console.log(data.from_percent); // FROM value in percent
+            console.log(data.from_value);   // FROM index in values array (if used)
+            console.log(data.to);           // TO value
+            console.log(data.to_percent);   // TO value in percent
+            console.log(data.to_value);     // TO index in values array (if used)
+            console.log(data.min_pretty);   // MIN prettified (if used)
+            console.log(data.max_pretty);   // MAX prettified (if used)
+            console.log(data.from_pretty);  // FROM prettified (if used)
+            console.log(data.to_pretty);    // TO prettified (if used)
+            
+            //document.getElementById("filter").innerHTML=custom_values[my_from];
+        },
+    
+        onChange: function (data) {
+            // Called every time handle position is changed
+    
+            console.log(data.from);
+            //document.getElementById("filter").innerHTML=custom_values[data.from];
+        },
+    
+        onFinish: function (data) {
+            // Called then action is done and mouse is released
+    
+            console.log(data.to);
+        },
+    
+        onUpdate: function (data) {
+            // Called then slider is changed using Update public method
+    
+            console.log(data.from_percent);
+        }
+    
+    });
+    
+    //---------------------------------------------------------------------------
+    var canvas = document.getElementById('myCanvas');
+	var context = canvas.getContext('2d');
+	var coordinates = [];
+	var coordinates_ped = [];
+	var coordinates_ped2 = [];
+	var coordinates_smoke = [];
+	
+	var rect_finish = 0;
+	var rect_finish_ped = 0;
+	var rect_finish_ped_2 = 0;
+	var rect_finish_smoke = 0;
+
+	var Max_point_roi = 9;
+	var Max_point_roi_ped = 5;
+	var Max_point_roi_smoke = 2;
+	canvas.style.position = "absolute";
+    //-------------------    Menu Toggle Script   -------------------------------
+        $("#menu-toggle").click(function(e) {
+          e.preventDefault();
+          $("#wrapper").toggleClass("toggled");
+        });
+
+    //---------------------------------------------------------------------------
+        //var activeTab = $(".tab-content").find(".active");
+        //var id = activeTab.attr('id');
+        //$(".act span").text(id);
+        //var id_selected = 0;
+        //$(".prev span").text(id_selected);
+    
+    //---------------------------------------------------------------------------
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // here is the new selected tab id
+            var selectedTabId = e.target.id;
+            // document.getElementById(selectedTabId).style.color = 'rgba(15, 97, 0, 1)';
+            $(".act span").text(selectedTabId);
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            if (selectedTabId == 'Stop') {
+                id_selected = 0;
+                if (coordinates.length > 0){
+                    drawPolygon();
+                }
+            } else if (selectedTabId == 'Traffic' ) {
+                id_selected = 1; 
+                
+            } else if (selectedTabId == 'Wrong' ) {
+                id_selected = 2; 
+                 
+            } else if (selectedTabId == 'Pedestrian') {
+                id_selected = 3; 
+                if (coordinates_ped.length > 0){
+                    drawPolygon_ped();
+                    if (coordinates_ped2.length> 0){
+                        drawPolygon_ped_2();
+                    }
+                }
+            } else if (selectedTabId == 'Smoke' ) {
+                id_selected = 4;
+                if (coordinates_smoke.length > 0){
+                    drawSquare_smoke();
+                } 
+                
+                
+            } else if (selectedTabId == 'Counting' ) {
+                id_selected = 5;
+                roi_up_low_line_draw()
+            } else if (selectedTabId == 'Lost' ) {
+                id_selected = 6;
+                
+            } else if (selectedTabId == 'Detection' ) {
+                id_selected = 7;
+            }
+            
+            $(".prev span").text(id_selected);
+        });
+     //---------------------------------------------------------------------------
+    function W_hi_bike_2_W_low_car() {		
+        var inputOne = document.getElementById("W_hi_bike").value;
+        var inputTwo = document.getElementById("W_low_car")
+        inputTwo.value = inputOne;
+	}
+
+    function L_hi_car_2_L_low_truck() {		
+        var inputOne = document.getElementById("L_hi_car").value;
+        var inputTwo = document.getElementById("L_low_truck")
+        inputTwo.value = inputOne;
+	}
+    
+//--------------------  #ch_v0r91  --------------------------------------------
+    function canvas_arrow(context, fromx, fromy, tox, toy, r){
+	var x_center = tox;
+	var y_center = toy;
+	
+	var angle;
+	var x;
+	var y;
+	context.lineWidth = 10;
+      context.globalAlpha = 0.5;
+      context.strokeStyle = "#24f04c";
+      context.fillStyle = "#24f04c"; // for the triangle fill
+      context.lineJoin = 'butt';
+      context.beginPath();
+      context.moveTo( fromx, fromy);
+      context.lineTo( tox, toy);
+      context.closePath();
+      context.stroke();
+      
+	context.fill();
+	context.globalAlpha = 0.8;
+      context.beginPath();
+	
+	angle = Math.atan2(toy-fromy,tox-fromx)
+	x = r*Math.cos(angle) + x_center;
+	y = r*Math.sin(angle) + y_center;
+
+	context.moveTo(x, y);
+	
+	angle += (1/3)*(2*Math.PI)
+	x = r*Math.cos(angle) + x_center;
+	y = r*Math.sin(angle) + y_center;
+	
+	context.lineTo(x, y);
+	
+	angle += (1/3)*(2*Math.PI)
+	x = r*Math.cos(angle) + x_center;
+	y = r*Math.sin(angle) + y_center;
+	
+	context.lineTo(x, y);
+	
+	context.closePath();
+      
+	
+	context.fill();
+     context.globalAlpha = 0.5;
+     context.font = "50px Arial";
+     context.fillText('H',fromx -40,(fromy+toy)/2);
+    }
+
+//-----------------  #ch_v0r91  ---------------------------------------------
+    function roi_up_low_line_draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        var roi_low_line_value = 100 - document.getElementById("roi_low_line").value;
+        var roi_up_line_value = 100 - document.getElementById("roi_up_line").value;
+        context.strokeStyle= '#00ff00';
+        context.fillStyle='#00ff00'; 
+        context.globalAlpha = 0.3;
+        context.lineWidth= 8;
+        context.beginPath();
+        context.moveTo(0,roi_low_line_value*{{h_rsz}}/100);
+	   context.lineTo({{w_rsz}},roi_low_line_value*{{h_rsz}}/100);
+        context.closePath();
+        context.stroke();
+        context.fill();
+        context.globalAlpha = 0.8;
+        context.font = "30px Arial";
+        context.fillText("Lower Detection Limit",(0 + {{w_rsz}})/2-100,roi_low_line_value*{{h_rsz}}/100);
+        context.globalAlpha = 0.3;
+        context.strokeStyle= '#ff0000';
+        context.fillStyle='#ff0000';
+        context.lineWidth= 8;  
+        context.beginPath();
+        context.moveTo(0,roi_up_line_value*{{h_rsz}}/100);
+	   context.lineTo({{w_rsz}},roi_up_line_value*{{h_rsz}}/100);
+        context.closePath();
+        context.stroke();
+        context.fill();
+        context.globalAlpha = 0.8;
+        
+        context.fillText("Upper Detection Limit",(0 + {{w_rsz}})/2-100,roi_up_line_value*{{h_rsz}}/100);
+        canvas_arrow(context, {{w_rsz}}-20, {{h_rsz}}, {{w_rsz}}-20, 12, 12);    
+    }    
+    //---------------------------------------------------------------------------
+	function getMousePos(canvas, evt) {		
+
+		var rect = canvas.getBoundingClientRect();
+		return {
+		  x: evt.clientX - rect.left,
+		  y: evt.clientY - rect.top
+		};
+	}
+
+//---------------------------------------------------------------------------
+	function drawMouseCircle(mousePos, index) {
+		context.beginPath();
+		context.arc(mousePos.x, mousePos.y, 9, 0, 2 * Math.PI, false);
+		context.stroke();
+		context.closePath();
+		
+		/* //  ch_v0r88 (commented) 
+		context.globalAlpha = 0.9;
+		context.lineWidth= 3;		
+		context.strokeStyle =  "#ffbf00"; //# ch_v0r85
+		context.font = "25px Arial";
+		x_1=parseInt(mousePos.x)
+		y_1=parseInt(mousePos.y)
+		
+		
+		point_label(x_1,y_1, (index+1).toString())
+            */ //  ch_v0r88 (commented) 
+	}
+//-----------------------------  ch_v0r87 (added) ----------------------------------------------
+    function draw_text_in_middle(text, coordinates_2D, delta_x, delta_y, font){
+		context.globalAlpha = 0.9;
+		context.lineWidth= 2;		
+		context.strokeStyle =  "#ffbf00"; //# ch_v0r85
+		context.font = font;
+		x_1=getColMean(coordinates_2D, 0);
+		y_1=getColMean(coordinates_2D, 1);
+		point_label((x_1 + delta_x), (y_1 + delta_y), text)
+    }
+//---------------------------------------------------------------------------
+    function point_label(x,y, text){
+    context.strokeText(text,parseInt(x),parseInt(y));
+    }
+//---------------------------------------------------------------------------
+	function drawPolygon2(mousePos){
+
+		context.strokeStyle='#00ffff';	 //# ch_v0r88 (changed from '#ffffff'; --> '#00ffff')	
+		context.fillStyle='#00bea6';
+		context.lineWidth= 2;		
+		context.globalAlpha = 0.6; //# ch_v0r88 (changed from '1'; --> '0.6')
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		index = coordinates.length;
+		
+		drawMouseCircle(mousePos, index);
+		
+		context.strokeStyle='#00ffff';	 //# ch_v0r88 (changed from '#ffffff'; --> '#00ffff')	
+		context.lineWidth= 2; //# ch_v0r88 (changed from '3'; --> '2')
+		context.globalAlpha = 0.6; //# ch_v0r88 (changed from '1'; --> '0.6')
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index<coordinates.length;index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();
+		context.globalAlpha = 0.3; //# ch_v0r88 (changed from '0.5'; --> '0.3')
+		context.fill();	
+		
+		context.lineWidth= 2; //# ch_v0r88 (changed from '3'; --> '2')
+		context.globalAlpha = 0.6; //# ch_v0r88 (changed from '1'; --> '0.6')
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index<coordinates.length;index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();	
+		context.strokeStyle='#00ffff';	 //# ch_v0r88 (changed from '#ffffff'; --> '#00ffff')	
+        	context.globalAlpha = 0.9; // ch_v0r88 (0.8 --> 0.9)
+		for(index=0; index<coordinates.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates[index][0], coordinates[index][1], 3, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from " 8, 0, 2 * Math.PI"; --> " 3, 0, 2 * Math.PI")			
+			context.fill();
+			
+		}
+	}
+//----------------------------  //# ch_v0r92  -----------------------------------------------
+	function drawSquare(mousePos){
+
+		context.strokeStyle='#931a00';	 
+		context.fillStyle='#fb390f ';
+		context.lineWidth= 2;		
+		context.globalAlpha = 0.6; 
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		index = coordinates_smoke.length;
+		
+		drawMouseCircle(mousePos, index);
+		
+		if (index > 0){
+        		context.strokeStyle='#931a00';	
+        		context.lineWidth= 2; 
+        		context.globalAlpha = 0.6; 
+        		context.beginPath();
+        		context.moveTo(coordinates_smoke[0][0], coordinates_smoke[0][1]);
+        		context.lineTo(mousePos.x, coordinates_smoke[0][1]);
+        		context.lineTo(mousePos.x, mousePos.y);
+        		context.lineTo(coordinates_smoke[0][0], mousePos.y);
+        		context.closePath();
+        		context.stroke();
+        		context.globalAlpha = 0.3; 
+        		context.fill();
+        		
+        		context.globalAlpha = 0.9; 
+        		for(index=0; index< coordinates_smoke.length;index++) {
+        			context.beginPath();			
+        			context.arc(coordinates_smoke[index][0], coordinates_smoke[index][1], 3, 0, 2 * Math.PI, false);
+        			context.fill();
+        			
+        		}
+        		
+        	}
+	}
+//------------------------------   //# ch_v0r92  ---------------------------------------------
+	function drawSquare_smoke(){	
+		context.clearRect(0, 0, canvas.width, canvas.height);	
+		context.globalAlpha = 0.3;
+		context.strokeStyle=' #931a00';	 
+		context.fillStyle='#fb390f';
+		context.lineWidth= 2; 
+
+		context.beginPath();
+		context.moveTo(coordinates_smoke[0][0], coordinates_smoke[0][1]);
+    		context.lineTo(coordinates_smoke[1][0], coordinates_smoke[0][1]);
+    		context.lineTo(coordinates_smoke[1][0], coordinates_smoke[1][1]);
+    		context.lineTo(coordinates_smoke[0][0], coordinates_smoke[1][1]);
+		context.closePath();
+		context.stroke();
+		context.fill();
+        	
+        	context.globalAlpha = 0.9; 
+		for(index=0; index< coordinates_smoke.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates_smoke[index][0], coordinates_smoke[index][1], 3, 0, 2 * Math.PI, false);
+			context.fill();
+			
+		}
+           		
+	}	
+//---------------------------------------------------------------------------
+	function drawPolygon(){	
+		context.clearRect(0, 0, canvas.width, canvas.height);	
+		context.globalAlpha = 0.3; //# ch_v0r88 (changed from '0.6'; --> '0.3')
+		context.strokeStyle='#00ffff';	 //# ch_v0r88 (changed from '#ffffff'; --> '#00ffff')	
+		context.fillStyle='#00ffff';
+		context.lineWidth= 2; //# ch_v0r88 (changed from '6'; --> '2')
+
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index < coordinates.length; index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.closePath();
+		context.stroke();
+		context.fill();
+        	
+        	context.globalAlpha = 0.9; //# ch_v0r88 (added)
+		for(index=0; index<coordinates.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates[index][0], coordinates[index][1], 3, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from " 8, 0, 2 * Math.PI"; --> " 3, 0, 2 * Math.PI")			
+			context.fill();
+			
+		}
+           		
+	}	
+//---------------------------------------------------------------------------
+
+	function drawPolygon2_ped(mousePos){
+
+		context.strokeStyle='#ff0000';	//# ch_v0r88 (changed from '#ffffff'; --> '#ff0000')	
+		context.fillStyle='#ff0000';
+		context.lineWidth= 2;		
+		context.globalAlpha = 1;
+		//context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		index = coordinates_ped.length;
+		drawMouseCircle(mousePos, index);
+		
+           context.strokeStyle='#ff0000';
+           
+		context.lineWidth= 2; //# ch_v0r88 (changed from '3'; --> '2')
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates_ped[0][0], coordinates_ped[0][1]);
+		for(index=1; index<coordinates_ped.length;index++) {
+			context.lineTo(coordinates_ped[index][0], coordinates_ped[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();
+		context.globalAlpha = 0.3;
+		context.fill();	
+		
+		context.lineWidth= 2;// # ch_v0r88 (changed from '3'; --> '1')
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates_ped[0][0], coordinates_ped[0][1]);
+		for(index=1; index<coordinates_ped.length;index++) {
+			context.lineTo(coordinates_ped[index][0], coordinates_ped[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();	
+        	context.fillStyle='#ff0000'; // ch_v0r87 ('ffffff' --> 'ff0000')
+        	context.globalAlpha = 0.8; // ch_v0r85 (added)
+		for(index=0; index<coordinates_ped.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates_ped[index][0], coordinates_ped[index][1], 2, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from " 6, 0, 2 * Math.PI"; --> " 2, 0, 2 * Math.PI")		
+			context.fill();
+		}
+	}
+//---------------------------------------------------------------------------
+
+	function drawPolygon2_ped_2(mousePos){
+
+		context.strokeStyle='#ff0000';	//# ch_v0r88 (changed from '#ffffff'; --> '#ff0000')	
+		context.fillStyle='#ff0000';
+		context.lineWidth= 2;		
+		context.globalAlpha = 1;
+		//context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		index = coordinates_ped2.length;
+		drawMouseCircle(mousePos, index);
+		
+           context.strokeStyle='#ff0000';
+           
+		context.lineWidth= 2; //# ch_v0r88 (changed from '3'; --> '2')
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates_ped2[0][0], coordinates_ped2[0][1]);
+		for(index=1; index<coordinates_ped2.length;index++) {
+			context.lineTo(coordinates_ped2[index][0], coordinates_ped2[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();
+		context.globalAlpha = 0.3;
+		context.fill();	
+		
+		context.lineWidth= 3;
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates_ped2[0][0], coordinates_ped2[0][1]);
+		for(index=1; index<coordinates_ped2.length;index++) {
+			context.lineTo(coordinates_ped2[index][0], coordinates_ped2[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();	
+        	context.fillStyle='#ff0000'; // ch_v0r87 ('ffffff' --> 'ff0000')
+        	context.globalAlpha = 0.8; // ch_v0r85 (added)
+		for(index=0; index<coordinates_ped2.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates_ped[index][0], coordinates_ped[index][1], 2, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from " 6, 0, 2 * Math.PI"; --> " 2, 0, 2 * Math.PI")		
+			context.fill();
+		}
+	}
+//---------------------------------------------------------------------------
+	function drawPolygon_ped(){	
+		//context.clearRect(0, 0, canvas.width, canvas.height);	
+		context.globalAlpha = 0.4;   //# ch_v0r88 (changed from '0.6' --> '0.4')
+		context.strokeStyle= '#ff0000';//		# ch_v0r88 (changed from '#ff0040'; --> '#ff0000')
+		context.fillStyle='#ff0000'; //		# ch_v0r88 (changed from '#ff0040'; --> '#ff0000')
+		context.lineWidth= 2;  //# ch_v0r88 (changed from '6'; --> '3')
+
+		context.beginPath();
+		context.moveTo(coordinates_ped[0][0], coordinates_ped[0][1]);
+		for(index=1; index < coordinates_ped.length; index++) {
+			context.lineTo(coordinates_ped[index][0], coordinates_ped[index][1]);
+		}
+		context.closePath();
+		context.stroke();
+		context.fill();
+	
+		for(index=0; index<coordinates_ped.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates_ped[index][0], coordinates_ped[index][1], 3, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from '8'; --> '2')		
+			context.fill();
+			
+		}
+		
+		font = "20px Arial";
+		text = "Pedestrian walkway 1";
+		// draw_text_in_middle(text, coordinates_ped, -50, -50, font); # ch_v0r88 (commented)
+			
+	}	
+//---------------------------------------------------------------------------
+	function drawPolygon_ped_2(){	
+		//context.clearRect(0, 0, canvas.width, canvas.height);	
+		context.globalAlpha = 0.4;   //# ch_v0r88 (changed from '0.6' --> '0.4')
+		context.strokeStyle= '#ff0000';//		# ch_v0r88 (changed from '#ff0040'; --> '#ff0000')
+		context.fillStyle='#ff0000'; //		# ch_v0r88 (changed from '#ff0040'; --> '#ff0000')
+		context.lineWidth= 2;  //# ch_v0r88 (changed from '6'; --> '3')
+
+		context.beginPath();
+		context.moveTo(coordinates_ped2[0][0], coordinates_ped2[0][1]);
+		for(index=1; index < coordinates_ped2.length; index++) {
+			context.lineTo(coordinates_ped2[index][0], coordinates_ped2[index][1]);
+		}
+		context.closePath();
+		context.stroke();
+		context.fill();
+	
+		for(index=0; index<coordinates_ped2.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates_ped[index][0], coordinates_ped[index][1], 3, 0, 2 * Math.PI, false);	//# ch_v0r88 (changed from '8'; --> '2')		
+			context.fill();
+			
+		}
+		
+		
+		font = "20px Arial";
+		text = "Pedestrian walkway 2";
+		// draw_text_in_middle(text, coordinates_ped2, -100, 0, font); # ch_v0r88 (commented)
+			
+	}
+//---------------------------------------------------------------------------
+	function getCol(matrix, col) {
+	       var column = [];
+	       for(var i=0; i<matrix.length; i++){
+		  column.push(matrix[i][col]);
+	       }
+	       return column;
+	    }
+//---------------------------------------------------------------------------
+	function getColMean(matrix, col) {
+	       var sum = 0;
+	       for(var i=0; i<matrix.length; i++){
+		  sum = sum + matrix[i][col];
+	       }
+	       return sum/matrix.length;
+	    }
+//---------------------------------------------------------------------------
+	function isEven(n) {
+	   return n % 2 == 0;
+	}
+//---------------------------------------------------------------------------
+	function isOdd(n) {
+	   return Math.abs(n % 2) == 1;
+	}
+
+     
+//---------------------------------------------------------------------------
+	canvas.addEventListener('mousemove', function(evt) {
+        	 var mousePos = getMousePos(canvas, evt);
+        	 var stop_en_roi = document.getElementById('stop_roi').checked
+        	 var smoke_en_roi = document.getElementById('draw_smoke').checked // # ch_v0r92
+        	 if (id_selected == 4 && smoke_en_roi == 0){
+            	 context.clearRect(0, 0, canvas.width, canvas.height);
+        	 }
+        	 if (id_selected == 0 && stop_en_roi == 0){
+            	 context.clearRect(0, 0, canvas.width, canvas.height);
+        	 }
+        	 
+        	 if (id_selected == 0 && stop_en_roi == 1){
+		 
+            	 if ((rect_finish == 0 && coordinates.length > 0) || (coordinates.length == 0)) {	
+        	 		drawPolygon2(mousePos);	
+        	 	 } else if (rect_finish == 1 ) {
+        	 		drawPolygon();
+        	 	 }
+        	 	
+        	 } else if (id_selected == 4 && smoke_en_roi == 1){
+		 
+        	 	 if ((rect_finish_smoke == 0 && coordinates_smoke.length > 0) || (coordinates_smoke.length == 0)) {	
+        	 		drawSquare(mousePos);	
+        	 	 } else if (rect_finish_smoke == 1 ) {
+        	 		drawSquare_smoke();
+        	 	 } 
+        	 	 
+		 }  else if (id_selected == 3) {
+		
+        		if ((rect_finish_ped == 0 && coordinates_ped.length > 0) || (coordinates_ped.length == 0)) {	
+                    		context.clearRect(0, 0, canvas.width, canvas.height);
+            			drawPolygon2_ped(mousePos);	
+            			
+            	} else if (rect_finish_ped == 1 && rect_finish_ped_2 == 0) {
+                        	context.clearRect(0, 0, canvas.width, canvas.height);
+            			drawPolygon_ped();
+            			drawPolygon2_ped_2(mousePos);
+            			
+            	} else if (rect_finish_ped == 1 && rect_finish_ped_2 == 1) {
+            	context.clearRect(0, 0, canvas.width, canvas.height);
+            	drawPolygon_ped();
+            	drawPolygon_ped_2()
+            			
+        		} 
+            } 
+            
+		}, false);
+//---------------------------------------------------------------------------
+	   canvas.addEventListener('click', function(evt) {
+    		var mousePos = getMousePos(canvas, evt);
+    		var stop_en_roi = document.getElementById('stop_roi').checked
+    		var smoke_en_roi = document.getElementById('draw_smoke').checked // # ch_v0r92
+    		
+        	if (id_selected == 0 && stop_en_roi == 1){ 			
+        		if (coordinates.length < Max_point_roi) {
+        			coordinates.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
+        			if (coordinates.length == Max_point_roi ) {
+        				rect_finish = 1			    	
+        				drawPolygon();	
+        				$.ajax({
+        				  type: "POST",
+        				  url: "/SW_roi_mouse_click",
+        				  data:{"points_x": getCol(coordinates, 0),"points_y": getCol(coordinates, 1)}
+        				});
+        			//document.getElementById("myP").disabled = false;						
+        			}
+        		}
+        	// ------------- Smoke ROI # ch_v0r92	------------------------
+        	} else if (id_selected == 4 && smoke_en_roi == 1){ 			
+        		if (coordinates_smoke.length < Max_point_roi_smoke) {
+        			coordinates_smoke.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
+        			if (coordinates_smoke.length == Max_point_roi_smoke ) {
+        				rect_finish_smoke = 1			    	
+        				drawSquare_smoke();	
+        				$.ajax({
+        				  type: "POST",
+        				  url: "/SW_roi_mouse_click",
+        				  data:{"points_smoke_x": getCol(coordinates_smoke, 0),"points_smoke_y": getCol(coordinates_smoke, 1)}
+        				});
+        			}
+        		}
+        	
+        	}  else if (id_selected == 3) {
+        	
+            	if (coordinates_ped2.length < Max_point_roi_ped && rect_finish_ped == 1) {
+        			coordinates_ped2.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
+        			if (coordinates_ped2.length == Max_point_roi_ped ) {
+        				rect_finish_ped_2 = 1			    	
+        				drawPolygon_ped_2();	
+        				$.ajax({
+        				  type: "POST",
+        				  url: "/SW_roi_mouse_click",
+        				  data:{"points_ped_xx": getCol(coordinates_ped2, 0),"points_ped_yy": getCol(coordinates_ped2, 1)} //# ch_v0r88 (changed from 'points_xx' and 'points_yy'; --> 'points_ped_xx', 'points_ped_yy')
+        				});
+        			//document.getElementById("myP").disabled = false;						
+        			}
+        		}
+        		
+            	if (coordinates_ped.length < Max_point_roi_ped) {
+        			coordinates_ped.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
+        			if (coordinates_ped.length == Max_point_roi_ped ) {
+        				rect_finish_ped = 1			    	
+        				drawPolygon_ped();	
+        				$.ajax({
+        				  type: "POST",
+        				  url: "/SW_roi_mouse_click",
+        				  data:{"points_ped_x": getCol(coordinates_ped, 0),"points_ped_y": getCol(coordinates_ped, 1)} //# ch_v0r88 (changed from 'points_x' and 'points_y'; --> 'points_ped_x', 'points_ped_y')
+        				});
+        			//document.getElementById("myP").disabled = false;						
+        			}
+        		}
+        		
+        	
+        	}
+		
+        }, false);
+        
+    </script>
+   
+  
+</html>

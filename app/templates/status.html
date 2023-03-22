@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+                <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;"> Sprinx  </div>
+                <div class="sidebar-heading" style="color: rgba(255, 255, 255, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">   Traffic Data </div>
+                
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ url_for('home') }}"><i class="material-icons" style="font-weight:bold;"> home  </i> <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <button class="btn btn-dark" id="menu-toggle" ><i class="material-icons" style="font-weight:bold;"> compare_arrows  </i><span class="sr-only">(current)</span></button>
+                    </li>
+                    
+                  </ul>
+                </div>
+          </nav>
+    
+          <div class="container-fluid">
+            <h1 class="mt-4">Simple Sidebar</h1>
+            <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
+            <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
+          </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+ 
+  
+  
+  {% endblock %}

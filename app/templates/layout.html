@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SadraTraffic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SADRA/favicon_sadra.ico' ) }}">
+
+
+    <!-- Bootstrap core CSS -->
+    <!--
+    <link href="{{ url_for('static', filename='css/simple-sidebar.css') }}" rel="stylesheet">
+  
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>   
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>  
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    -->
+    <!-- Bootstrap core JavaScript -->
+<style>
+    {% block style %}
+    
+    {% endblock %}
+</style>
+
+
+    <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='ion.rangeSlider/js/ion.rangeSlider.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap_4/js2/bootstrap.min.js') }}" ></script>
+
+
+   <!-- Bootstrap core JavaScript -->
+   
+     
+      <!-- Optional JavaScript -->
+      <!-- Popper.js, then Bootstrap JS -->
+
+
+    {% block link %}
+
+    {% endblock %}
+
+
+
+  </head>
+  <body>
+    {% block header %}
+
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <a href="{{ url_for('home') }}">
+        <div class="sidebar-heading"><img src= "static/images/logo/SADRA/sadra-logo.png" style="width:280px;height:35px;" /></a></div>
+        </a>
+        <div class="sidebar-heading" style="color: rgba(47, 110, 0, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp SADRA</div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="btn btn-light" style="color: rgba(47, 110, 0, 1);" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-light" id="menu-toggle" style="color: rgba(47, 110, 0, 1);" ><i class="fa fa-arrows-h"  > </i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            <li class="nav-item active">
+              <a class="btn btn-light" style="color: rgba(47, 110, 0, 1);" href="{{ url_for('logout') }}" ><i class="fa fa-sign-out"  > </i>  <span class="sr-only">(current)</span></a> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+          </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    {% endblock %}
+      
+      <div class="d-flex" id="wrapper">
+
+        {% block sidebar %}
+
+            <!-- Sidebar -->
+            <div class="bg-white border-right" style="margin-top:55px" id="sidebar-wrapper" >
+                <div class="list-group list-group-flush">
+                  {% if session.username != 'user' %}
+                    <a id = "home" class="list-group-item list-group-item-action bg-light"   style="color: rgba(0, 0, 0, 1);" href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+                    <a id = "analytic" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+                    <a id = "counting" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('counting') }}"> <i class="fa fa-car">                                </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+                    <a id = "event"class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+                    <a id = "statistic" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+                    <a id = "info" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('info') }}"><i class="fa fa-info-circle fa-lg">                       </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+                  {% else %}
+                    <a id = "event"class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+                    <a id = "statistic" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+                  {% endif %}
+
+                </div>
+              </div>
+              <!-- /#sidebar-wrapper -->
+
+        {% endblock %}
+
+    
+        <div class="placeholders"id="page-content-wrapper">
+          <div class="container-fluid" align="center">
+        
+        {% block content %}
+        
+        {% endblock %}
+          </div>
+        </div>
+    </div>
+
+    <div class="footer" id="footer">
+      {% block footer %}
+      &copy; Copyright 2022 by <a href="http://sadra-isp.ir/">SADRAISP</a>.
+      {% endblock %}
+    </div>
+  </body>
+
+
+  <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery-3.3.1.js') }}"></script>  --> 
+  <!-- we cant use multi jquery - canvas in analytic problem! # ch_v0r90 (added by m.taheri) -->
+
+
+   <!-- Menu Toggle Script -->
+  <script>
+    //-------------------    Menu Toggle Script   -------------------------------
+  $("#menu-toggle").click(function(e) {
+          e.preventDefault();
+          $("#wrapper").toggleClass("toggled");
+        });
+  </script>
+  <script>
+    
+    var url = window.location.href;
+    var lastPart = url.substr(url.lastIndexOf('/') + 1);
+
+
+      if (lastPart === "analytic"){
+        $("#analytic").css("color", "rgba(15, 97, 0, 1);");
+        $("#analytic").addClass("list-group-item list-group-item-action list-group-item-dark");
+        $("#analytic").removeClass("bg-light");
+
+      }
+
+      else if (lastPart === "counting"){
+      $("#counting").css("color", "rgba(15, 97, 0, 1);");
+      $("#counting").addClass("list-group-item list-group-item-action list-group-item-dark");
+      $("#counting").removeClass("bg-light");
+      }
+      else  if (lastPart === "event"){
+        $("#event").css("color", "rgba(15, 97, 0, 1);");
+        $("#event").addClass("list-group-item list-group-item-action list-group-item-dark");
+        $("#event").removeClass("bg-light");
+      }
+      else  if (lastPart === "statistic"){
+        $("#statistic").css("color", "rgba(15, 97, 0, 1);");
+        $("#statistic").addClass("list-group-item list-group-item-action list-group-item-dark");
+        $("#statistic").removeClass("bg-light");
+      }
+      else  if (lastPart === "info"){
+        $("#info").css("color", "rgba(15, 97, 0, 1);");
+        $("#info").addClass("list-group-item list-group-item-action list-group-item-dark");
+        $("#info").removeClass("bg-light");
+      }
+      else{
+        $("#home").css("color", "rgba(15, 97, 0, 1);");
+        $("#home").addClass("list-group-item list-group-item-action list-group-item-dark");
+        $("#home").removeClass("bg-light");
+      }
+
+  </script>
+
+
+  {% block script %}
+  {% endblock %}
+
+
+
+</html>

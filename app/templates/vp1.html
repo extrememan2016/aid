@@ -1,0 +1,212 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <!-- Navbar Content -->
+	
+	<div align="center" >
+		<h2>Automatic vanishing point detection</h2>
+         <canvas id="canvas" width={{w_rsz}} height={{h_rsz}} ></canvas>		
+		<img src="{{ url_for('static', filename='images/vp1_demo2.png') }}"; width={{w_rsz}} height={{h_rsz}} >	
+	
+		<!-- <button id="myP"  type="button" onclick="myFunction()">Next step ...</button> -->
+        
+	</div>
+	
+    <div align="center" >
+		<input onclick="window.location = '/calibration_step_1';" id="myP" type="submit" name="submit" value="Next step ...">  
+     </div>
+{% endblock %}
+{% block script %}
+
+	<script>
+		
+
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		ctx.globalAlpha = "0.7"
+		var segments = {};
+		canvas.style.position = "absolute";
+		//document.getElementById("myP").style.visibility = "hidden";
+		document.getElementById("myP").disabled = true;
+
+
+		segments['0'] = {
+		    last: 0,
+		    height: 15,
+		    distanceToOuter: 30,
+		    broke: false,
+		    outerAnimStarted: false,
+		    outerAnimThickness: 3,
+		    outerAnimDistance: 5,
+		    incValue: 0.5,
+		    colour: 'green',
+		    outerColour: 'green'
+		};
+		var percentage = 0;
+		var lastPercentage = 0;
+		var maxPercentage = 100;
+		//simulate download
+		(function loop() {
+		    setTimeout(function () {
+			//set segment start size
+			lastPercentage = percentage;
+			//set percentage
+			percentage += 2; //randomNumber(1, 20);
+			//if percentage goes over 100, reduce back to 100
+			if (percentage > 100) {
+			    percentage = 100;
+			    
+			}
+			//push segment into object stack
+			segments[percentage] = {
+			    last: lastPercentage,
+			    height: 15,
+			    distanceToOuter: 30,
+			    broke: false,
+			    outerAnimStarted: false,
+			    outerAnimThickness: 25,
+			    outerAnimDistance: 5,
+			    incValue: 0.2,
+			    colour: 'green',
+			    outerColour: 'green'
+			};
+			//if percentage is under 100, continue to loop
+			if (percentage === 100) {
+			    //document.getElementById("myP").style.visibility = "visible";
+			    document.getElementById("myP").disabled = false;
+			    segments[100].broke = true;
+			    segments[segments[100].last].broke = true;
+			} else if (percentage === 0) {
+			    segments[0].broke = true;
+			} else {
+			    segments[lastPercentage].broke = true;
+			}
+			if (percentage < maxPercentage) {
+			    loop();
+			    draw(percentage);
+			    requestAnimationFrame(increaseDistanceToOuter);
+			}
+		    }, 1.5 * 100); // #ch_v0r92    1.5 * 1000
+		}());
+
+		function draw(percentage) {
+		    //clear canvas
+		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		    //begin outer white circle
+		    ctx.beginPath();
+		    ctx.lineWidth = 15;
+		    ctx.strokeStyle = 'white';
+		    //ctx.arc(150, 150, 120, toRadians(0), toRadians(360));
+		    ctx.arc(canvas.width/2, canvas.height/2, 120, toRadians(0), toRadians(360));
+		    ctx.stroke();
+		    //end outer white circle
+		    //begin inner gradient
+		    var grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 60, canvas.width/2, canvas.height/2, 1);
+		    grd.addColorStop(0, "rgba(255,255,255,0)");
+		    grd.addColorStop(1, "white");
+		    ctx.beginPath();
+		    ctx.arc(canvas.width/2, canvas.height/2, 60, toRadians(0), toRadians(360));
+		    ctx.fillStyle = grd;
+		    ctx.fill();
+		    //end inner gradient
+		    //begin inner white circle
+		    ctx.beginPath();
+		    ctx.lineWidth = 1;
+		    ctx.strokeStyle = 'lightgrey';
+		    ctx.arc(canvas.width/2, canvas.height/2, 20, toRadians(0), toRadians(360));
+		    ctx.fillStyle = 'white';
+		    ctx.fill();
+		    ctx.stroke();
+		    //end inner white circle
+		    //start text
+		    ctx.fillStyle = 'green';
+		    ctx.font = "16pt Arial";
+		    ctx.textAlign = "center";
+		    ctx.fillText(percentage, canvas.width/2,  canvas.height/2 + 8);
+		    ctx.fillStyle = 'white';
+		    ctx.font = "26pt Arial";
+		    ctx.textAlign = "center";
+		    if (percentage < maxPercentage) {
+		    	ctx.fillText("Please waite ...", parseInt(canvas.width/2) + 20,  5*parseInt(canvas.height/6) );
+		    } else if (percentage === 100) {		
+			ctx.fillText("Go to the 'Next step'", parseInt(canvas.width/2) + 20,  5*parseInt(canvas.height/6) );
+		    }
+		    //end text
+		    //start segments
+		    for (var key in segments) {
+			circleSegment(
+			    Math.floor(segments[key].last * 3.6),
+			    Math.ceil(key * 3.6),
+			    segments[key].height,
+			    segments[key].distanceToOuter,
+			    segments[key].colour
+			);
+			if(segments[key].outerAnimStarted) {
+			    outerAnim(
+				Math.floor(segments[key].last * 3.6),
+				Math.ceil(key * 3.6),
+				segments[key].outerAnimThickness,
+				segments[key].outerAnimDistance,
+				segments[key].outerColour
+			    );
+			}
+		    }
+		    //end segments
+		}
+
+		function increaseDistanceToOuter() {
+		    for (var key in segments) {
+			if (!segments[key].broke) {
+			    segments[key].height += segments[key].incValue;
+			    segments[key].incValue = segments[key].incValue / 2;
+			    segments[key].distanceToOuter += 0.05;
+			} else {
+			    if (segments[key].distanceToOuter < 120) {
+				segments[key].distanceToOuter++;
+			    } else if (segments[key].distanceToOuter >= 120) {
+				segments[key].height = 15;
+				segments[key].distanceToOuter = 120;
+				if (!segments[key].outerAnimStarted) {
+				    segments[key].outerAnimStarted = true;
+				} else {
+				    if(segments[key].outerAnimThickness >= 0){
+				        segments[key].outerAnimThickness = segments[key].outerAnimThickness - 0.01;
+				    } else {
+				        segments[key].outerColour = 'rgba(255,255,255,0)';
+				    }
+				    segments[key].outerAnimDistance += 0.1;
+				}
+			    }
+			}
+		    }
+		    draw(percentage);
+		    requestAnimationFrame(increaseDistanceToOuter);
+		}
+
+		function toRadians(deg) {
+		    return deg * Math.PI / 180;
+		}
+
+		function circleSegment(degreesFrom, degreesTo, thickness, distanceToOuter, colour) {
+		    ctx.beginPath();
+		    ctx.lineWidth = thickness;
+		    ctx.strokeStyle = colour;
+		    ctx.arc( canvas.width/2,canvas.height/2, distanceToOuter, toRadians(degreesFrom), toRadians(degreesTo));
+		    ctx.stroke();
+		}
+
+		function outerAnim(degreesFrom, degreesTo, thickness, distance, colour) {
+		    ctx.beginPath();
+		    ctx.lineWidth = thickness;
+		    ctx.strokeStyle = colour;
+		    ctx.arc( canvas.width/2,canvas.height/2, 120 + distance, toRadians(degreesFrom), toRadians(degreesTo));
+		    ctx.stroke();
+		}
+
+		function randomNumber(min, max) {
+		    return Math.floor(Math.random() * (max - min + 1) + min);
+		}
+
+	</script>
+
+{% endblock %}

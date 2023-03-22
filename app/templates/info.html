@@ -1,0 +1,46 @@
+
+{% extends "layout.html" %}
+
+{% block link %}
+    <!-- Bootstrap core CSS -->
+
+    <!-- <link href="{{ url_for('static', filename='material-icons/css/material-icons.css') }}" rel="stylesheet"> -->
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/buttons.dataTables.min.css') }}" rel="stylesheet">
+
+{% endblock %}  
+
+{% block content %}  
+
+    <div  id="page-content-wrapper">
+    
+          <div class="container-fluid">
+            <h1 class="mt-4">Simple Sidebar</h1>
+            <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
+            <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
+          </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+
+  {% endblock %}  
+  
+  
+  {% block script %} 
+  
+  
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/jquery.dataTables.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/dataTables.buttons.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.flash.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.html5.min.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/tempusdominus-bootstrap-4.min.js') }}"></script>  
+    
+      
+  
+<!-- Menu Toggle Script -->
+
+  {% endblock %} 
+

@@ -1,0 +1,334 @@
+
+{% extends "layout.html" %}
+
+{% block link %}
+    <!-- Bootstrap core CSS -->
+ 
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/buttons.dataTables.min.css') }}" rel="stylesheet">
+
+
+
+{% endblock %}
+{% block content %}
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+          
+          <!-- ---------------------   flash ------------------------------->  
+          <div style="text-align:center;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                 {% if messages %}
+                   <div class="alert alert-{{ messages.0.0 }}" role="alert">
+                     {% for category, message in messages %}
+                       {{ message }} </br>
+                     {% endfor %}
+                   </div>
+                 {% endif %}
+               {% endwith %}
+           </div>
+           <!-- ---------------------   flash ------------------------------->
+           
+            
+            <h3>  <i class="fa fa-area-chart"></i> <b> Statistics</b></h3>
+            
+            
+            <div class="row" style="padding:10px">
+            
+                <!-- ---------------------  new clumn ------------------------------->
+                <div class="col-sm-6">
+                          
+        
+                    <div class="card" style="width: 97%;margin:0 auto ;" align:"left"> <!-- ----  Card ------------->
+                        
+                        <div class="card-header" > <i class="fa fa-cogs"></i> &nbsp Filter Setting  </div>
+                        <div class="card-body" > <!-- ----  Card  body ------------->
+                            <form name="stop_form" id="stop_form" action="" method="post">
+                             <small>
+                             
+                                <!-- ---------------------  new row ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Vehicle Class
+                                    </div>
+                                    
+                                    <div class="col-sm-5">
+                                    
+                                        <div class="checkbox">
+                                           
+                                            <label><input type="checkbox"  name="type" value="Motorbike" onclick="filterMe()">Motorbike</label>
+                                            &nbsp &nbsp &nbsp
+                                            <label><input type="checkbox"  name="type" value="Car" onclick="filterMe()">Car</label>
+                                            &nbsp &nbsp &nbsp 
+                                            <label><input type="checkbox" name="type" value="Truck" onclick="filterMe()">Truck</label>
+                                            &nbsp &nbsp &nbsp 
+                                            <label><input type="checkbox" name="type" value="Pedestrian" onclick="filterMe()">Total</label>
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- ---------------------  new row ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3">Period</div>
+                                    
+                                    <div class="col-sm-5">
+                                        <div class="form-group form-inline">
+                                            <span id="date-label-to" class="date-label">From&nbsp:</span>
+                                            <div class="input-group date" id="dateTimePickerFrom" data-target-input="nearest">
+                                                <input style="font-size: 14px" id="dateTimePick1" name="dateTimePick1" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerFrom" data-toggle="datetimepicker"  required/>
+                                                <div class="input-group-append" data-target="#dateTimePickerFrom" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <!-- ---------------------  new row ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3">&nbsp</div> 
+                                    
+                                    <div class="col-sm-5">
+                                        <div class="form-group form-inline ">
+                                            <span id="date-label-to" class="date-label">To&nbsp&nbsp&nbsp&nbsp&nbsp: </span>
+                                            <div class="input-group date" id="dateTimePickerTo" data-target-input="nearest">
+                                                <input style="font-size: 14px" id="dateTimePick2" name="dateTimePick2" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerTo" data-toggle="datetimepicker" />
+                                                <div class="input-group-append" data-target="#dateTimePickerTo" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- ---------------------  new row  ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Chart Type
+                                    </div>
+                                    
+                                    <div class="col-sm-5">
+                                    
+                                        <div class="checkbox">
+                                           
+                                            <label><input type="checkbox"  name="type" value="Line" onclick="filterMe()">Line</label>
+                                            &nbsp &nbsp &nbsp &nbsp
+                                            <label><input type="checkbox"  name="type" value="Pie" onclick="filterMe()">Pie</label>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- ---------------------  new row  ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-auto">
+                                        <button type="submit" class="btn btn-success btn-sm" >Apply</button>
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="csvMe1()" id="csvButton" >Download CSV</button>
+                                    </div>
+                                </div>
+                            </small> 
+                            </form> 
+                               
+                        </div> <!-- /# card-body -->
+                    </div> <!-- /#panel  card -->
+            
+                </div>
+                
+                
+                <div class="col-sm-6">
+                
+                    <div class="row"> <!-- row 1 -->
+                        <div class="col-sm-auto"> <!-- row 1 col 1-->
+                          <span class="badge badge-primary statistic-items" style="font-size:42px; text-align:left; ">
+                              <i  class="fa fa fa-motorcycle"></i> 
+                              <span style="padding-left:1em"></span>128  
+                              <p style="font-size:12px; text-align:right;">                                   
+                                  MOTORBIKES
+                              </p>  
+                          </span>
+                        </div>
+                        
+                        <div class="col"> <!-- row 1 col 2-->
+                          <span class="badge badge-success statistic-items" style="font-size:42px; text-align:left; ">
+                              <i  class="fa fa fa-car"></i> 
+                              <span style="padding-left:1em"></span>1280  
+                              <p style="font-size:12px; text-align:right;">                                   
+                                  CARS
+                              </p>  
+                          </span>
+                        </div>
+                        
+                      </div> <!-- /row 1 -->
+                      
+                      <span style="padding-left:1em"></span>                  
+                      
+                      <div class="row"> <!-- row 2 -->
+                          <div class="col-sm-auto"> <!-- row 2 col 1-->
+                              <span class="badge badge-warning statistic-items" style="font-size:42px; text-align:left; ">
+                              <i  class="fa fa fa-truck"></i> 
+                              <span style="padding-left:1em"></span>1020  
+                              <p style="font-size:12px; text-align:right;">                                   
+                                  TRUCK
+                              </p>  
+                          </span>
+                          </div>
+                        
+                          <div class="col"> <!-- row 2 col 2-->
+                              <span class="badge badge-danger statistic-items" style="font-size:42px; text-align:left; ">
+                              <i  class="fa fa fa-calculator"></i> 
+                              <span style="padding-left:1em"></span>2428  
+                              <p style="font-size:12px; text-align:right;">                                   
+                                  TOTAL
+                              </p>  
+                          </span>
+                          </div>
+                          
+                      </div><!-- /row 2 -->
+                
+                    
+                </div>
+            </div>
+            <!-- ------------------------------------------------------------ -->
+            <br>
+
+            <div class="card" style="align:left;" >
+                <div class="card-header" > <i class="fa fa-area-chart"></i> &nbsp Vehicle Counting by Class   </div>
+                <small>
+                <div class="card-body" >
+                    <canvas id="chLine"></canvas>
+                </div> <!-- /# card-body -->
+                </small>
+                <div style="text-align:center;">
+                    <font color="red"><h5>{{error_mes}}</h5></font>
+                    
+                </div>
+            </div> <!-- /#panel  card -->
+            
+          </div> <!-- /#container-fluid --> 
+         
+         
+    </div>
+    <!-- /#page-content-wrapper -->
+
+    {% endblock %}
+
+    {% block script %}
+
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script> -->
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery-3.3.1.js') }}"></script>   --> 
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/jquery.dataTables.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/dataTables.buttons.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.flash.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.html5.min.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/tempusdominus-bootstrap-4.min.js') }}"></script> 
+    
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='chartjs/chart.js') }}"></script> 
+    <!-- <script  src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>  </script> -->
+
+<!-- Menu Toggle Script -->
+<script type="text/javascript">
+
+    $('#dateTimePickerFrom').datetimepicker({
+        format:    'YYYY-MM-DD HH:mm:ss',
+        useCurrent: true,
+        maxDate:   'now',
+        buttons:{showClear: true},
+        icons: {clear: 'fa fa-trash'},
+        
+     });
+     
+    $('#dateTimePickerTo').datetimepicker({
+         format:    'YYYY-MM-DD HH:mm:ss',
+         maxDate:   'now',
+         buttons:{showClear: true},
+         icons: {clear: 'fa fa-trash'  },
+         // date: moment(),
+     
+     });
+    
+</script>
+
+<script>
+    
+    
+    
+    // chart colors
+    var colors = ['#007bff','#28a745','#FFA500','#dc3545'];//blue, green, orange,red
+
+    
+    
+    var chLine = document.getElementById("chLine");
+    chLine.height = 70;
+    var chartData = {
+      labels: [" 1:12 PM ", "1:13 PM", "1:14 PM", "1:15 PM", "1:16 PM", "1:17 PM", "1:18 PM", " 1:12 PM ", "1:13 PM", "1:14 PM", "1:15 PM", "1:16 PM", "1:17 PM", "1:18 PM"],
+      datasets: [{
+        label: "Motorbikes",
+        data: [100, 110, 120, 110, 100, 90, 80, 100, 110, 120, 110, 100, 90, 80],
+        backgroundColor: 'transparent',
+        borderColor: colors[0],
+        borderWidth: 4,
+        pointBackgroundColor: colors[0]
+      },
+       {
+         label: "Cars",
+         data: [200, 210, 220, 210, 200, 190, 180, 200, 210, 220, 210, 200, 190, 180],
+         backgroundColor: 'transparent',
+         borderColor: colors[1],
+         borderWidth: 4,
+         pointBackgroundColor: colors[1]
+       }, 
+       {
+         label: "Truck",
+         data: [90, 80, 100, 110, 120, 110, 100, 90, 80, 100, 110, 120, 110, 100],
+         backgroundColor: 'transparent',
+         borderColor: colors[2],
+         borderWidth: 4,
+         pointBackgroundColor: colors[2]
+       }, 
+       {
+         label: "Total",
+         data: [390, 400, 440, 430, 420, 390, 360, 390, 400, 440, 430, 420, 390, 360],
+         backgroundColor: 'transparent',
+         borderColor: colors[3],
+         borderWidth: 4,
+         pointBackgroundColor: colors[3]
+       }
+      ]
+      
+      
+      
+    };
+    if (chLine) {
+      new Chart(chLine, {
+      type: 'line',
+      data: chartData,
+      options: {
+        scales: {
+          xAxes: [{
+            ticks: {
+              beginAtZero: false
+            }
+          }]
+        },
+        legend: {
+          display: true
+        },
+        responsive: true
+      }
+      });
+    }
+
+
+
+
+
+</script>
+
+{% endblock %}
+

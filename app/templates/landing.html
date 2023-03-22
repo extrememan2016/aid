@@ -1,0 +1,19 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+	<div align="row placeholders">
+    <div class="message">
+      <h1>Logged in as {{session.username}}</h1>
+      <p>you will be redirect to Home page in 1 seconds ...
+      <p><a href="{{ next }}">you can also click here!</a>		
+    </div>	
+	</div>
+  <meta http-equiv="refresh" content="1;url={{ next }}" />
+
+  {% endblock %}

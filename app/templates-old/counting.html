@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>{% if row[30] == 1 %}SprinxTraffic {% elif row[30]==2 %}SadraTraffic{% endif %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if row[30] == 1 %}
+          <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SprinX/favicon.ico'      ) }}">
+    {% elif row[30]==2 %}
+         <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SADRA/favicon_sadra.ico' ) }}">
+    {% endif %}
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='material-icons/css/material-icons.css') }}" rel="stylesheet"> -->
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/buttons.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='tempusdominus-bootstrap/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet">
+
+      
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery-3.3.1.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/jquery.dataTables.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/dataTables.buttons.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.flash.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.html5.min.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/tempusdominus-bootstrap-4.min.js') }}"></script>  
+    
+</head>
+<header>
+
+  
+    <!-- /#sidebar-wrapper -->
+
+    {% if row[30] == 1 %}
+  
+      <!-- # ch_v0r91  added -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SprinX/sprinx-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp Sprinx </div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(255, 255, 255, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-dark" id="menu-toggle" ><i class="fa fa-arrows-h"  ></i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('home') }}" >           <i class="fa fa-wrench fa-lg">         </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('analytic') }}">        <i class="fa fa-cubes ">               </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action list-group-item-dark" style="color: rgba(0, 0, 0, 1);      " href="{{ url_for('counting') }}">        <i class="fa fa-car">                  </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('event') }}">           <i class="fa fa-list">                 </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('statistic') }}">       <i class="fa fa-area-chart">           </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('info') }}">            <i class="fa fa-info-circle fa-lg">    </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        
+  {% elif row[30]==2 %}
+      <!-- # ch_v0r89  added -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SADRA/sadra-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(47, 110, 0, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp SADRA</div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" style="color: rgba(47, 110, 0, 1);" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-light" id="menu-toggle" style="color: rgba(47, 110, 0, 1);" ><i class="fa fa-arrows-h"  >                                   </i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-white border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action list-group-item-dark"   style="color: rgba(15, 97, 0, 1);" href="{{ url_for('counting') }}"> <i class="fa fa-car">                                </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('info') }}"><i class="fa fa-info-circle fa-lg">                       </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+  {% endif %}
+  
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+    
+          <div class="container-fluid">
+            <h1 class="mt-4">Simple Sidebar</h1>
+            <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
+            <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
+          </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+ 
+  
+  
+
+  
+  
+</header>
+
+
+<body>
+
+</body>
+
+      
+
+<!-- Menu Toggle Script -->
+  <script>
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+  
+</html>

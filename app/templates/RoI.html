@@ -1,0 +1,313 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+      <!-- Navbar Content -->
+<div align="center" >
+	<h2>Calibration</h2>
+	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
+	<img id='theImg' src="{{ url_for('static', filename='images/screen_roi.png') }}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
+	
+</div>
+<div align="center" >
+	<input onclick="window.location = '/vp1_view';" id="myP" type="submit" name="submit" value="Next step ..."> 
+</div>
+
+{% endblock %}
+{% block script %}
+
+<script>
+	var canvas = document.getElementById('myCanvas');
+	var context = canvas.getContext('2d');
+	var coordinates = [];
+	var arr_cordinates = [];
+	var lines_codinates = [];
+	var rect_finish = 0;
+	var line_finish = 0;
+	var Max_point_roi = 6;
+	var step_1_view_finish = 0
+	var step_2_view_finish = 0
+	var step_3_view_finish = 0
+	canvas.style.position = "absolute";
+	document.getElementById("myP").disabled = true;
+
+//---------------------------------------------------------------------------
+	function writeMessage(canvas, message,color,mousePos) {
+
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.font = '18pt Calibri';
+		context.fillStyle = color;
+		context.fillText(message, 10, 25);
+		context.globalAlpha = 0.5; // set global alpha
+		context.beginPath();
+		context.arc(mousePos.x, mousePos.y, 5, 0, 2 * Math.PI, false);
+		context.fillStyle = color;
+		context.fill();
+      	}
+//---------------------------------------------------------------------------
+	function getMousePos(canvas, evt) {		
+
+		var rect = canvas.getBoundingClientRect();
+		return {
+		  x: evt.clientX - rect.left,
+		  y: evt.clientY - rect.top
+		};
+	}
+//---------------------------------------------------------------------------
+	function drawPolygon(){	
+		context.clearRect(0, 0, canvas.width, canvas.height);	
+		context.globalAlpha = 0.6;
+		context.strokeStyle='#ffffff';		
+		context.fillStyle='#00ffff';
+		context.lineWidth= 6;
+
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index < coordinates.length; index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.closePath();
+		context.stroke();
+		context.fill();
+	
+		for(index=0; index<coordinates.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates[index][0], coordinates[index][1], 8, 0, 2 * Math.PI, false);			
+			context.fill();
+			
+		}
+		
+		
+		text = "Region of Interest";//  ch_v0r87 added
+		draw_text_in_middle(text, coordinates, -180, 0); //  ch_v0r87 added
+		
+		/* // # ch_v0r87 commented
+		if (coordinates.length > 0) {
+			
+			context.globalAlpha = 0.9;
+			context.lineWidth= 3;		
+			context.strokeStyle = "#00FF00"; //# ch_v0r85
+			context.font = "25px Arial";
+			for(index=0; index<coordinates.length;index++) {
+				var x_1 = coordinates[index][0];				
+				var y_1 = coordinates[index][1];
+				context.strokeText((index+1).toString(),parseInt((x_1 )),parseInt((y_1 )));
+				//context.stroke();
+				
+			}
+		}
+		*/		
+	}
+//---------------------------------------------------------------------------
+	function drawMouseCircle(mousePos) {
+		context.beginPath();
+		context.arc(mousePos.x, mousePos.y, 9, 0, 2 * Math.PI, false);
+		context.stroke();
+		context.closePath();
+		
+		// -------------# ch_v0r87 (added) ---------------
+		context.globalAlpha = 0.9;
+		context.lineWidth= 3;		
+		context.strokeStyle =  "#ffbf00"; //# ch_v0r85
+		context.font = "25px Arial";
+		x_1=parseInt(mousePos.x)
+		y_1=parseInt(mousePos.y)
+		text = (index+1).toString()
+		point_label(x_1,y_1, text)
+		// -------------# ch_v0r87 (added) ---------------
+		
+	}
+//-----------------------------  ch_v0r87 (added) ----------------------------------------------
+    function draw_text_in_middle(text, coordinates_2D, delta_x, delta_y){
+		context.globalAlpha = 0.9;
+		context.lineWidth= 2;		
+		context.strokeStyle =  "#ffbf00"; //# ch_v0r85
+		context.font = "48px Arial";
+		x_1=getColMean(coordinates_2D, 0);
+		y_1=getColMean(coordinates_2D, 1);
+		point_label((x_1 + delta_x), (y_1 + delta_y), text);
+    }
+		
+//-----------------------------  ch_v0r87 (added) ----------------------------------------------
+    function point_label(x,y, text){
+    context.strokeText(text,parseInt((x)),parseInt((y)));
+    
+    }
+//-----------------------------   // # ch_v0r87 (added)   ------------------------------------------
+	function getColMean(matrix, col) {
+	       var sum = 0;
+	       for(var i=0; i<matrix.length; i++){
+		  sum = sum + matrix[i][col];
+	       }
+	       return sum/matrix.length;
+	    }
+//---------------------------------------------------------------------------
+	function drawPolygon2(mousePos){
+  
+
+		context.strokeStyle='#ffffff';		
+		context.fillStyle='#00ffff';
+		context.lineWidth= 2;		
+		context.globalAlpha = 1;
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		//drawMouseCircle(mousePos); // # ch_v0r87 commented
+		index = coordinates.length; // # ch_v0r87 (added)		
+		drawMouseCircle(mousePos, index);// # ch_v0r87 (added)
+		context.strokeStyle='#ffffff';// # ch_v0r87 (added)
+
+		context.lineWidth= 3;
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index<coordinates.length;index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();
+		context.globalAlpha = 0.5;
+		context.fill();	
+		
+		context.lineWidth= 3;
+		context.globalAlpha = 1;
+		context.beginPath();
+		context.moveTo(coordinates[0][0], coordinates[0][1]);
+		for(index=1; index<coordinates.length;index++) {
+			context.lineTo(coordinates[index][0], coordinates[index][1]);
+		}
+		context.lineTo(mousePos.x, mousePos.y);
+		context.closePath();
+		context.stroke();	
+        	context.fillStyle='#ffffff'; // ch_v0r85 (added)
+        	context.globalAlpha = 0.8; // ch_v0r85 (added)
+		for(index=0; index<coordinates.length;index++) {
+			context.beginPath();			
+			context.arc(coordinates[index][0], coordinates[index][1], 8, 0, 2 * Math.PI, false);			
+			context.fill();
+			
+		}
+		/* // # ch_v0r87 commented
+		if (coordinates.length > 0) {
+			
+			context.globalAlpha = 0.9;
+			context.lineWidth= 3;		
+			context.strokeStyle =  "#ADFF2F"; //# ch_v0r85
+			context.font = "25px Arial";
+			for(index=0; index<coordinates.length;index++) {
+				var x_1 = coordinates[index][0];				
+				var y_1 = coordinates[index][1];
+				context.strokeText((index+1).toString(),parseInt((x_1 )),parseInt((y_1 )));
+				//context.stroke();
+				
+			}
+		}
+		*/
+		
+	}
+//---------------------------------------------------------------------------
+	
+
+//---------------------------------------------------------------------------
+	function Step_by_step(str1,str2, str_2_shift, str3, str_3_shift,str4, str_4_shift) {
+		context.fillStyle='#000000';
+		context.globalAlpha = 0.3;
+		context.font = "80px Arial";
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.fillStyle = "#ffffff";
+		context.globalAlpha = 0.9;
+		context.fillText(str1,canvas.width/2 - 100,canvas.height/6);
+		context.font = "40px Arial";
+		context.fillText(str2,canvas.width/2 - str_2_shift, 2*canvas.height/6);
+		context.font = "20px Arial";
+		context.fillText(str3,canvas.width/2 - str_3_shift, 3*canvas.height/6);
+		context.fillText(str4,canvas.width/2 - str_4_shift, 3*canvas.height/6 + 25);
+		context.font = "30px Arial";		
+		context.fillText( "Click to continue ...",canvas.width/2 - 100, 3*canvas.height/6 + 90 );
+
+	}
+//---------------------------------------------------------------------------
+	function getCol(matrix, col) {
+	       var column = [];
+	       for(var i=0; i<matrix.length; i++){
+		  column.push(matrix[i][col]);
+	       }
+	       return column;
+	    }
+//---------------------------------------------------------------------------
+	function isEven(n) {
+	   return n % 2 == 0;
+	}
+//---------------------------------------------------------------------------
+	function isOdd(n) {
+	   return Math.abs(n % 2) == 1;
+	}
+//---------------------------------------------------------------------------
+	canvas.addEventListener('mousemove', function(evt) {
+		var mousePos = getMousePos(canvas, evt);	
+		
+		if ((rect_finish == 0 && coordinates.length > 0) || (step_2_view_finish == 1 && coordinates.length == 0)) {	
+			drawPolygon2(mousePos);	
+		
+			
+		} else if (rect_finish == 1 ) {
+
+			drawPolygon();
+			
+		} else if (step_2_view_finish == 0) {
+			
+
+			str1 = "Step 0 ";
+			str2 = " Draw Region of Interest ";
+			str_2_shift = 200;
+			str_3 = "To draw the Region of Intrest you should click on the region corners";
+			str_3_shift = 250;
+			str_4 = " (Just 6 points is allowed to be selected)";
+			str_4_shift = 150;
+			Step_by_step(str1,str2, str_2_shift, str_3, str_3_shift,str_4, str_4_shift);
+
+		} 
+		
+		}, false);
+//---------------------------------------------------------------------------
+	canvas.addEventListener('click', function(evt) {
+    		var mousePos = getMousePos(canvas, evt);
+				
+		step_1_view_finish = 1;
+		
+		if (coordinates.length < Max_point_roi) {
+			if (step_2_view_finish == 0) {				
+				step_2_view_finish = 1;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				image = document.getElementById('theImg');
+				image.src = "{{ url_for('static', filename='images/screen_roi.png') }}" ;
+				
+			} else {		
+				coordinates.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
+			}
+			if (coordinates.length == Max_point_roi ) {
+				rect_finish = 1			    	
+				drawPolygon();	
+				$.ajax({
+				  type: "POST",
+				  url: "/roi_mouse_click",
+				  data:{"points_x": getCol(coordinates, 0),"points_y": getCol(coordinates, 1)}
+				});
+			document.getElementById("myP").disabled = false;						
+			}
+
+		}
+		
+		}, false);
+
+
+</script>
+
+{% endblock %}
+
+  
+	
+    
+
+

@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block style %}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto auto ;
+    grid-gap: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1px;
+  }
+  
+  .grid-container > div {
+    background-color: rgba(200, 200, 200, 0.3);
+    text-align: center;
+    padding: 2px 0;
+    font-size: 30px;
+  }
+  
+  
+   /* Container holding the image and the text */
+  .container {
+    position: relative;
+    text-align: center;
+    color: rgba(0, 255, 0, 0.8);
+  }
+  
+  /* Centered text */
+  .centered {
+    position: absolute;
+    top: 5%;
+    left: 20%;
+    transform: translate(0%, 0%);
+    font-size: 16px;
+  } 
+
+{% endblock %}
+
+{% block content %}
+
+          
+         <!-- FlashContent -->
+         <div class="container" style="min-height:100% width:80%">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <!-- <strong>Title</strong> --> {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}   
+        </div>
+     <!-- FlashContent -->
+     
+
+
+<div class="row">
+
+<div class="col-xs-6 col-sm-3 placeholder">
+        <div class="item1">
+        {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+        {% else %} <!-- Camera registered -->  
+        {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+             <div class="container">
+                <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+                <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+              </div> 
+        {% else %} 
+             <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+            &nbsp;Camera offline</button>                 
+        {% endif %}
+        {% endif %}
+        </div>
+</div>
+
+<div class="col-xs-6 col-sm-3 placeholder">
+    <div class="item1">
+    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+    {% else %} <!-- Camera registered -->  
+    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+         <div class="container">
+            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+          </div> 
+    {% else %} 
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+        &nbsp;Camera offline</button>                 
+    {% endif %}
+    {% endif %}
+    </div>
+</div>
+<div class="col-xs-6 col-sm-3 placeholder">
+    <div class="item1">
+    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+    {% else %} <!-- Camera registered -->  
+    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+         <div class="container">
+            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+          </div> 
+    {% else %} 
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+        &nbsp;Camera offline</button>                 
+    {% endif %}
+    {% endif %}
+    </div>
+</div>
+<div class="col-xs-6 col-sm-3 placeholder">
+    <div class="item1">
+    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+    {% else %} <!-- Camera registered -->  
+    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+         <div class="container">
+            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+          </div> 
+    {% else %} 
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+        &nbsp;Camera offline</button>                 
+    {% endif %}
+    {% endif %}
+    </div>
+</div>
+<div class="col-xs-6 col-sm-3 placeholder">
+    <div class="item1">
+    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+    {% else %} <!-- Camera registered -->  
+    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+         <div class="container">
+            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+          </div> 
+    {% else %} 
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+        &nbsp;Camera offline</button>                 
+    {% endif %}
+    {% endif %}
+    </div>
+</div>
+<div class="col-xs-6 col-sm-3 placeholder">
+    <div class="item1">
+    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
+     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+    {% else %} <!-- Camera registered -->  
+    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
+         <div class="container">
+            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
+            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+          </div> 
+    {% else %} 
+         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+        &nbsp;Camera offline</button>                 
+    {% endif %}
+    {% endif %}
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+
+{% block script %}
+
+
+  <!-- refresh Cams script -->
+  <script>
+    $(document).ready(function() {
+    var url_1 = "static/imgs/Cam_1.jpg?rnd="+Math.random();
+    var url_2 = "static/imgs/Cam_2.jpg?rnd="+Math.random();
+    var url_3 = "static/imgs/Cam_3.jpg?rnd="+Math.random();
+    var url_4 = "static/imgs/Cam_4.jpg?rnd="+Math.random();
+    var url_5 = "static/imgs/Cam_5.jpg?rnd="+Math.random();
+    var url_6 = "static/imgs/Cam_6.jpg?rnd="+Math.random();
+    var url_7 = "static/imgs/Cam_7.jpg?rnd="+Math.random();
+    var url_8 = "static/imgs/Cam_8.jpg?rnd="+Math.random();
+    var url_9 = "static/imgs/Cam_9.jpg?rnd="+Math.random();
+    var url_10 = "static/imgs/Cam_10.jpg?rnd="+Math.random();
+    var url_11 = "static/imgs/Cam_11.jpg?rnd="+Math.random();
+    var url_12 = "static/imgs/Cam_12.jpg?rnd="+Math.random();
+    var url_13 = "static/imgs/Cam_13.jpg?rnd="+Math.random();
+    var url_14 = "static/imgs/Cam_14.jpg?rnd="+Math.random();
+    var url_15 = "static/imgs/Cam_15.jpg?rnd="+Math.random();
+    var url_16 = "static/imgs/Cam_16.jpg?rnd="+Math.random();
+    $("#cam_1").attr("src",url_1);
+    $("#cam_2").attr("src",url_2);
+    $("#cam_3").attr("src",url_3);
+    $("#cam_4").attr("src",url_4);
+    $("#cam_5").attr("src",url_5);
+    $("#cam_6").attr("src",url_6);
+    $("#cam_7").attr("src",url_7);
+    $("#cam_8").attr("src",url_8);
+    $("#cam_9").attr("src",url_9);
+    $("#cam_10").attr("src",url_10);
+    $("#cam_11").attr("src",url_11);
+    $("#cam_12").attr("src",url_12);
+    $("#cam_13").attr("src",url_13);
+    $("#cam_14").attr("src",url_14);
+    $("#cam_15").attr("src",url_15);
+    $("#cam_16").attr("src",url_16);
+    });
+</script>
+
+{% endblock %}

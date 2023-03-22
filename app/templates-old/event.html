@@ -1,0 +1,451 @@
+<html lang="en">
+
+<style>
+    table {
+      border-collapse: collapse;
+      border-spacing: 0px;
+      width: 98%;
+      border: 1px solid #ddd;
+      align:center;
+          float: none;
+              margin: 0 auto;
+    }
+    
+    th, td {
+      text-align: center;
+      padding: 16px;
+      border: 1px solid #dddddd;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+</style>
+
+<head>
+
+    <meta charset="utf-8">
+    <title>{% if row[30] == 1 %}SprinxTraffic {% elif row[30]==2 %}SadraTraffic{% endif %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if row[30] == 1 %}
+          <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SprinX/favicon.ico'      ) }}">
+    {% elif row[30]==2 %}
+         <link rel="shortcut icon" href="{{ url_for('static', filename = 'images/logo/SADRA/favicon_sadra.ico' ) }}">
+    {% endif %}
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='material-icons/css/material-icons.css') }}" rel="stylesheet"> -->
+    <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='DataTables/css/buttons.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='tempusdominus-bootstrap/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet">
+
+      
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery-3.3.1.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/jquery.dataTables.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/dataTables.buttons.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.flash.min.js') }}"></script>   
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/js/buttons.html5.min.js') }}"></script> 
+    <script type="text/javascript" src="{{ url_for('static', filename='tempusdominus-bootstrap/js/tempusdominus-bootstrap-4.min.js') }}"></script>  
+    
+    
+</head>
+<header>    
+    
+    {% if row[30] == 1 %}
+  
+      <!-- # ch_v0r91  added -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SprinX/sprinx-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp Sprinx </div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(255, 255, 255, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-dark" id="menu-toggle" ><i class="fa fa-arrows-h"  ></i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('home') }}" >           <i class="fa fa-wrench fa-lg">         </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('analytic') }}">        <i class="fa fa-cubes ">               </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('counting') }}">        <i class="fa fa-car">                  </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action list-group-item-dark" style="color: rgba(0, 0, 0, 1);      " href="{{ url_for('event') }}">           <i class="fa fa-list">                 </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('statistic') }}">       <i class="fa fa-area-chart">           </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-dark"              style="color: rgba(255, 255, 255, 1);" href="{{ url_for('info') }}">            <i class="fa fa-info-circle fa-lg">    </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        
+  {% elif row[30]==2 %}
+      <!-- # ch_v0r89  added -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="sidebar-heading"><img src= "static/images/logo/SADRA/sadra-logo.png" style="width:280px;height:35px;" /></a></div>
+        <div class="sidebar-heading" style="color: rgba(47, 110, 0, 1); font-size: 1.6rem; font-weight:bold; font-family: sans-serif;">&nbsp &nbsp SADRA</div> <!-- # ch_v0r89  &nbsp added -->
+        <div class="sidebar-heading" style="color: rgba(180, 180, 180, 1); font-size: 1.6rem; font-weight:bold; font-family: Arial;">&nbspTraffic AID </div> <!-- # ch_v0r89  Data -> AID -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" style="color: rgba(47, 110, 0, 1);" href="{{ url_for('home') }}"> <i class="fa fa-home"  ></i> <span class="sr-only">(current)</span></a><!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> home  </i> ->  <i class="fa fa-home"  ></i>  -->
+            </li>
+            <li class="nav-item active">
+                <button class="btn btn-light" id="menu-toggle" style="color: rgba(47, 110, 0, 1);" ><i class="fa fa-arrows-h"  >                                   </i>  <span class="sr-only">(current)</span></button> <!-- # ch_v0r89 <i class="material-icons" style="font-weight:bold;"> compare_arrows  </i>  -> <i class="fa fa-arrows-h"  ></i> -->
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+    
+      <div class="d-flex" id="wrapper">
+    
+        <!-- Sidebar -->
+        <div class="bg-white border-right" id="sidebar-wrapper">
+          <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('counting') }}"> <i class="fa fa-car">                                </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action list-group-item-dark"   style="color: rgba(15, 97, 0, 1);" href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+            <a class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('info') }}"><i class="fa fa-info-circle fa-lg">                       </i> Info               </a>      <!-- # ch_v0r89  [   <i class="material-icons">info</i> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
+          </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+  {% endif %}
+    
+    
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+            
+
+            <!-- ---------------------   flash ------------------------------->  
+            <div style="text-align:center;">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'message' %}
+                          <div class="alert alert-warning" role="alert">
+                        {% else %}
+                          <div class="alert alert-{{ category }}" role="alert">
+                        {% endif %}
+                          {{ message }}
+                        </div>
+                    {% endfor %}
+                  {% endif %}
+              {% endwith %}
+            </div>
+            <!-- ---------------------   flash ------------------------------->
+            
+            <br>
+            <h3> &nbsp &nbsp <i class="fa fa-list"></i> <b> Event Journal</b></h3>
+            <div class="card" style="width: 97%;margin:0 auto ;" align:"left">
+                
+                <div class="card-header" > <i class="fa fa-cogs"></i> &nbsp Filter Setting  </div>
+                <div class="card-body" >
+                    <form name="stop_form" id="stop_form" action="" method="post">
+                     <small>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                Event Type
+                            </div>
+                            
+                            <div class="col-sm-auto">
+                            
+                                <div class="checkbox">
+                                   
+                                    <label><input type="checkbox"  name="type" value="Stopped-Vehicle" onclick="filterMe()">Stop</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="checkbox"  name="type" value="Queue" onclick="filterMe()">Queue</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="checkbox" name="type" value="Wrong-Way" onclick="filterMe()">Wrong Way</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="checkbox" name="type" value="Pedestrian" onclick="filterMe()">Pedestrian</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="checkbox" name="type" value="ImageDegradation" onclick="filterMe()">Image degradation</label>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-4">Period</div>
+                            
+                            <div class="col-md-auto">
+                                <div class="form-group form-inline">
+                                    <span id="date-label-to" class="date-label">From: </span>
+                                    <div class="input-group date" id="dateTimePickerFrom" data-target-input="nearest">
+                                        <input id="dateTimePick1" name="dateTimePick1" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerFrom" data-toggle="datetimepicker"  required/>
+                                        <div class="input-group-append" data-target="#dateTimePickerFrom" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm">
+                                <div class="form-group form-inline ">
+                                    <span id="date-label-to" class="date-label">To: </span>
+                                    <div class="input-group date" id="dateTimePickerTo" data-target-input="nearest">
+                                        <input id="dateTimePick2" name="dateTimePick2" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerTo" data-toggle="datetimepicker" />
+                                        <div class="input-group-append" data-target="#dateTimePickerTo" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <button type="submit" class="btn btn-success btn-sm" >Apply</button>
+                                <button type="button" class="btn btn-warning btn-sm" onclick="csvMe1()" id="csvButton" >Download CSV</button>
+                            </div>
+                        </div>
+                    </small> 
+                    </form> 
+                       
+                </div> <!-- /# card-body -->
+            </div> <!-- /#panel  card -->
+            <!-- ------------------------------------------------------------ -->
+            <br>
+
+            <div class="card" style="width: 97%;margin:0 auto ;" align:"left">
+                
+                <div class="card-header" >  &nbsp Event List   </div>
+                <small>
+                <div class="card-body" >
+                
+                    <p id="table-filter" style="display:none">
+                        &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Search: 
+                        <select>
+                         <option value="">All</option>
+                          {% for i in Range %}
+                             <option value={% if i<10 %}Cam_0{{i}} {% else %}Cam_{{i}} {% endif %}>{% if i<10 %}Cam_0{{i}} {% else %}Cam_{{i}} {% endif %}</option>
+                          {% endfor %}
+                        </select>
+                    </p>
+                    
+                    <table id="hii"  class="display nowrap">
+                    
+                        <thead>
+                        <tr>
+                            <th >COUNT</th>
+                            <th >CAMERA</th>
+                            <th >TIME</th>
+                            <th >NAME</th>
+                            <th >TYPE</th>
+                            
+                            <th >IMAGE</th>
+            
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in range(0,table| length)  %}
+                        <tr>
+                    
+                            <td>{{ table[i][0] }}</td>
+                            <td>{{ table[i][1] }}</td>
+                            <td>{{ table[i][2]}}</td>
+                            <td>{{ table[i][3]}}</td>
+                            <td>{{ table[i][4]}}</td>
+                            
+                            <td>
+                                <div style="    text-align:center">
+                                    <video class="embed-responsive-item" id="video1" width="110" controls>
+                                        <!-- <source src="static/videos/{{ table[i][5]}}" type="video/mp4"> -->
+                                        <source src="{{ url_for('send_file', filename= table[i][5] )}}" type="video/mp4">
+                                        Your browser does not support HTML5 video.
+                                    </video>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+            
+                    </table>
+                    
+                </small>
+                
+                </div> <!-- /# card-body -->
+                <div style="text-align:center;">
+                    <font color="red"><h5>{{error}}</h5></font>
+                    
+                </div>
+            </div> <!-- /#panel  card -->
+            
+          </div> <!-- /#container-fluid -->
+    </div><!-- /#page-content-wrapper -->
+  </div> <!-- /#wrapper -->
+  
+</header>
+
+
+<body>
+
+
+</body>
+
+<script>
+
+           
+    
+    $(document).ready(function() {
+        table = $("#hii").DataTable({
+           dom: 'lr<"table-filter-container">tip',
+           initComplete: function(settings){
+              var api = new $.fn.dataTable.Api( settings );
+              $('.table-filter-container', api.table().container()).append(
+                 $('#table-filter').detach().show()
+              );
+              
+              $('#table-filter select').on('change', function(){
+                 table.search(this.value).draw();   
+              });       
+           }
+        });
+        
+        // $('#dropdown1').on('change', function () {
+        //    table.columns(4).search( this.value ).draw();
+        // } );
+        
+        // --------------------  981028_v0r2  -----------------------------
+        table.on( 'order.dt search.dt', function () {                                               
+           table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {  
+              cell.innerHTML = i + 1;
+              table.cell(cell).invalidate('dom'); 
+           } );
+        } ).draw();
+        // --------------------  981028_v0r2  -----------------------------
+    });
+</script>
+
+
+<script type="text/javascript">
+
+    $('#dateTimePickerFrom').datetimepicker({
+        format:    'YYYY-MM-DD HH:mm:ss',
+        useCurrent: true,
+        maxDate:   'now',
+        buttons:{showClear: true},
+        icons: {clear: 'fa fa-trash'},
+        
+     });
+     
+    $('#dateTimePickerTo').datetimepicker({
+         format:    'YYYY-MM-DD HH:mm:ss',
+         maxDate:   'now',
+         buttons:{showClear: true},
+         icons: {clear: 'fa fa-trash'  },
+         // date: moment(),
+     
+     });
+    
+</script>
+
+<script>
+        function myOnChangeFunction() {
+            alert("the specified date falls on a specific period");
+        };
+        //------------------  csvMe1  -----------------------
+        function csvMe1() {
+              var titles = [];
+              var data = [];
+            
+            
+              $('.dataTable  th').each(function() {
+                if(! $(this).text().includes("IMAGE")){         // 981028_v0r2
+                    titles.push($(this).text());
+                }
+              });
+            
+              $('.dataTable  td').each(function() {
+              if(! $(this).text().includes("Your browser does not support HTML5 video")){ // 981028_v0r2
+                    data.push($(this).text());
+                }
+              });
+              
+              var CSVString = prepCSVRow(titles, titles.length, '');
+              CSVString = prepCSVRow(data, titles.length, CSVString);
+              var downloadLink = document.createElement("a");
+              var blob = new Blob(["\ufeff", CSVString]);
+              var url = URL.createObjectURL(blob);
+              downloadLink.href = url;
+              downloadLink.download = "data.csv";
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+        }
+        
+        function prepCSVRow(arr, columnCount, initial) {
+          var row = ''; // this will hold data
+          var delimeter = ','; // data slice separator, in excel it's `;`, in usual CSv it's `,`
+          var newLine = '\r\n'; // newline separator for CSV row
+        
+         function splitArray(_arr, _count) {
+            var splitted = [];
+            var result = [];
+            _arr.forEach(function(item, idx) {
+              if ((idx + 1) % _count === 0) {
+                splitted.push(item);
+                result.push(splitted);
+                splitted = [];
+              } else {
+                splitted.push(item);
+              }
+            });
+            return result;
+          }
+          
+          
+          var plainArr = splitArray(arr, columnCount);
+          plainArr.forEach(function(arrItem) {
+            arrItem.forEach(function(item, idx) {
+              row += item + ((idx + 1) === arrItem.length ? '' : delimeter);
+            });
+            row += newLine;
+          });
+          return initial + row;
+        }
+        
+</script>
+
+<script>       
+        
+        //------------------  filterMe  -----------------------  
+        $(function() { oTable = $('#hii').dataTable(); }) 
+         
+        function filterMe() {
+          var types = $('input:checkbox[name="type"]:checked').map(function() {
+            return '^' + this.value + '\$';
+          }).get().join('|');
+          oTable.fnFilter(types, 4, true, false, false, false);
+        }
+        
+
+</script> 
+
+<script>
+
+    $(document).ready(function(){
+        $(".dropdown-menu li a").click(function(){
+            $("#options").text($(this).text());
+        });
+    });
+</script>   Toggle Script -->
+ 
+
+  
+</html>

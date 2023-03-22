@@ -1,0 +1,608 @@
+#!/usr/bin/env python3
+### import cv2
+### from AID.VideoStream.fps import FPS
+
+
+import time
+
+import numpy as np
+
+import datetime
+
+from flask import Flask, render_template, Response, request, redirect, url_for
+from flask import flash, send_from_directory# ch_v0r90 (send_from_directory added)
+
+
+import flask # ch_v0r90 (added by m.taheri)
+import flask_login # ch_v0r90 (added by m.taheri)
+from flask import session # ch_v0r90 (added by m.taheri)
+from datetime import timedelta # ch_v0r90 (added by m.taheri)
+
+
+import pymysql # ch_v0r90 (added by m.taheri)
+pymysql.install_as_MySQLdb() # ch_v0r90 (added by m.taheri)
+from flask_mysqldb import MySQL # ch_v0r90 (added by m.taheri)
+from datetime import timedelta
+from flask_sqlalchemy import SQLAlchemy
+
+
+import re# ch_v0r85 (added)
+
+
+### from your_app.man_calibration import man_calib
+### from your_app.least_squares import ls_fine_tune_parameters
+### from your_app.calculateSpeeds import Speed_Calc
+
+
+### from your_app.utils import add_remove_stopped_vehicle_2,  ROI_transparent  # ch_v0r90 (moved to AID_Loop)
+### from your_app.utils import scale_function# , camera_calib    # ch_v0r90 ('camera_calib' moved to AID_Loop)
+### from your_app.utils import getPrmLeast, getPrmDflt# , getPrmDfs_calib_1  # ch_v0r90 ('getPrmDfs_calib_1' moved to AID_Loop)
+### from your_app.utils import angle_between_points, camera_stop #, line_to_vanish  # ch_v0r90 ('line_to_vanish' moved to AID_Loop)
+### from your_app.utils import save_frame# , getPrmDfs_calib_2 # ch_v0r90 ('getPrmDfs_calib_2' moved to AID_Loop)
+from your_app.utils import verify_url, read_from_db, write_to_db_cams, write_to_db_CAM_ID, write_to_db_any, read_from_db_all, check_for_1_week_period # ch_v0r89 (read_from_db_all, check_for_1_week_period added)
+from your_app.utils import  write_to_db_roi, VP1_from_DB # ch_v0r90 (VP1_from_DB added)
+from your_app.utils import make_classification_staff ###, reset_counter_and_speeds # ch_v0r91 ('make_classification_staff', 'reset_counter_and_speeds' added)
+
+
+### from your_app.KeyClipWriter import KeyClipWriter # ch_v0r86 
+
+### from your_app.utils import poitsROIstr_to_pointsROInp#, point_inside_ROI # ch_v0r88 (added)
+from your_app.utils import get_lock   # ch_v0r88 (added)
+### from your_app.utils import points_roi_To_mask  # ch_v0r92 (added)
+
+### from your_app.utils import computeCameraCalibration  # ch_v0r87 added
+
+### from Kalman_filter.detectors import Detectors
+### from Kalman_filter.tracker import Tracker
+import os, glob
+
+import sys, traceback, importlib, threading # ch_v0r84 (added)
+from  your_app.config import config# ch_v0r84 (added)
+### import redis # ch_v0r85 (added)
+### from collections import deque # ch_v0r86 (added)
+
+## from your_app.AID_Loop import AID_loop # ch_v0r89 (added)
+from your_app import settings # ch_v0r89 (added)
+
+
+#===============================  initializing calibration parameters =========
+
+h_rsz, w_rsz = 480, 864; 
+rsz_shape = (h_rsz, w_rsz)  # new size for the shown video
+W, L = 0, 0
+swing_angle, focal, h_camera, h_camera_real = 0,0,0, 0.00 
+camera = video = fps =  None
+save_frame_global = None # ch_v0r85
+videoLoop = None  # ch_v0r84
+VP1 = VP2 = VP3 = road_camera_staff = []
+calib = h = w = 0
+real_line_meseares = points_roi = []
+kcw = [] # ch_v0r86 (added)
+
+
+# define REDIS connection information for Redis
+# Replaces with your configuration information
+### r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB) # ch_v0r89 (added)
+
+
+#================= Initializing flask app =====================================
+app = Flask(__name__)
+app.secret_key = b'_5#y1L"F4Q8z\n\xec]/'
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=5)
+
+
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'raspberry'
+app.config['MYSQL_DB'] = 'pythonprogramming'
+
+db = SQLAlchemy()
+
+mysql = MySQL(app)
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:raspberry@localhost/pythonprogramming"
+
+db.init_app(app)
+
+#================= Initializing Login manager ===================================== # ch_v0r90 (added by m.taheri)
+
+login_manager = flask_login.LoginManager()
+
+
+
+
+login_manager.init_app(app)
+
+# Our mock database.
+# users = {'foo@bar.tld': {'password': 'secret'}}
+
+
+
+#================= how to load a user from a Flask request and from its session ===================================== # ch_v0r90 (added by m.taheri)
+
+
+class User(flask_login.UserMixin,db.Model):
+    __tablename__ = "users"
+    uid = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    username = db.Column(db.String(20))
+    password = db.Column(db.String(100))
+    #pass
+
+
+
+@login_manager.user_loader
+def user_loader(username):
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+    user_data = cursor.fetchone()
+    if user_data:
+        # create a User object from the database data
+        user=User()
+        user.id=user_data[0]
+        user.username=user_data[1]
+        user.password=user_data[2]
+        #return User(user_data[0], user_data[1], user_data[2])
+        return user
+    else:
+        return None
+
+
+@login_manager.request_loader
+def request_loader(request):
+    # get the authorization header from the request
+    auth_header = request.headers.get('Authorization')
+    
+    # check if the header is valid and contains a token
+    if auth_header and auth_header.startswith('Bearer '):
+        # get the token from the header
+        token = auth_header.split()[1]
+        
+        # verify the token and get the user data
+        user_data = verify_token(token)
+        
+        if user_data:
+            # create a User object from the user data
+            user=User()
+            user.id=user_data[0]
+            user.username=user_data[1]
+            user.password=user_data[2]
+            return user
+            #return User(user_data[0], user_data[1], user_data[2])
+            #return User(user_data['uid'], user_data['username'], user_data['password'])
+    
+    # return None if no valid header or token found
+    return None
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=1)
+    session.modified = True
+
+#================= Initializing Login/Logout Routes ===================================== # ch_v0r90 (added by m.taheri)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if flask.request.method == 'GET':
+        return render_template('login.html')
+                
+
+
+    username = flask.request.form['username']
+    password = flask.request.form['password']
+
+    #cursor = mysql.connection.cursor()
+    #cursor = mysql.connection.cursor(pymysql.cursors.DictCursor)
+    #cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password,))
+    #account = cursor.fetchone()
+    
+    account =   User.query.filter_by(username=username).first()
+
+    #if account:
+    if account.password == password:
+    
+        user = User()
+        user.id = username
+        flask_login.login_user(user)
+        session['username'] = username
+        return flask.redirect(flask.url_for('protected'))
+    else:
+        flash("The username or password is incorrect", "warning")
+    return render_template('login.html')
+
+
+@app.route('/protected')
+@flask_login.login_required
+def protected():
+    #return 'Logged in as: ' + flask_login.current_user.username
+    if flask_login.current_user.username =='user':
+        next = url_for('event')
+    else:
+        next = url_for('home')
+    return render_template('landing.html',next = next)
+
+
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    return render_template('logout.html')
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    #return 'Unauthorized', 401
+    
+    if(request.path == '/'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('401.html')
+
+#--------------- # ch_v0r90 (display video) ---------------------------------------
+app.config['UPLOAD_FOLDER'] = 'your_app/output'
+@app.route('/send_file/<filename>')
+@flask_login.login_required
+def send_file(filename):
+    print('filename -------------------> ', filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    
+# use decorators to link the function to a url
+
+@app.route('/', methods=['GET', 'POST'])
+@flask_login.login_required
+def home():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+# Read from DB 
+    ID = "1" # r.get("ID") # ch_v0r91 added
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    del ID
+    row = list(read_from_db('CAMS_VALID'))
+    # if request from html
+    if request.method == "POST":
+        # verify the IP cam URL
+        cam_remove_val = 'off'
+        cam_en_val_temp = ''
+        change_ind = 0
+        verify_indx = -1
+        submit = 0
+        IP_add = key_url = ''
+        cam_num = 16
+        vid_dirname = 'static/videos/' # ch_v0r87 (added)
+       
+        if str(request.form.getlist('actions')[0]) == 'submit':#if request.form.post['actions']# submit button clicked else calib button clicked
+            submit = 1
+        elif str(request.form.getlist('actions')[0]) == 'calib': # ch_v0r87 (added)
+            submit = 2 # ch_v0r87 (added)
+        elif str(request.form.getlist('actions')[0]) == 'analytic':# ch_v0r87 (added)
+            submit = 3 # ch_v0r87 (added)
+        
+        for key in request.form:
+            for i in range(1,cam_num+1):
+                if key.startswith(str(i)+'_'):
+                    ID = str(i) 
+                    ind_row = i+(i-1)*2
+                    cam_en_val = row[ind_row]
+                    cam_valid_val = row[ind_row+1]
+                    if key.endswith("_URL"):
+                        key_url = request.form.get(str(key),"")
+                    elif key.endswith("_en"):
+                        cam_en_val_temp = request.form.get(str(key),"")                    
+                    elif key.endswith("_rm"):
+                        cam_remove_val = request.form.get(str(key),"")
+                    break
+        if submit == 1:
+            # If Cam Enable is 'ON'
+            if cam_en_val_temp == 'on':
+                if cam_en_val == 0:
+                    cam_en_val = 1
+                    change_ind = 1
+            else: 
+                if cam_en_val == 1:
+                    cam_en_val = 0
+                    change_ind = 1
+            # If url is not empty --> check for url validity 
+            if key_url != '':
+                verify_indx, isfile = verify_url(key_url, 'Cam_'+ID)
+                if verify_indx == 1:
+                    if isfile == 1: 
+                        IP_add = '127.0.0.1'
+                        key_url = vid_dirname+key_url # ch_v0r87 ('key_url' --> 'vid_dirname+key_url')
+                    else:
+                        IP_add = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', key_url).group()
+
+            # If remove checkbox is checked
+            if cam_remove_val == 'on':
+                cam_valid_val = 0
+                change_ind = 1
+                #write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r89 commented
+                cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added)
+                write_to_db_any("CAM_"+str(ID), cam_dict)
+                flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
+            elif verify_indx == 0: # Invalid URL
+                flash(u'Invalid URL provided', 'warning') # Categories: success (green), info (blue), warning (yellow), danger (red)
+            elif verify_indx == 1: # Valid URL --> save it
+                flash(u'Valid URL provided', 'success')
+                change_ind = 1
+                cam_en_val = 1
+                cam_valid_val = 1
+                write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r86
+            # save the changes
+            if change_ind == 1:
+                cam_en_str = "cam_"+str(ID)+"_enable"
+                cam_valid_str = "cam_"+str(ID)+"_valid"
+                write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID))
+                row = list(read_from_db('CAMS_VALID'))
+            return render_template('index.html',row_val=row, row=row_cam )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+        elif  submit == 2:
+            #session['ID'] = str(ID)
+            # r.set("ID", str(ID))
+            return redirect(url_for('roi'))
+        elif  submit == 3: # ch_v0r87 (added)
+            # r.set("ID", str(ID)) # ch_v0r87 (added)
+            return redirect(url_for('analytic')) # ch_v0r87 (added)
+            
+    else:
+        return render_template('index.html',row_val=row, row=row_cam )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+    
+#============================= analytic =======================================
+@app.route('/analytic',  methods=['GET', 'POST'])
+@flask_login.login_required
+def analytic():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+    # ---------------------- ch_v0r87 (POST method added)
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) 
+    # ----------------- ch_v0r91 (added) -------------------------------
+    classification_staff = make_classification_staff(row_cam) 
+    counting_list = []
+    for k in classification_staff.keys():
+        counting_list +=list(classification_staff[k])
+    counting_list[3] = 100 - counting_list[3]
+    print(counting_list)
+
+
+    if request.method == 'POST':
+        print("write to DB")
+            
+    if True:        
+        detect_type_ind = 1
+        slow_vehicle_th = 40
+        stop_vehicle_th = 2
+        stop_vehicle_dur_th = 1
+        # --------------------   Notice: ROI should be returned to html ----------------------
+        return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=row_cam, counting_list=counting_list )
+    else:#except:
+        return redirect(url_for('roi'))
+    
+#============================= info =======================================
+@app.route('/info')
+@flask_login.login_required
+def info():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) 
+    return render_template('info.html', row=row_cam)  
+
+#============================= event =======================================
+@app.route('/event', methods=['GET', 'POST'])
+@flask_login.login_required
+def event():
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID))
+    error=''
+    Num_of_cams = 5 # int(r.get("Num_of_cams"))
+    print(Num_of_cams)
+    if request.method == "POST": # if the user postes a date filter
+        # # ch_v0r91 added
+        date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
+        date_to   = request.form['dateTimePick2']
+        print(date_from,date_to)
+        
+        check_week_ind = check_for_1_week_period(date_from,date_to, 60) # ch_v0r91 diff_days_duration added)
+        if check_week_ind ==1:
+            if date_to !='': # if date_to is not empty
+                query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
+                param = (date_from, date_to) 
+            else: # if date_to is empty
+                query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
+                param = (date_from,)
+            table = list(read_from_db_all(query, param))
+        else:
+            error_mes = 'Report duration is Out of Range!'
+            table = ''
+            flash(error_mes, 'warning')
+        print(table)
+        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1), row=row_cam)  # return for user post
+    else:
+        
+        table = ''
+        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1), row=row_cam)  # first opening the page (# ch_v0r91 row added)
+    
+#============================= counting =======================================
+@app.route('/counting')
+@flask_login.login_required
+def counting():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    return render_template('counting.html', row=row_cam)  # render a template # ch_v0r91 row added:
+
+#============================= statistic  # ch_v0r91 added =======================================
+@app.route('/statistic', methods=['GET', 'POST'])
+@flask_login.login_required
+def statistic():
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    print('row_cam', row_cam)
+    error_mes = table =''
+    
+    if request.method == "POST": # if the user postes a date filter
+        # get the filled from_to dates
+        date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
+        date_to   = request.form['dateTimePick2']
+        print(date_from,date_to)
+        
+        check_week_ind = check_for_1_week_period(date_from,date_to, 7)
+        if check_week_ind ==1:
+            if date_to !='': # if date_to is not empty
+                query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
+                param = (date_from, date_to) 
+            else: # if date_to is empty
+                query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
+                param = (date_from,)
+            table = list(read_from_db_all(query, param))
+        else:
+            error_mes = 'Report duration is Out of Range!'
+            table = ''
+            flash(error_mes, 'warning')
+        
+        print(table)
+        return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # return for user post
+    else:
+        table = ''
+        return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # first opening the page (# ch_v0r91 row added)
+
+#============================= status =======================================
+@app.route('/status')
+@flask_login.login_required
+def status():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+    return render_template('status.html')  # render a template
+
+
+
+#================= Getting cordinates of rectangular calibration  ============= 
+#================= pattern from user ==========================================
+@app.route('/mouse_click1', methods = ['POST'])
+@flask_login.login_required
+def worker_2():
+    return 'OK'
+#================= # ch_v0r90 Apply fine-tuning VP1   ====== 
+@app.route('/apply_VP1', methods = ['POST'])
+@flask_login.login_required
+def worker_vp1():   
+    return 'OK'
+
+#================= Getting Region of Intrest from user  ====== 
+@app.route('/roi_mouse_click', methods = ['POST'])
+@flask_login.login_required
+def worker_0():
+    return 'OK'
+
+#================= Getting Region of Interest from user  ====== ch_v0r87 (module added)
+@app.route('/SW_roi_mouse_click', methods = ['POST'])
+@flask_login.login_required
+def worker_SW():
+    return 'OK'
+
+#================= Getting real measurements of some known length on the road == 
+#================= from user to improve camera calibration ====================
+@app.route('/mouse_click2', methods = ['POST'])
+@flask_login.login_required
+def worker_3():
+    return 'OK'
+
+#================ calibration step 1 (Getting real measurements of rectangular
+# =============== patern length and width, and camera height from user)=======
+@app.route('/vp1_view' , methods=['GET', 'POST'])
+@flask_login.login_required
+def vp1_view():
+    ID = "1"
+    VP1 = [100, 100]
+    if request.method == 'GET':        
+        try:
+            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+            return render_template('vp1_view.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=VP1[0],vp1_y=VP1[1], row=row_cam)   # ch_v0r91 row added)
+        except:
+            return redirect(url_for('roi'))
+    elif request.method == 'POST':
+        To_VP_ind = 1
+        #ID = r.get("ID") # ch_v0r90 (moved)
+        option = request.form['options']
+        if option == 'From_VP':
+            To_VP_ind = 0
+        
+        if request.form['action'] == "Change it":
+            return redirect(url_for('vp1'))            
+        elif request.form['action'] == "It's OK. Next Step...":
+            return redirect(url_for('calibration_step_1'))
+
+#================ calibration step 1 (Getting real mesurements of rectangular
+# =============== patern length and width, and camera heigth from user)=======
+@app.route('/calibration_step_1' , methods=['GET', 'POST'])
+@flask_login.login_required
+def calibration_step_1():    
+    
+    if request.method == 'POST':
+        print("Post")
+    else:        
+        try:            
+            #------------  ch_v0r85 -----------------------
+            ID = "1"
+            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+            return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, row=row_cam)   # ch_v0r91 row added)
+        except:
+            return redirect(url_for('roi'))
+#==============================================================
+@app.route('/calibration_step_2', methods=['GET','POST'])
+@flask_login.login_required
+def calibration_step_2():
+    
+    if request.method == 'POST':
+        print("Post")
+    else:        
+        try:
+            ID = "1"
+            file_name = "file_name"
+            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+            return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, file_name=file_name, row=row_cam)   # ch_v0r91 row added)
+        except:
+            return redirect(url_for('roi')) 
+  
+#===========================================================
+@app.route('/vp1')
+@flask_login.login_required
+def vp1():
+    try:
+        ID = "1"
+        row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+        return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam)   # ch_v0r91 row added)
+    except:
+        return redirect(url_for('roi'))
+    
+    
+#===========================================================
+@app.route('/roi')
+@flask_login.login_required
+def roi():
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam)   # ch_v0r91 row added)
+
+#=========================================================== 
+@app.errorhandler(404)
+def page_not_found(e):
+    print( '404 page not found'+ str(e)) # ch_v0r90 (py3 change)
+    ID = "1"
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    return render_template('404.html', row=row_cam), 404 
+
+#========================================================================
+def calib_step_init(calib, framePluginInstance, fps_capture, CAM_ID):
+    """Video streaming generator function."""
+    print("some initial condition")
+    return "OK"
+  
+#========================================================================
+def main():
+    app.run(debug=False,host='0.0.0.0', threaded=True)
+    
+if __name__ == '__main__':
+    main()
+    

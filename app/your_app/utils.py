@@ -363,13 +363,14 @@ def write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val, key_url,
 
 
     selectedcam = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
-    selectedcam.isenable = cam_en_val
-    selectedcam.isvalid =cam_valid_val
-    if IP_add != '':
-        selectedcam.url_cam = key_url
-        selectedcam.IP_cam =IP_add
+    if selectedcam is not None:
+        selectedcam.isenable = cam_en_val
+        selectedcam.isvalid =cam_valid_val
+        if IP_add != '':
+            selectedcam.url_cam = key_url
+            selectedcam.IP_cam =IP_add
 
-    db.session.commit() # ch_v0r96 (added by m.taheri)
+        db.session.commit() # ch_v0r96 (added by m.taheri)
     # create the application object
 #------------------------- # ch_v0r85 (added)  --------------------------------------------------# 
 # write to DB VP1

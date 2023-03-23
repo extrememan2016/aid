@@ -57,7 +57,7 @@
      
 
 
-<div class="row">
+<div class="row" id="refresher">
 
 
 {% for validcam in validcams %}
@@ -65,23 +65,34 @@
 
 <div class="col-xs-6 col-sm-3 placeholder">
         <div class="item{{validcam.did}}">
-        {% if validcam.isvalid ==0 %} <!-- Camera not registered -->  
+        {% if validcam.url_cam == None %}
+        <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
+            &nbsp;Edit Camera</button>  
+        <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam{{validcam.did}}" onclick="deletecam({{validcam.did}})" ><i class="fa fa-times" aria-hidden="true"></i>
+              &nbsp;Remove Camera</button> 
+        {% elif validcam.isvalid ==0 %} <!-- Camera not registered -->  
          <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
-        {% else %} <!-- Camera registered -->  
-        {% if validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
+        <!-- Camera registered -->  
+        {% elif validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
              <div class="container item">
                 <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}"  />
                 <div class="centered"><i class="fa fa-check-circle"></i>Camera {{validcam.did}} online</div>
-              </div> 
+              </div>
         {% else %} 
              <button  type="button" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
             &nbsp;Camera offline</button>                 
-        {% endif %}
         {% endif %}
         </div>
 </div>
 
 {% endfor %}
+<div class="col-xs-6 col-sm-3 placeholder">
+   <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" id="addcam"><i class="fa fa-video-camera"></i>&nbsp;Add Camera</button>                 
+
+</div>
+
+
+
 
 
 </div>
@@ -105,9 +116,9 @@
                 <div class="form-group">
                     <label for="URL_{{validcam.did}}" class="control-label">Cam{{validcam.did}} URL:</label>
                     <input type="text" class="form-control" id="URL_{{validcam.did}}" name="{{validcam.did}}_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
-                    {% if validcams[2] ==1 %}
+                    {% if validcam[2] ==1 %}
                         <div class="input-group-prepend">                       
-                            <span class="input-group-text"><input id="{{validcam.did}}_en" name="{{validcam.did}}_en" type="checkbox" aria-label="Checkbox for following text input" {% if validcams[1]==1 %}checked{% endif %}>  Enable  </span>
+                            <span class="input-group-text"><input id="{{validcam.did}}_en" name="{{validcam.did}}_en" type="checkbox" aria-label="Checkbox for following text input" {% if validcam.isenable==1 %}checked{% endif %}>  Enable  </span>
                             <span class="input-group-text" data-toggle="collapse" href="#collapseExample" ><input id="{{validcam.did}}_rm" name="{{validcam.did}}_rm" type="checkbox"  aria-label="Checkbox for following text input" >  Remove  </span>
                             <!-- collapse remove-warning for modals -->
                             <div class="collapse" id="collapseExample">
@@ -122,7 +133,7 @@
       </div>
       
       <div class="modal-footer">
-         {% if validcams[2] ==1 %}
+         {% if validcam[2] ==1 %}
              <button id="calib_{{validcam.did}}" type="submit" name="actions" value="calib" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Calibration</button>
              <button id="analytic" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Analytic</button>
          {% endif %}
@@ -180,5 +191,49 @@
     $("#cam_16").attr("src",url_16);
     });
 </script>
+
+<script>
+  $(document).ready(function() {
+
+    $('#addcam').click(function() {
+      $.ajax({
+        url: '/createcam',
+        type: 'POST',
+        success: function(response) {
+          console.log(response);
+          window.location.reload();
+        },
+        error: function(error) {
+          console.log(error);
+        }
+
+      });
+    });
+
+
+
+  });
+
+  
+
+  function deletecam(camid) {
+        $.ajax({
+        url: '/deletecam',
+        type: 'POST',
+        data: {camid: camid},
+        success: function(response) {
+          console.log(response);
+          window.location.reload();
+        },
+        error: function(error) {
+          console.log(error);
+        }
+
+      });
+
+      } 
+
+</script>
+
 
 {% endblock %}

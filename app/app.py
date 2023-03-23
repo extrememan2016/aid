@@ -262,7 +262,7 @@ def home():
     allcams = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
     del ID
     #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
-    validcams = Camera.query.with_entities(Camera.did,Camera.isenable,Camera.isvalid,Camera.pingok).all()
+    validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()
     
     #pprint(validcams)
     # if request from html
@@ -274,7 +274,7 @@ def home():
         verify_indx = -1
         submit = 0
         IP_add = key_url = ''
-        cam_num = 16
+        cam_num = Camera.query.count()
         vid_dirname = 'static/videos/' # ch_v0r87 (added)
        
         if str(request.form.getlist('actions')[0]) == 'submit':#if request.form.post['actions']# submit button clicked else calib button clicked
@@ -283,17 +283,24 @@ def home():
             submit = 2 # ch_v0r87 (added)
         elif str(request.form.getlist('actions')[0]) == 'analytic':# ch_v0r87 (added)
             submit = 3 # ch_v0r87 (added)
-        
+
+       
         for key in request.form:
-            for i in range(1,cam_num+1):
-                if key.startswith(str(i)+'_'):
-                    ID = str(i) 
+            for cam in validcams:
+                if key.startswith(str(cam.did)+'_'):
+                    ID = str(cam.did) 
                     """ ind_row = i+(i-1)*2
                     cam_en_val = row[ind_row]
                     cam_valid_val = row[ind_row+1] """
-                    print(i)
-                    cam_en_val=validcams[i-1].isenable
-                    cam_valid_val=validcams[i-1].isvalid
+                    print(cam.did)
+
+                    selectedcam=Camera.query.filter_by(did=cam.did).first()
+
+                    pprint(validcams)   
+                    
+
+                    cam_en_val = selectedcam.isenable
+                    cam_valid_val = selectedcam.isvalid
 
 
                     if key.endswith("_URL"):
@@ -303,7 +310,17 @@ def home():
                     elif key.endswith("_rm"):
                         cam_remove_val = request.form.get(str(key),"")
                     break
+            
         if submit == 1:
+
+            #################################
+
+            if cam_en_val is None : # ch_v0r96 (added by m.taheri)
+                cam_en_val = 1
+                selectedcam.pingok = 1
+                db.session.commit()
+            #################################
+
             # If Cam Enable is 'ON'
             if cam_en_val_temp == 'on':
                 if cam_en_val == 0:
@@ -351,7 +368,7 @@ def home():
                 cam_valid_str = "cam_"+str(ID)+"_valid" # not using in ch_v0r96 (added by m.taheri)
                 write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID))
                 #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
-                validcams = Camera.query.with_entities(Camera.did,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
+                validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
             return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
         elif  submit == 2:
             #session['ID'] = str(ID)
@@ -405,6 +422,31 @@ def info():
     row_cam = list(read_from_db("CAM_"+ID)) 
     return render_template('info.html', row=row_cam)  
 
+
+#============================= create new camera =======================================
+@app.route('/createcam',methods=['POST'])
+@flask_login.login_required
+def createcam():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+    newcam = Camera()
+    db.session.add(newcam)
+    db.session.commit()
+    return redirect(url_for('home'))
+#============================= remove camera =======================================
+@app.route('/deletecam',methods=['POST'])
+@flask_login.login_required
+def deletecam():
+    if flask_login.current_user.username =='user':
+        return redirect(url_for('event'))
+
+    if request.method == 'POST':
+        camid = request.form['camid']
+
+    cam = Camera.query.filter_by(did=camid).first()
+    db.session.delete(cam)
+    db.session.commit()
+    return redirect(url_for('home'))
 #============================= event =======================================
 @app.route('/event', methods=['GET', 'POST'])
 @flask_login.login_required

@@ -115,7 +115,7 @@ login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
 # Our mock database.
-# users = {'foo@bar.tld': {'password': 'secret'}}
+# user = {'foo@bar.tld': {'password': 'secret'}}
 
 
 
@@ -123,17 +123,17 @@ login_manager.init_app(app)
 
 
 class User(flask_login.UserMixin,db.Model):
-    __tablename__ = "user"
+    #__tablename__ = "user"
     uid = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
     #pass
 
-class Camera(flask_login.UserMixin,db.Model):
+class Camera(db.Model):
     #__tablename__ = "user"
-    did db.Column(db.Integer, primary_key=True) NOT NULL AUTO_INCREMENT,
+    did=db.Column(db.Integer, primary_key=True)
     IP_cam = db.Column(db.String(30))
-    url_cam= db.Column(db.String(60))
+    url_cam = db.Column(db.String(60))
     cam_VP1_X= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
     cam_VP1_y= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
     cam_focal= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
@@ -172,7 +172,7 @@ class Camera(flask_login.UserMixin,db.Model):
 def user_loader(username):
     
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+    cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
     user_data = cursor.fetchone()
     if user_data:
         # create a User object from the database data
@@ -216,7 +216,7 @@ def request_loader(request):
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=1)
+    app.permanent_session_lifetime = timedelta(minutes=10)
     session.modified = True
 
 #================= Initializing Login/Logout Routes ===================================== # ch_v0r90 (added by m.taheri)
@@ -231,7 +231,7 @@ def login():
 
     #cursor = mysql.connection.cursor()
     #cursor = mysql.connection.cursor(pymysql.cursors.DictCursor)
-    #cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password,))
+    #cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s', (username, password,))
     #account = cursor.fetchone()
     
     account =   User.query.filter_by(username=username).first()
@@ -290,6 +290,9 @@ def home():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
 # Read from DB 
+    #example = Camera.query.filter_by(did=1).first()
+    #print(camera.url_cam)
+    
     ID = "1" # r.get("ID") # ch_v0r91 added
     row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
     del ID

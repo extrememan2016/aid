@@ -1,0 +1,45 @@
+from your_app.extensions import db
+
+class Camera(db.Model):
+    #__tablename__ = "camera"
+    did=db.Column(db.Integer, primary_key=True)
+    IP_cam = db.Column(db.String(30))
+    url_cam = db.Column(db.String(60))
+    cam_VP1_X= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_VP1_y= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_focal= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_height= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_swing = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_tilt= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_center_X=db.Column(db.Integer)
+    cam_center_Y=db.Column(db.Integer)
+    cam_FPS=db.Column(db.Integer)
+    cam_VP2_X= db.Column(db.Numeric(precision=13, scale=3), nullable=False)
+    cam_VP2_y = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    To_VP = db.Column(db.Boolean)  
+    mask_points= db.Column(db.String(70)) 
+    detection_type=db.Column(db.Integer)
+    slow_vehicle_th=db.Column(db.Integer)
+    stop_vehicle_th=db.Column(db.Integer)
+    road_points = db.Column(db.String(100)) 
+    ped_walkway_1_points= db.Column(db.String(100)) 
+    ped_walkway_2_points= db.Column(db.String(100)) 
+    stop_vehicle_dur_th =db.Column(db.Integer)
+    disp_stop_roi=db.Column(db.Integer)
+    draw_3d = db.Column(db.Boolean)  
+    class_lines_roi= db.Column(db.String(70)) 
+    bike_dimensions= db.Column(db.String(70)) 
+    car_dimensions= db.Column(db.String(70)) 
+    truck_dimensions = db.Column(db.String(70)) 
+    disp_dimensions= db.Column(db.Boolean)  
+    theme_ind=db.Column(db.Integer)
+    Background_road_congest=db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    smoke_ROI_points = db.Column(db.String(70)) 
+    smoke_staff= db.Column(db.String(70)) 
+
+    isenable = db.Column(db.Boolean)  
+    isvalid = db.Column(db.Boolean)  
+    pingok = db.Column(db.Boolean)  
+    #pass
+    def __repr__(self):
+        return f'<Camera "{self.title}">'

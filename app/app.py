@@ -2,7 +2,6 @@
 ### import cv2
 ### from AID.VideoStream.fps import FPS
 
-
 import time
 
 import numpy as np
@@ -11,21 +10,20 @@ import datetime
 
 from flask import Flask, render_template, Response, request, redirect, url_for
 from flask import flash, send_from_directory# ch_v0r90 (send_from_directory added)
+from pprint import pprint
 
 
-import flask # ch_v0r90 (added by m.taheri)
-import flask_login # ch_v0r90 (added by m.taheri)
-from flask import session # ch_v0r90 (added by m.taheri)
-from datetime import timedelta # ch_v0r90 (added by m.taheri)
+import flask # ch_v0r96 (added by m.taheri)
+import flask_login # ch_v0r96 (added by m.taheri)
+from flask import session # ch_v0r96 (added by m.taheri)
+from datetime import timedelta # ch_v0r96 (added by m.taheri)
 
 
-import pymysql # ch_v0r90 (added by m.taheri)
-pymysql.install_as_MySQLdb() # ch_v0r90 (added by m.taheri)
-from flask_mysqldb import MySQL # ch_v0r90 (added by m.taheri)
+import pymysql # ch_v0r96 (added by m.taheri)
+pymysql.install_as_MySQLdb() # ch_v0r96 (added by m.taheri)
+from flask_mysqldb import MySQL # ch_v0r96 (added by m.taheri)
 from datetime import timedelta
-from flask_sqlalchemy import SQLAlchemy
-
-
+from your_app.extensions import db
 import re# ch_v0r85 (added)
 
 
@@ -42,7 +40,6 @@ import re# ch_v0r85 (added)
 from your_app.utils import verify_url, read_from_db, write_to_db_cams, write_to_db_CAM_ID, write_to_db_any, read_from_db_all, check_for_1_week_period # ch_v0r89 (read_from_db_all, check_for_1_week_period added)
 from your_app.utils import  write_to_db_roi, VP1_from_DB # ch_v0r90 (VP1_from_DB added)
 from your_app.utils import make_classification_staff ###, reset_counter_and_speeds # ch_v0r91 ('make_classification_staff', 'reset_counter_and_speeds' added)
-
 
 ### from your_app.KeyClipWriter import KeyClipWriter # ch_v0r86 
 
@@ -63,6 +60,9 @@ from  your_app.config import config# ch_v0r84 (added)
 
 ## from your_app.AID_Loop import AID_loop # ch_v0r89 (added)
 from your_app import settings # ch_v0r89 (added)
+
+from your_app.models.camera import Camera
+
 
 
 #===============================  initializing calibration parameters =========
@@ -96,7 +96,7 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'raspberry'
 app.config['MYSQL_DB'] = 'pythonprogramming'
 
-db = SQLAlchemy()
+
 
 mysql = MySQL(app)
 
@@ -105,11 +105,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:raspberry@localhost/python
 
 db.init_app(app)
 
-#================= Initializing Login manager ===================================== # ch_v0r90 (added by m.taheri)
+#================= Initializing Login manager ===================================== # ch_v0r96 (added by m.taheri)
 
 login_manager = flask_login.LoginManager()
-
-
 
 
 login_manager.init_app(app)
@@ -119,7 +117,10 @@ login_manager.init_app(app)
 
 
 
-#================= how to load a user from a Flask request and from its session ===================================== # ch_v0r90 (added by m.taheri)
+#================= how to load a user from a Flask request and from its session ===================================== # ch_v0r96 (added by m.taheri)
+
+
+
 
 
 class User(flask_login.UserMixin,db.Model):
@@ -129,43 +130,6 @@ class User(flask_login.UserMixin,db.Model):
     password = db.Column(db.String(100))
     #pass
 
-class Camera(db.Model):
-    #__tablename__ = "user"
-    did=db.Column(db.Integer, primary_key=True)
-    IP_cam = db.Column(db.String(30))
-    url_cam = db.Column(db.String(60))
-    cam_VP1_X= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_VP1_y= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_focal= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_height= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_swing = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_tilt= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    cam_center_X=db.Column(db.Integer)
-    cam_center_Y=db.Column(db.Integer)
-    cam_FPS=db.Column(db.Integer)
-    cam_VP2_X= db.Column(db.Numeric(precision=13, scale=3), nullable=False)
-    cam_VP2_y = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    To_VP = db.Column(db.Boolean)  
-    mask_points= db.Column(db.String(70)) 
-    detection_type=db.Column(db.Integer)
-    slow_vehicle_th=db.Column(db.Integer)
-    stop_vehicle_th=db.Column(db.Integer)
-    road_points = db.Column(db.String(100)) 
-    ped_walkway_1_points= db.Column(db.String(100)) 
-    ped_walkway_2_points= db.Column(db.String(100)) 
-    stop_vehicle_dur_th =db.Column(db.Integer)
-    disp_stop_roi=db.Column(db.Integer)
-    draw_3d = db.Column(db.Boolean)  
-    class_lines_roi= db.Column(db.String(70)) 
-    bike_dimensions= db.Column(db.String(70)) 
-    car_dimensions= db.Column(db.String(70)) 
-    truck_dimensions = db.Column(db.String(70)) 
-    disp_dimensions= db.Column(db.Boolean)  
-    theme_ind=db.Column(db.Integer)
-    Background_road_congest=db.Column(db.Numeric(precision=8, scale=2), nullable=False)
-    smoke_ROI_points = db.Column(db.String(70)) 
-    smoke_staff= db.Column(db.String(70)) 
-    #pass
 
 
 @login_manager.user_loader
@@ -219,7 +183,7 @@ def make_session_permanent():
     app.permanent_session_lifetime = timedelta(minutes=10)
     session.modified = True
 
-#================= Initializing Login/Logout Routes ===================================== # ch_v0r90 (added by m.taheri)
+#================= Initializing Login/Logout Routes ===================================== # ch_v0r96 (added by m.taheri)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -294,9 +258,13 @@ def home():
     #print(camera.url_cam)
     
     ID = "1" # r.get("ID") # ch_v0r91 added
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r96 (commented by m.taheri)
+    allcams = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
     del ID
-    row = list(read_from_db('CAMS_VALID'))
+    #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
+    validcams = Camera.query.with_entities(Camera.did,Camera.isenable,Camera.isvalid,Camera.pingok).all()
+    
+    #pprint(validcams)
     # if request from html
     if request.method == "POST":
         # verify the IP cam URL
@@ -320,9 +288,14 @@ def home():
             for i in range(1,cam_num+1):
                 if key.startswith(str(i)+'_'):
                     ID = str(i) 
-                    ind_row = i+(i-1)*2
+                    """ ind_row = i+(i-1)*2
                     cam_en_val = row[ind_row]
-                    cam_valid_val = row[ind_row+1]
+                    cam_valid_val = row[ind_row+1] """
+                    print(i)
+                    cam_en_val=validcams[i-1].isenable
+                    cam_valid_val=validcams[i-1].isvalid
+
+
                     if key.endswith("_URL"):
                         key_url = request.form.get(str(key),"")
                     elif key.endswith("_en"):
@@ -356,7 +329,12 @@ def home():
                 change_ind = 1
                 #write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r89 commented
                 cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added)
-                write_to_db_any("CAM_"+str(ID), cam_dict)
+
+                db.session.delete(Camera.query.filter_by(did=ID).first())
+                db.session.commit()
+
+                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
+
                 flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
             elif verify_indx == 0: # Invalid URL
                 flash(u'Invalid URL provided', 'warning') # Categories: success (green), info (blue), warning (yellow), danger (red)
@@ -365,14 +343,16 @@ def home():
                 change_ind = 1
                 cam_en_val = 1
                 cam_valid_val = 1
-                write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r86
+                write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r86 
+
             # save the changes
             if change_ind == 1:
-                cam_en_str = "cam_"+str(ID)+"_enable"
-                cam_valid_str = "cam_"+str(ID)+"_valid"
+                cam_en_str = "cam_"+str(ID)+"_enable"  # not using in ch_v0r96 (added by m.taheri)
+                cam_valid_str = "cam_"+str(ID)+"_valid" # not using in ch_v0r96 (added by m.taheri)
                 write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID))
-                row = list(read_from_db('CAMS_VALID'))
-            return render_template('index.html',row_val=row, row=row_cam )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+                #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
+                validcams = Camera.query.with_entities(Camera.did,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
+            return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
         elif  submit == 2:
             #session['ID'] = str(ID)
             # r.set("ID", str(ID))
@@ -382,7 +362,7 @@ def home():
             return redirect(url_for('analytic')) # ch_v0r87 (added)
             
     else:
-        return render_template('index.html',row_val=row, row=row_cam )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+        return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
     
 #============================= analytic =======================================
 @app.route('/analytic',  methods=['GET', 'POST'])

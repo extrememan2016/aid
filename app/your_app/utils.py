@@ -9,7 +9,7 @@ import numpy as np
 import cv2
 import math, time, datetime, os, glob
 import subprocess # ch_v0r90 (added)
-
+from flask import url_for #ch_v0r90 (added by m.taheri)
 #from imutils.object_detection import non_max_suppression # ch_v0r86 (commented)
 import sys # ch_v0r90 (added)
 if sys.version_info >= (3, 0): # ch_v0r90 (added to check python version)
@@ -17,6 +17,7 @@ if sys.version_info >= (3, 0): # ch_v0r90 (added to check python version)
     from pathlib import Path # ch_v0r90 (added)
 else:
     from dbconnect import connection
+
 #import 
  # ch_v0r86 (added)
 #
@@ -29,9 +30,11 @@ import socket # ch_v0r88 (added)
 import sys # ch_v0r88 (added)
 import threading  # ch_v0r90 (added)
 from PIL import Image  # ch_v0r91 (added)
-from skimage.feature import graycomatrix, graycoprops  # ch_v0r92 (added) ch_v0r90 (added by m.taheri)
+from skimage.feature import graycomatrix, graycoprops  # ch_v0r92 (added) ch_v0r90 (changed by m.taheri)
 from collections import deque # ch_v0r92 (added)
 
+from .extensions import db
+from your_app.models.camera import Camera
 
 
 
@@ -300,10 +303,15 @@ def verify_url(url, cam_name):
     dirname = 'static/imgs/'
     #video path
     vid_dirname = 'static/videos/' # ch_v0r87 (added)
-    if os.path.isfile(vid_dirname+url): # ch_v0r88 (check if file)
+    if os.path.isfile(vid_dirname): # ch_v0r88 (check if file)
         url = vid_dirname+url
+    else:
+        vid_dirname = "\\app\\static\\videos\\"
+        url =  os.getcwd()+ vid_dirname+url
+
     cap = cv2.VideoCapture(url) # ch_v0r88 ('vid_dirname+url' --> 'url')   
     count = 0
+    print(url)
     while(count< 1):
         ret, frame = cap.read()        
         if not ret:
@@ -345,55 +353,91 @@ def read_from_db(device): # ch_v0r85 (added)
 #---------------------------------------------------------------------------# 
 
 def write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val, key_url, IP_add, ID):
-    c, conn = connection()
-    c.execute("UPDATE CAMS_VALID SET  " +cam_en_str+"=%s,  " +cam_valid_str+"=%s WHERE did=%s;", (cam_en_val,cam_valid_val, 1))
+    """ c, conn = connection() # ch_v0r96 (commented by m.taheri)
+    c.execute("UPDATE CAMS_VALID SET " +cam_en_str+"=%s,  " +cam_valid_str+"=%s WHERE did=%s;", (cam_en_val,cam_valid_val, 1))
     if IP_add != '':
-        c.execute("UPDATE CAM_"+ID+" SET  url_cam=%s, IP_cam=%s WHERE did=%s;", (key_url, IP_add, 1))
+        c.execute("UPDATE CAM_"+ID+" SET  url_cam=%s, IP_cam=%s WHERE did=%s;", (key_url, IP_add, 1)) 
     conn.commit()            
     c.close()
-    conn.close() 
+    conn.close()  """
+
+
+    selectedcam = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
+    selectedcam.isenable = cam_en_val
+    selectedcam.isvalid =cam_valid_val
+    if IP_add != '':
+        selectedcam.url_cam = key_url
+        selectedcam.IP_cam =IP_add
+
+    db.session.commit() # ch_v0r96 (added by m.taheri)
     # create the application object
 #------------------------- # ch_v0r85 (added)  --------------------------------------------------# 
 # write to DB VP1
 #---------------------------------------------------------------------------# 
 def write_to_db_CAM_ID(ID, VP1, road_camera_staff, video_FPS, To_VP):
     
-    c, conn = connection()
+    selectedcam = Camera.query.filter_by(did=ID).first() # ch_v0r96 (addedl by m.taheri)
+
+    # c, conn = connection()  # ch_v0r96 (commented by m.taheri)
     if road_camera_staff == '' and video_FPS == '' and To_VP == '':
         print('Yaah ----------------- VP1 -----------------------> ', VP1)
-        c.execute("UPDATE CAM_"+ID+" SET cam_VP1_X=%s, cam_VP1_y=%s WHERE did=%s;", (VP1[0], VP1[1] , 1))
+        #c.execute("UPDATE CAM_"+ID+" SET cam_VP1_X=%s, cam_VP1_y=%s WHERE did=%s;", (VP1[0], VP1[1] , 1))
+        selectedcam.cam_VP1_X = VP1[0] # ch_v0r96 (addedl by m.taheri)
+        selectedcam.cam_VP1_y = VP1[1]
+        
         
     elif video_FPS == '' and road_camera_staff != '' and To_VP == '':
         print('Yaah ----------------- road_camera_staff -----------------------> ', road_camera_staff)
         original_vp1, original_vp2, focal_length, tilt, cam_height, original_centre, swing, video_FPS, Rotation_Matrix, To_VP, VP1_rsz = getPrmLeast(road_camera_staff) # ch_v0r86 (To_VP and VP1_rsz added)
         print('original_vp2 ------> ', original_vp2)    
         querry = "UPDATE CAM_"+ID+" SET cam_focal=%s , cam_height=%s , cam_swing=%s, cam_tilt=%s , cam_center_X=%s , cam_center_Y=%s, cam_VP2_X=%s, cam_VP2_y=%s  WHERE did=%s;"
-        c.execute(querry, (focal_length, cam_height, swing, tilt *( 180 / np.pi), original_centre[0], original_centre[1], round(original_vp2[0],3), round(original_vp2[1],2), 1)) # ch_v0r91 (round(original_vp2[0],3), round(original_vp2[1],2) replaced)
+        #c.execute(querry, (focal_length, cam_height, swing, tilt *( 180 / np.pi), original_centre[0], original_centre[1], round(original_vp2[0],3), round(original_vp2[1],2), 1)) # ch_v0r91 (round(original_vp2[0],3), round(original_vp2[1],2) replaced) # ch_v0r96 (commented by m.taheri)
         
+        selectedcam.cam_focal =  focal_length # ch_v0r96 (addedl by m.taheri)
+        selectedcam.cam_height =cam_height
+        selectedcam.cam_swing= swing
+        selectedcam.cam_tilt= tilt *( 180 / np.pi)
+        selectedcam.cam_center_X =original_centre[0]
+        selectedcam.cam_center_Y =original_centre[1]
+        selectedcam.cam_VP2_X =round(original_vp2[0],3)
+        selectedcam.cam_VP2_y=round(original_vp2[1],2)
+
+
+
+
+
     elif road_camera_staff == '' and VP1 == '' and To_VP == '':
         print('Yaah ----------------- FPS -----------------------> ', int(video_FPS))
-        c.execute("UPDATE CAM_"+ID+" SET cam_FPS=%s WHERE did=%s;", (int(video_FPS), 1))
+        # c.execute("UPDATE CAM_"+ID+" SET cam_FPS=%s WHERE did=%s;", (int(video_FPS), 1)) # ch_v0r96 (commented by m.taheri)
         
+        selectedcam.cam_FPS = int(video_FPS)
     else:
         print('Yaah ----------------- To_VP -----------------------> ', int(To_VP))
-        c.execute("UPDATE CAM_"+ID+" SET To_VP=%s WHERE did=%s;", (int(To_VP), 1))
-        
-    conn.commit()            
+        # c.execute("UPDATE CAM_"+ID+" SET To_VP=%s WHERE did=%s;", (int(To_VP), 1)) # ch_v0r96 (commented by m.taheri)
+
+        selectedcam.To_VP = int(To_VP) # ch_v0r96 (addedl by m.taheri)
+
+    db.session.commit() # ch_v0r96 (added by m.taheri)
+    """ conn.commit()   # ch_v0r96 (commented by m.taheri)
     c.close()
-    conn.close() 
+    conn.close() """ 
     # create the application object
 #------------------------- # ch_v0r86 (added)  --------------------------------------------------# 
 # write to DB roi
 #---------------------------------------------------------------------------# 
 def write_to_db_roi(ID, points_roi):
     
-    c, conn = connection()
+    #c, conn = connection()
     print('Yaah ----------------- points_roi -----------------------> ', points_roi)
-    c.execute("UPDATE CAM_"+ID+" SET mask_points=%s WHERE did=%s;", (points_roi, 1))
-        
-    conn.commit()            
+    #c.execute("UPDATE CAM_"+ID+" SET mask_points=%s WHERE did=%s;", (points_roi, 1))
+
+    selectedcam = Camera.query.filter_by(did=ID).first() # ch_v0r96 (addedl by m.taheri)
+    selectedcam.mask_points = points_roi
+
+    db.session.commit()
+    """ conn.commit()            
     c.close()
-    conn.close() 
+    conn.close() """ 
 #------------------------- # ch_v0r87  update any field of any cam(Based on python dictionary added)  --------------------------------------------------# 
 # write to DB any
 #---------------------------------------------------------------------------# 
@@ -1075,10 +1119,10 @@ def make_classification_staff(row):
     bike_dimensions  = row[26]
     car_dimensions   = row[27]
     truck_dimensions = row[28]
-    class_lines_roi_np  = poitsROIstr_to_pointsROInp(class_lines_roi, np.int32) # ch_v0r90 (added by m.taheri)
-    bike_dimensions_np  = poitsROIstr_to_pointsROInp(bike_dimensions, np.float32)# ch_v0r90 (added by m.taheri)
-    car_dimensions_np   = poitsROIstr_to_pointsROInp(car_dimensions, np.float32)# ch_v0r90 (added by m.taheri)
-    truck_dimensions_np = poitsROIstr_to_pointsROInp(truck_dimensions, np.float32)# ch_v0r90 (added by m.taheri)
+    class_lines_roi_np  = poitsROIstr_to_pointsROInp(class_lines_roi, np.int32) # ch_v0r96 (added by m.taheri)
+    bike_dimensions_np  = poitsROIstr_to_pointsROInp(bike_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
+    car_dimensions_np   = poitsROIstr_to_pointsROInp(car_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
+    truck_dimensions_np = poitsROIstr_to_pointsROInp(truck_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
     classification_staff = {'lines_roi_up': (100 -class_lines_roi_np), 'bike_dimensions':bike_dimensions_np, 'car_dimensions':car_dimensions_np, 'truck_dimensions':truck_dimensions_np}
     return classification_staff
     

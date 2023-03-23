@@ -1,6 +1,7 @@
-from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
-
+""" from flask_login import UserMixin
 class User(UserMixin):
     def __init__(self, id, username, password):
         self.id = id
@@ -29,4 +30,6 @@ class User(UserMixin):
             # create a User object from the database data
             return User(user_data[0], user_data[1], user_data[2])
         else:
-            return None
+            return None """
+
+

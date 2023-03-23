@@ -98,3 +98,13 @@ header{
   .statistic-items{
     min-width: 250px;
   }
+
+  .item{
+    background-color: #dddddd;
+  }
+  .btnitem{
+  height: 100px;
+  margin-top:10px;
+  cursor:pointer;
+
+  }

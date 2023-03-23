@@ -40,7 +40,7 @@
 
           
          <!-- FlashContent -->
-         <div class="container" style="min-height:100% width:80%">
+         <div class="container" style="min-height:100%;width:80%">
             {% with messages = get_flashed_messages(with_categories=true) %}
               <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
               {% if messages %}
@@ -59,134 +59,56 @@
 
 <div class="row">
 
+
+{% for validcam in validcams %}
+
+
 <div class="col-xs-6 col-sm-3 placeholder">
-        <div class="item1">
-        {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
+        <div class="item{{validcam.did}}">
+        {% if validcam.isvalid ==0 %} <!-- Camera not registered -->  
+         <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
         {% else %} <!-- Camera registered -->  
-        {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-             <div class="container">
-                <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-                <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
+        {% if validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
+             <div class="container item">
+                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}"  />
+                <div class="centered"><i class="fa fa-check-circle"></i>Camera {{validcam.did}} online</div>
               </div> 
         {% else %} 
-             <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
+             <button  type="button" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
             &nbsp;Camera offline</button>                 
         {% endif %}
         {% endif %}
         </div>
 </div>
 
-<div class="col-xs-6 col-sm-3 placeholder">
-    <div class="item1">
-    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
-    {% else %} <!-- Camera registered -->  
-    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-         <div class="container">
-            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
-          </div> 
-    {% else %} 
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
-        &nbsp;Camera offline</button>                 
-    {% endif %}
-    {% endif %}
-    </div>
-</div>
-<div class="col-xs-6 col-sm-3 placeholder">
-    <div class="item1">
-    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
-    {% else %} <!-- Camera registered -->  
-    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-         <div class="container">
-            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
-          </div> 
-    {% else %} 
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
-        &nbsp;Camera offline</button>                 
-    {% endif %}
-    {% endif %}
-    </div>
-</div>
-<div class="col-xs-6 col-sm-3 placeholder">
-    <div class="item1">
-    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
-    {% else %} <!-- Camera registered -->  
-    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-         <div class="container">
-            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
-          </div> 
-    {% else %} 
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
-        &nbsp;Camera offline</button>                 
-    {% endif %}
-    {% endif %}
-    </div>
-</div>
-<div class="col-xs-6 col-sm-3 placeholder">
-    <div class="item1">
-    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
-    {% else %} <!-- Camera registered -->  
-    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-         <div class="container">
-            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
-          </div> 
-    {% else %} 
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
-        &nbsp;Camera offline</button>                 
-    {% endif %}
-    {% endif %}
-    </div>
-</div>
-<div class="col-xs-6 col-sm-3 placeholder">
-    <div class="item1">
-    {% if row_val[2] ==0 %} <!-- Camera not registered -->  
-     <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-video-camera"></i>&nbsp;Cam 1</button>                 
-    {% else %} <!-- Camera registered -->  
-    {% if row_val[1] ==1 and row_val[3] ==1 %} <!-- Camera is Enable and online -->
-         <div class="container">
-            <img style="cursor:pointer;" class="img-responsive" id="cam_1" height="120" width="200" data-toggle="modal" data-target="#editModal_1"  />
-            <div class="centered"><i class="fa fa-check-circle"></i>Camera 1 online</div>
-          </div> 
-    {% else %} 
-         <button style="cursor:pointer; height: 100%;" type="button" class="btn btn-outline-danger btn-lg btn-block" data-toggle="modal" data-target="#editModal_1"><i class="fa fa-times" aria-hidden="true"></i>
-        &nbsp;Camera offline</button>                 
-    {% endif %}
-    {% endif %}
-    </div>
-</div>
+{% endfor %}
+
 
 </div>
 
 
 
  <!-- Get URL Modals -->
- 
- <!-- Get URL Modals_1 -->
- <div class="modal fade" id="editModal_1" role="dialog" >
+
+ {% for validcam in validcams %}
+ <!-- Get URL Modals_i -->
+ <div class="modal fade" id="editModal_{{validcam.did}}" role="dialog" >
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content" >
       <div class="modal-header" >
-        <h4>Enter Cam1 network streaming url</h4>
+        <h4>Enter Cam{{validcam.did}} network streaming url</h4>
        </div>
 
       <div class="modal-body">      
-          <form method="post" role="form" action="/" id="form1">
+          <form method="post" role="form" action="/" id="form{{validcam.did}}">
                 <div class="form-group">
-                    <label for="URL_1" class="control-label">Cam1 URL:</label>
-                    <input type="text" class="form-control" id="URL_1" name="1_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
-                    {% if row_val[2] ==1 %}
+                    <label for="URL_{{validcam.did}}" class="control-label">Cam{{validcam.did}} URL:</label>
+                    <input type="text" class="form-control" id="URL_{{validcam.did}}" name="{{validcam.did}}_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
+                    {% if validcams[2] ==1 %}
                         <div class="input-group-prepend">                       
-                            <span class="input-group-text"><input id="1_en" name="1_en" type="checkbox" aria-label="Checkbox for following text input" {% if row_val[1]==1 %}checked{% endif %}>  Enable  </span>
-                            <span class="input-group-text" data-toggle="collapse" href="#collapseExample" ><input id="1_rm" name="1_rm" type="checkbox"  aria-label="Checkbox for following text input" >  Remove  </span>
+                            <span class="input-group-text"><input id="{{validcam.did}}_en" name="{{validcam.did}}_en" type="checkbox" aria-label="Checkbox for following text input" {% if validcams[1]==1 %}checked{% endif %}>  Enable  </span>
+                            <span class="input-group-text" data-toggle="collapse" href="#collapseExample" ><input id="{{validcam.did}}_rm" name="{{validcam.did}}_rm" type="checkbox"  aria-label="Checkbox for following text input" >  Remove  </span>
                             <!-- collapse remove-warning for modals -->
                             <div class="collapse" id="collapseExample">
                               <div class="card card-body">
@@ -200,18 +122,19 @@
       </div>
       
       <div class="modal-footer">
-         {% if row_val[2] ==1 %}
-             <button id="calib_1" type="submit" name="actions" value="calib" class="btn btn-primary"  form="form1"  {% if row_val[1] ==0 or row_val[3] ==0 %} disabled{% endif %}>Calibration</button>
-             <button id="analytic" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form1"  {% if row_val[1] ==0 or row_val[3] ==0 %} disabled{% endif %}>Analytic</button>
+         {% if validcams[2] ==1 %}
+             <button id="calib_{{validcam.did}}" type="submit" name="actions" value="calib" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Calibration</button>
+             <button id="analytic" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Analytic</button>
          {% endif %}
          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-         <button type="submit" name="actions" value="submit" class="btn btn-primary" form="form1">Submit</button>
+         <button type="submit" name="actions" value="submit" class="btn btn-primary" form="form{{validcam.did}}">Submit</button>
       </div>
       
     </div>
   </div>
 </div>
-<!-- Get URL Modals_1 -->
+<!-- Get URL Modals_i -->
+{% endfor %}
 
 
 {% endblock %}

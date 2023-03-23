@@ -164,6 +164,56 @@
 </div>
 
 </div>
+
+
+
+ <!-- Get URL Modals -->
+ 
+ <!-- Get URL Modals_1 -->
+ <div class="modal fade" id="editModal_1" role="dialog" >
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content" >
+      <div class="modal-header" >
+        <h4>Enter Cam1 network streaming url</h4>
+       </div>
+
+      <div class="modal-body">      
+          <form method="post" role="form" action="/" id="form1">
+                <div class="form-group">
+                    <label for="URL_1" class="control-label">Cam1 URL:</label>
+                    <input type="text" class="form-control" id="URL_1" name="1_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
+                    {% if row_val[2] ==1 %}
+                        <div class="input-group-prepend">                       
+                            <span class="input-group-text"><input id="1_en" name="1_en" type="checkbox" aria-label="Checkbox for following text input" {% if row_val[1]==1 %}checked{% endif %}>  Enable  </span>
+                            <span class="input-group-text" data-toggle="collapse" href="#collapseExample" ><input id="1_rm" name="1_rm" type="checkbox"  aria-label="Checkbox for following text input" >  Remove  </span>
+                            <!-- collapse remove-warning for modals -->
+                            <div class="collapse" id="collapseExample">
+                              <div class="card card-body">
+                                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Warning; All the settings for this camera will be lost!
+                              </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+          </form>                              
+      </div>
+      
+      <div class="modal-footer">
+         {% if row_val[2] ==1 %}
+             <button id="calib_1" type="submit" name="actions" value="calib" class="btn btn-primary"  form="form1"  {% if row_val[1] ==0 or row_val[3] ==0 %} disabled{% endif %}>Calibration</button>
+             <button id="analytic" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form1"  {% if row_val[1] ==0 or row_val[3] ==0 %} disabled{% endif %}>Analytic</button>
+         {% endif %}
+         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+         <button type="submit" name="actions" value="submit" class="btn btn-primary" form="form1">Submit</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+<!-- Get URL Modals_1 -->
+
+
 {% endblock %}
 
 

@@ -123,12 +123,49 @@ login_manager.init_app(app)
 
 
 class User(flask_login.UserMixin,db.Model):
-    __tablename__ = "users"
+    __tablename__ = "user"
     uid = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
     #pass
 
+class Camera(flask_login.UserMixin,db.Model):
+    #__tablename__ = "user"
+    did db.Column(db.Integer, primary_key=True) NOT NULL AUTO_INCREMENT,
+    IP_cam = db.Column(db.String(30))
+    url_cam= db.Column(db.String(60))
+    cam_VP1_X= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_VP1_y= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_focal= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_height= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_swing = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_tilt= db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    cam_center_X=db.Column(db.Integer)
+    cam_center_Y=db.Column(db.Integer)
+    cam_FPS=db.Column(db.Integer)
+    cam_VP2_X= db.Column(db.Numeric(precision=13, scale=3), nullable=False)
+    cam_VP2_y = db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    To_VP = db.Column(db.Boolean)  
+    mask_points= db.Column(db.String(70)) 
+    detection_type=db.Column(db.Integer)
+    slow_vehicle_th=db.Column(db.Integer)
+    stop_vehicle_th=db.Column(db.Integer)
+    road_points = db.Column(db.String(100)) 
+    ped_walkway_1_points= db.Column(db.String(100)) 
+    ped_walkway_2_points= db.Column(db.String(100)) 
+    stop_vehicle_dur_th =db.Column(db.Integer)
+    disp_stop_roi=db.Column(db.Integer)
+    draw_3d = db.Column(db.Boolean)  
+    class_lines_roi= db.Column(db.String(70)) 
+    bike_dimensions= db.Column(db.String(70)) 
+    car_dimensions= db.Column(db.String(70)) 
+    truck_dimensions = db.Column(db.String(70)) 
+    disp_dimensions= db.Column(db.Boolean)  
+    theme_ind=db.Column(db.Integer)
+    Background_road_congest=db.Column(db.Numeric(precision=8, scale=2), nullable=False)
+    smoke_ROI_points = db.Column(db.String(70)) 
+    smoke_staff= db.Column(db.String(70)) 
+    #pass
 
 
 @login_manager.user_loader
@@ -189,8 +226,6 @@ def login():
     if flask.request.method == 'GET':
         return render_template('login.html')
                 
-
-
     username = flask.request.form['username']
     password = flask.request.form['password']
 

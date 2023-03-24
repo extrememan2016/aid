@@ -189,7 +189,9 @@ def make_session_permanent():
 def login():
     if flask.request.method == 'GET':
         return render_template('login.html')
-                
+
+
+
     username = flask.request.form['username']
     password = flask.request.form['password']
 
@@ -256,7 +258,8 @@ def home():
 # Read from DB 
     #example = Camera.query.filter_by(did=1).first()
     #print(camera.url_cam)
-    
+
+
     ID = "1" # r.get("ID") # ch_v0r91 added
     #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r96 (commented by m.taheri)
     allcams = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
@@ -296,7 +299,7 @@ def home():
 
                     selectedcam=Camera.query.filter_by(did=cam.did).first()
 
-                    pprint(validcams)   
+                    pprint(selectedcam)   
                     
 
                     cam_en_val = selectedcam.isenable
@@ -313,13 +316,6 @@ def home():
             
         if submit == 1:
 
-            #################################
-
-            if cam_en_val is None : # ch_v0r96 (added by m.taheri)
-                cam_en_val = 1
-                selectedcam.pingok = 1
-                db.session.commit()
-            #################################
 
             # If Cam Enable is 'ON'
             if cam_en_val_temp == 'on':
@@ -430,8 +426,18 @@ def createcam():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
     newcam = Camera()
+
+    maxid = db.session.query(db.func.max(Camera.did)).scalar() or 0    
+    for i in range(1,maxid+2):
+        cam = Camera.query.filter_by(did=i).with_entities(Camera.did).first()
+        if cam is None:
+            newcam.did = i
+            print("test "+str(newcam.did))
+            break
+    newcam.pingok = 1
     db.session.add(newcam)
     db.session.commit()
+    print("we decied"+str(newcam.did))
     return redirect(url_for('home'))
 #============================= remove camera =======================================
 @app.route('/deletecam',methods=['POST'])

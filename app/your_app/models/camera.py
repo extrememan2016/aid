@@ -37,9 +37,7 @@ class Camera(db.Model):
     smoke_ROI_points = db.Column(db.String(70)) 
     smoke_staff= db.Column(db.String(70)) 
 
-    isenable = db.Column(db.Boolean)  
-    isvalid = db.Column(db.Boolean)  
-    pingok = db.Column(db.Boolean)  
+    isenable = db.Column(db.Boolean,default = 0)  
+    isvalid = db.Column(db.Boolean,default = 0)  
+    pingok = db.Column(db.Boolean,default = 0)  
     #pass
-    def __repr__(self):
-        return f'<Camera "{self.title}">'

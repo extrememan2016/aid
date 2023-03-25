@@ -63,8 +63,8 @@
 {% for validcam in validcams %}
 
 
-<div class="col-xs-6 col-sm-3 placeholder">
-        <div class="item{{validcam.did}}">
+<div class="col-xs-6 col-sm-3 placeholder" id="item{{validcam.did}}">
+        <div>
         {% if validcam.url_cam == None %}
         <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
             &nbsp;Edit Camera</button>  
@@ -86,15 +86,10 @@
 </div>
 
 {% endfor %}
-<div class="col-xs-6 col-sm-3 placeholder">
+<div class="col-xs-6 col-sm-3 placeholder" id="addcambtn">
    <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" id="addcam"><i class="fa fa-video-camera"></i>&nbsp;Add Camera</button>                 
 
 </div>
-
-
-
-
-
 </div>
 
 
@@ -201,7 +196,61 @@
         type: 'POST',
         success: function(response) {
           console.log(response);
-          window.location.reload();
+
+
+
+          // jquery starting here
+
+          //$("#refresher").html("");
+
+          $.each(response.items, function(index, item) {
+          var i=parseInt(item) - 1;
+          
+          var newhtml=`<div class="col-xs-6 col-sm-3 placeholder" id="item${item}">
+                            <div>
+                            <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_${item}"><i class="fa fa-times" aria-hidden="true"></i>
+                                &nbsp;Edit Camera</button>  
+                            <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam${item}" onclick="deletecam(${item})" ><i class="fa fa-times" aria-hidden="true"></i>
+                                  &nbsp;Remove Camera</button> 
+
+                            </div>
+                    </div>
+                    `;
+          
+          var new_custom_modal_for_new_item=`  <!-- Get URL Modals_i -->
+                          <div class="modal fade" id="editModal_${item}" role="dialog" >
+                            <div class="modal-dialog">
+                              <!-- Modal content-->
+                              <div class="modal-content" >
+                                <div class="modal-header" >
+                                  <h4>Enter Cam${item} network streaming url</h4>
+                                </div>
+
+                                <div class="modal-body">      
+                                    <form method="post" role="form" action="/" id="form${item}">
+                                          <div class="form-group">
+                                              <label for="URL_${item}" class="control-label">Cam${item} URL:</label>
+                                              <input type="text" class="form-control" id="URL_${item}" name="${item}_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
+                                          </div>
+                                    </form>                              
+                                </div>
+                                
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                                  <button type="submit" name="actions" value="submit" class="btn btn-primary" form="form${item}">Submit</button>
+                                </div>
+                                
+                              </div>
+                            </div>
+                          </div>`
+
+          //$("#addcambtn").before(newhtml);
+          $("#item" + i).after(newhtml);
+
+          $("#cfo").append(new_custom_modal_for_new_item);
+
+              });
+          //window.location.reload(); // if you want to stop using jquery then you can remove from jq part and use this
         },
         error: function(error) {
           console.log(error);
@@ -223,7 +272,10 @@
         data: {camid: camid},
         success: function(response) {
           console.log(response);
-          window.location.reload();
+          $("#item"+camid).remove()
+
+
+          //window.location.reload();
         },
         error: function(error) {
           console.log(error);

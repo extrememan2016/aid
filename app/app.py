@@ -11,7 +11,7 @@ import datetime
 from flask import Flask, render_template, Response, request, redirect, url_for
 from flask import flash, send_from_directory# ch_v0r90 (send_from_directory added)
 from pprint import pprint
-
+from flask import jsonify
 
 import flask # ch_v0r96 (added by m.taheri)
 import flask_login # ch_v0r96 (added by m.taheri)
@@ -438,7 +438,16 @@ def createcam():
     db.session.add(newcam)
     db.session.commit()
     print("we decied"+str(newcam.did))
-    return redirect(url_for('home'))
+
+
+    items = []
+    item = newcam.did
+    items.append(item)
+    return jsonify({'items': items})
+
+
+    #return newcam.did
+    #return redirect(url_for('home'))
 #============================= remove camera =======================================
 @app.route('/deletecam',methods=['POST'])
 @flask_login.login_required
@@ -452,7 +461,9 @@ def deletecam():
     cam = Camera.query.filter_by(did=camid).first()
     db.session.delete(cam)
     db.session.commit()
-    return redirect(url_for('home'))
+
+    return jsonify(success=True)
+    #return redirect(url_for('home'))
 #============================= event =======================================
 @app.route('/event', methods=['GET', 'POST'])
 @flask_login.login_required

@@ -259,7 +259,6 @@ def home():
     #example = Camera.query.filter_by(did=1).first()
     #print(camera.url_cam)
 
-
     ID = "1" # r.get("ID") # ch_v0r91 added
     #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r96 (commented by m.taheri)
     allcams = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
@@ -362,7 +361,12 @@ def home():
             if change_ind == 1:
                 cam_en_str = "cam_"+str(ID)+"_enable"  # not using in ch_v0r96 (added by m.taheri)
                 cam_valid_str = "cam_"+str(ID)+"_valid" # not using in ch_v0r96 (added by m.taheri)
-                write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID))
+
+                cam_dict={'isenable': cam_en_val , 'isvalid': cam_valid_val,'url_cam': key_url, 'IP_cam':IP_add } # ch_v0r96 (commented by m.taheri)
+
+                write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
+                
+                #write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID)) # ch_v0r96 (commented by m.taheri)
                 #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
                 validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
             return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
@@ -408,17 +412,21 @@ def analytic():
     else:#except:
         return redirect(url_for('roi'))
     
-#============================= info =======================================
+#============================= info ======================================= #### ch_v0r96 (edited by m.taheri)
 @app.route('/info')
 @flask_login.login_required
 def info():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) 
-    return render_template('info.html', row=row_cam)  
 
-
+    ID = r.get("ID") # ch_v0r91 added
+    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    
+    uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()) #  ch_v0r92 (added)
+    uptime2 = check_output(["uptime"])    
+    
+    return render_template('info.html', row=row_cam, setting_class = "active",
+            uptime = str(uptime).split('.')[0], uptime2=uptime2)  # render a template # ch_v0r91 row added
 #============================= create new camera =======================================
 @app.route('/createcam',methods=['POST'])
 @flask_login.login_required
@@ -567,9 +575,29 @@ def worker_vp1():
     return 'OK'
 
 #================= Getting Region of Intrest from user  ====== 
-@app.route('/roi_mouse_click', methods = ['POST'])
-@flask_login.login_required
+@app.route('/roi_mouse_click', methods = ['POST'])           #### ch_v0r96 (added by m.taheri)
+#@timing
 def worker_0():
+
+    points_x, points_y = '', ''
+    points_x = request.form.getlist('points_x[]') # x-cordinates of rectangular calibration pattern
+    points_y = request.form.getlist('points_y[]') # y-cordinates of rectangular calibration pattern
+    #print(points_x,points_y)
+    if points_x:
+        points_x_db_str=''
+        points_roi = np.zeros((len(points_x), 2), dtype=float) 
+        for i in range(0,len(points_x)):
+            points_roi[i,:] = ((int(points_x[i])  ,int(points_y[i])))
+        # ---------------------- ch_v0r86  (points_roi write to DB)-----------------------------
+            str_1=(int(points_roi[i,0])).__str__()+','+(int(points_roi[i,1])).__str__()
+            if i==0:
+                points_x_db_str = str_1+';'
+            else:
+                points_x_db_str = points_x_db_str+str_1+';'
+                
+        #ID = str(r.get("ID")) 
+        #write_to_db_roi(str(ID),points_x_db_str)
+        # ---------------------- ch_v0r86  -----------------------------
     return 'OK'
 
 #================= Getting Region of Interest from user  ====== ch_v0r87 (module added)

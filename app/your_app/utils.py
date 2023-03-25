@@ -442,9 +442,130 @@ def write_to_db_roi(ID, points_roi):
 #------------------------- # ch_v0r87  update any field of any cam(Based on python dictionary added)  --------------------------------------------------# 
 # write to DB any
 #---------------------------------------------------------------------------# 
-def write_to_db_any(table, cam_dict): # ch_v0r90 (ID --> table)
+def write_to_db_any(ID, cam_dict): # ch_v0r90 (ID --> table)
     
-    c, conn = connection()
+    selectedcam = Camera.query.filter_by(did=ID).first()
+    if selectedcam is not None:
+        for key, value in cam_dict.items():
+
+            if "IP_cam" in key:
+                selectedcam.IP_cam = value
+            
+            elif "url_cam" in key:
+                selectedcam.url_cam = value
+            
+            elif "cam_VP1_X" in key:
+                selectedcam.cam_VP1_X =value
+
+            elif "cam_VP1_y" in key:
+                selectedcam.cam_VP1_y =value
+
+            elif "cam_focal" in key:
+                selectedcam.cam_focal =value
+                
+            elif "cam_height" in key:
+                selectedcam.cam_height =value
+            
+            elif "cam_swing" in key:
+                selectedcam.cam_swing =value
+
+            elif "cam_tilt" in key:
+                selectedcam.cam_tilt =value
+
+            elif "cam_center_X" in key:
+                selectedcam.cam_center_X =value
+
+            elif "cam_center_Y" in key:
+                selectedcam.cam_center_Y =value
+
+            elif "cam_FPS" in key:
+                selectedcam.cam_FPS =value
+
+            elif "cam_VP2_X" in key:
+                selectedcam.cam_VP2_X =value
+
+            elif "cam_VP2_y" in key:
+                selectedcam.cam_VP2_y =value
+
+            elif "To_VP" in key:
+                selectedcam.To_VP =value
+
+            elif "mask_points" in key:
+                selectedcam.mask_points =value
+
+            elif "detection_type" in key:
+                selectedcam.detection_type =value
+
+            elif "slow_vehicle_th" in key:
+                selectedcam.slow_vehicle_th =value
+
+            elif "stop_vehicle_th" in key:
+                selectedcam.stop_vehicle_th =value
+
+            elif "road_points" in key:
+                selectedcam.road_points =value
+
+            elif "ped_walkway_1_points" in key:
+                selectedcam.ped_walkway_1_points =value
+
+            elif "ped_walkway_2_points" in key:
+                selectedcam.ped_walkway_2_points =value
+
+            elif "stop_vehicle_dur_th" in key:
+                selectedcam.stop_vehicle_dur_th =value
+
+            elif "disp_stop_roi" in key:
+                selectedcam.disp_stop_roi =value
+
+            elif "draw_3d" in key:
+                selectedcam.draw_3d =value
+
+            elif "class_lines_roi" in key:
+                selectedcam.class_lines_roi =value
+
+            elif "bike_dimensions" in key:
+                selectedcam.bike_dimensions =value
+
+            elif "car_dimensions" in key:
+                selectedcam.car_dimensions =value
+
+            elif "truck_dimensions" in key:
+                selectedcam.truck_dimensions =value
+
+            elif "disp_dimensions" in key:
+                selectedcam.disp_dimensions =value
+
+            elif "theme_ind" in key:
+                selectedcam.theme_ind =value
+
+            elif "Background_road_congest" in key:
+                selectedcam.Background_road_congest =value
+
+            elif "smoke_ROI_points" in key:
+                selectedcam.smoke_ROI_points =value
+
+
+            elif "smoke_staff" in key:
+                selectedcam.smoke_staff =value
+
+
+
+            elif "isenable" in key:
+                selectedcam.isenable =value
+
+
+
+            elif "isvalid" in key:
+                selectedcam.isvalid =value
+
+
+            elif "pingok" in key:
+                selectedcam.pingok =value
+
+    db.session.commit()
+
+
+    """ c, conn = connection()
     #print(table, ' Yaah ----------------- cam_dict -----------------------> ', cam_dict)
     sql = "UPDATE "+table+" SET {} where did = {}".format(', '.join('{}=%s'.format(k) for k in cam_dict), '%s') # ch_v0r90 (CAM_"+ID --> table)
     if sys.version_info >= (3, 0): # ch_v0r92  (In Python3 dict.values() returns "views" instead of lists:)
@@ -457,7 +578,7 @@ def write_to_db_any(table, cam_dict): # ch_v0r90 (ID --> table)
         
     conn.commit()            
     c.close()
-    conn.close() 
+    conn.close()  """
 
 
 #============================  # ch_v0r87 (added)  ============================================
@@ -1241,7 +1362,7 @@ def save_background_road_congest(backgroundImage_2, road_masked_roi, Road_conges
         # save Road_congest
         #print(Back_Road_congest_new)
         cam_dict={'Background_road_congest': Back_Road_congest_new }  # ch_v0r89 (added)
-        write_to_db_any("CAM_"+str(cam_ID), cam_dict)
+        write_to_db_any(cam_ID, cam_dict)
         saved_OK = True
     return saved_OK, Back_Road_congest_new
     
@@ -1399,7 +1520,7 @@ def background_smoke_init(back_roi, smoke_staff, cam_ID, r):
         # save the background cri to Data-Base
         db_save =  ','.join([str(i) for i in smoke_staff_new])
         cam_dict={'smoke_staff': db_save }  
-        write_to_db_any("CAM_"+str(cam_ID), cam_dict)
+        write_to_db_any(cam_ID, cam_dict)
     return smoke_staff
 # #===========================  # ch_v0r92 (added) =============================================
 def smoke_handle(cam_ID, r, frame_2, rgb_background, smoke_staff, frameId, road_camera_staff):

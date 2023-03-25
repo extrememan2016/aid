@@ -67,9 +67,9 @@
         <div>
         {% if validcam.url_cam == None %}
         <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
-            &nbsp;Edit Camera</button>  
+            &nbsp;Edit Camera {{validcam.did}}</button>  
         <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam{{validcam.did}}" onclick="deletecam({{validcam.did}})" ><i class="fa fa-times" aria-hidden="true"></i>
-              &nbsp;Remove Camera</button> 
+              &nbsp;Remove</button> 
         {% elif validcam.isvalid ==0 %} <!-- Camera not registered -->  
          <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
         <!-- Camera registered -->  
@@ -209,9 +209,9 @@
           var newhtml=`<div class="col-xs-6 col-sm-3 placeholder" id="item${item}">
                             <div>
                             <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_${item}"><i class="fa fa-times" aria-hidden="true"></i>
-                                &nbsp;Edit Camera</button>  
+                                &nbsp;Edit Camera ${item}</button>  
                             <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam${item}" onclick="deletecam(${item})" ><i class="fa fa-times" aria-hidden="true"></i>
-                                  &nbsp;Remove Camera</button> 
+                                  &nbsp;Remove</button> 
 
                             </div>
                     </div>

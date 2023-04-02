@@ -4,7 +4,7 @@
 
       <!-- Navbar Content -->
 <div align="center" >
-	<h2>Calibration</h2>
+	<h2>Calibrating Camera {{camid}}</h2>
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
 	<img id='theImg' src="{{ url_for('static', filename='images/screen_roi.png') }}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
 	
@@ -17,6 +17,7 @@
 {% block script %}
 
 <script>
+	
 	var canvas = document.getElementById('myCanvas');
 	var context = canvas.getContext('2d');
 	var coordinates = [];
@@ -273,7 +274,7 @@
 //---------------------------------------------------------------------------
 	canvas.addEventListener('click', function(evt) {
     		var mousePos = getMousePos(canvas, evt);
-				
+			var camid = '{{camid}}';	
 		step_1_view_finish = 1;
 		
 		if (coordinates.length < Max_point_roi) {
@@ -292,7 +293,7 @@
 				$.ajax({
 				  type: "POST",
 				  url: "/roi_mouse_click",
-				  data:{"points_x": getCol(coordinates, 0),"points_y": getCol(coordinates, 1)}
+				  data:{"camid": camid ,"points_x": getCol(coordinates, 0),"points_y": getCol(coordinates, 1)}
 				});
 			document.getElementById("myP").disabled = false;						
 			}

@@ -373,7 +373,7 @@ def home():
         elif  submit == 2:
             #session['ID'] = str(ID)
             # r.set("ID", str(ID))
-            return redirect(url_for('roi',camid=request.form.getlist('camid')[0] ))
+            return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
         elif  submit == 3: # ch_v0r87 (added)
             # r.set("ID", str(ID)) # ch_v0r87 (added)
             return redirect(url_for('analytic')) # ch_v0r87 (added)
@@ -578,7 +578,7 @@ def worker_vp1():
 @app.route('/roi_mouse_click', methods = ['POST'])           #### ch_v0r96 (added by m.taheri)
 #@timing
 def worker_0():
-
+    camid = request.form.getlist('camid')[0]
     points_x, points_y = '', ''
     points_x = request.form.getlist('points_x[]') # x-cordinates of rectangular calibration pattern
     points_y = request.form.getlist('points_y[]') # y-cordinates of rectangular calibration pattern
@@ -594,6 +594,11 @@ def worker_0():
                 points_x_db_str = str_1+';'
             else:
                 points_x_db_str = points_x_db_str+str_1+';'
+        
+
+        cam_dict={'mask_points': points_x_db_str } # ch_v0r96 (added by m.taheri)
+
+        write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
                 
         #ID = str(r.get("ID")) 
         #write_to_db_roi(str(ID),points_x_db_str)
@@ -686,12 +691,7 @@ def vp1():
 @app.route('/roi/<camid>',methods = ['POST', 'GET'])
 @flask_login.login_required
 def roi(camid):
-    print(camid)
-    for key in request.form:
-        print("Value is " + str(key))
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-    return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam)   # ch_v0r91 row added)
+    return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)
 
 #=========================================================== 
 @app.errorhandler(404)

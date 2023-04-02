@@ -294,12 +294,9 @@ def home():
                     """ ind_row = i+(i-1)*2
                     cam_en_val = row[ind_row]
                     cam_valid_val = row[ind_row+1] """
-                    print(cam.did)
 
                     selectedcam=Camera.query.filter_by(did=cam.did).first()
 
-                    pprint(selectedcam)   
-                    
 
                     cam_en_val = selectedcam.isenable
                     cam_valid_val = selectedcam.isvalid
@@ -341,12 +338,11 @@ def home():
                 change_ind = 1
                 #write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r89 commented
                 
-                cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added)
-                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
-
-                db.session.delete(Camera.query.filter_by(did=ID).first())
+                db.session.delete(Camera.query.filter_by(did=ID).first()) # ch_v0r96 (added by m.taheri)
                 db.session.commit()
 
+                #cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added) # ch_v0r96 (commented by m.taheri)
+                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
 
                 flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
             elif verify_indx == 0: # Invalid URL
@@ -377,7 +373,7 @@ def home():
         elif  submit == 2:
             #session['ID'] = str(ID)
             # r.set("ID", str(ID))
-            return redirect(url_for('roi'))
+            return redirect(url_for('roi',camid=request.form.getlist('camid')[0] ))
         elif  submit == 3: # ch_v0r87 (added)
             # r.set("ID", str(ID)) # ch_v0r87 (added)
             return redirect(url_for('analytic')) # ch_v0r87 (added)
@@ -687,9 +683,12 @@ def vp1():
     
     
 #===========================================================
-@app.route('/roi')
+@app.route('/roi/<camid>',methods = ['POST', 'GET'])
 @flask_login.login_required
-def roi():
+def roi(camid):
+    print(camid)
+    for key in request.form:
+        print("Value is " + str(key))
     ID = "1"
     row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
     return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam)   # ch_v0r91 row added)

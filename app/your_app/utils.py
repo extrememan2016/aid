@@ -302,16 +302,17 @@ def line(p1, p2):
 def verify_url(url, cam_name):
     dirname = 'static/imgs/'
     #video path
-    vid_dirname = 'static/videos/' # ch_v0r87 (added)
-    if os.path.isfile(vid_dirname): # ch_v0r88 (check if file)
-        url = vid_dirname+url
-    else:
-        vid_dirname = "\\app\\static\\videos\\"
-        url =  os.getcwd()+ vid_dirname+url
+    lin_vid_dirname = 'static/videos/'  # ch_v0r87 (added)
+    win_vid_dirname = "\\app\\static\\videos\\"    # ch_v0r96 (added by m.taheri)
+
+    if os.path.isfile(lin_vid_dirname+url): # ch_v0r88 (check if file)
+        url = lin_vid_dirname+url
+    elif os.path.isfile(os.getcwd()+ win_vid_dirname+url):
+        url =  os.getcwd()+ win_vid_dirname+url
 
     cap = cv2.VideoCapture(url) # ch_v0r88 ('vid_dirname+url' --> 'url')   
     count = 0
-    print(url)
+
     while(count< 1):
         ret, frame = cap.read()        
         if not ret:

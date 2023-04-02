@@ -340,12 +340,13 @@ def home():
                 cam_valid_val = 0
                 change_ind = 1
                 #write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r89 commented
+                
                 cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added)
+                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
 
                 db.session.delete(Camera.query.filter_by(did=ID).first())
                 db.session.commit()
 
-                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
 
                 flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
             elif verify_indx == 0: # Invalid URL
@@ -355,14 +356,17 @@ def home():
                 change_ind = 1
                 cam_en_val = 1
                 cam_valid_val = 1
-                write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r86 
+                # write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r96 (commented by m.taheri)
+                
+                cam_dict={'cam_FPS': 0 } # ch_v0r96 (added by m.taheri)
+                write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
 
             # save the changes
             if change_ind == 1:
                 cam_en_str = "cam_"+str(ID)+"_enable"  # not using in ch_v0r96 (added by m.taheri)
                 cam_valid_str = "cam_"+str(ID)+"_valid" # not using in ch_v0r96 (added by m.taheri)
 
-                cam_dict={'isenable': cam_en_val , 'isvalid': cam_valid_val,'url_cam': key_url, 'IP_cam':IP_add } # ch_v0r96 (commented by m.taheri)
+                cam_dict={'isenable': cam_en_val , 'isvalid': cam_valid_val,'url_cam': key_url, 'IP_cam':IP_add } # ch_v0r96 (added by m.taheri)
 
                 write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
                 

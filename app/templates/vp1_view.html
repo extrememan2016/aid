@@ -11,6 +11,8 @@
 </div>
 	<div class="d-flex justify-content-center">
             	<form id="package_form" action="" method="post">
+					<input  name="camid" value="{{camid}}" type="hidden">
+
                     	<div class="d-flex flex-row">
                         	<div class="p-2"><label>Direction Of Travel:  </label></div>
                         	<div class="d-flex flex-column">                    	
@@ -18,8 +20,8 @@
                                 <div class="p-2"><input id="myradio2" type="radio" name="options" id="option2" value="From_VP" data-content="Cars drive in the opposite direction to Vanishing Point" data-placement="top" rel="popover"> From Vanishing Point  </input><br></div>
                             </div> 
                        
-                             <div class="p-2"><input id="myP" type="submit" name="action" value="Change it" data-content="Change the location of Vanishing Point" data-placement="top" rel="popover"></div>  
-                             <div class="p-2"><input id="myP2" type="submit" name="action" value="It's OK. Next Step..." data-content="The location of Vanishing Point is OK. Go to the next step ..." data-placement="top" rel="popover"></div> 
+                             <div class="p-2"><input id="myP" class="btn btn-primary" type="submit" name="action" value="Change it" data-content="Change the location of Vanishing Point" data-placement="top" rel="popover"></div>  
+                             <div class="p-2"><input id="myP2" class="btn btn-primary" type="submit" name="action" value="It's OK. Next Step..." data-content="The location of Vanishing Point is OK. Go to the next step ..." data-placement="top" rel="popover"></div> 
             	    </div>
         	    </form> 
      </div>

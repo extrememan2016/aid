@@ -25,18 +25,23 @@
     {% endblock %}
 </style>
 
+    {% block overridecssjslinks %}
 
     <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     
     <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script>   
     <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script> 
     <script type="text/javascript" src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
+
+    
+    <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ url_for('static', filename='ion.rangeSlider/js/ion.rangeSlider.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap_4/js2/bootstrap.min.js') }}" ></script>
 
+
+    {% endblock %}
 
    <!-- Bootstrap core JavaScript -->
    

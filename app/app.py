@@ -443,6 +443,8 @@ def createcam():
             print("test "+str(newcam.did))
             break
     newcam.pingok = 1
+    newcam.cam_VP1_X = 619.24
+    newcam.cam_VP1_y = -116.37
     db.session.add(newcam)
     db.session.commit()
     print("we decied"+str(newcam.did))
@@ -620,28 +622,35 @@ def worker_3():
 
 #================ calibration step 1 (Getting real measurements of rectangular
 # =============== patern length and width, and camera height from user)=======
-@app.route('/vp1_view' , methods=['GET', 'POST'])
+@app.route('/vp1_view' , methods=['GET', 'POST'])    # you can also remove GET Stuff and use like this ID = request.args.get('camid')
 @flask_login.login_required
 def vp1_view():
-    ID = "1"
-    VP1 = [100, 100]
+    #ID = r.get("ID")
+    ID = request.args.get('camid')
+
+    h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
     if request.method == 'GET':        
         try:
-            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-            return render_template('vp1_view.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=VP1[0],vp1_y=VP1[1], row=row_cam)   # ch_v0r91 row added)
+            row_cam = Camera.query.filter_by(did=ID).first()
+            return render_template('vp1_view.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, row=row_cam, camid=ID)   # ch_v0r91 row added)
         except:
-            return redirect(url_for('roi'))
+            #return redirect(url_for('roi'))
+            redirect(url_for('roi',camid=ID))
     elif request.method == 'POST':
-        To_VP_ind = 1
-        #ID = r.get("ID") # ch_v0r90 (moved)
+        To_VP = 1
         option = request.form['options']
         if option == 'From_VP':
-            To_VP_ind = 0
+            To_VP = 0
+
+        # write to DB "To_VP" 
         
+
+        # write_to_db_any -> "To_VP"
+
         if request.form['action'] == "Change it":
-            return redirect(url_for('vp1'))            
+            return redirect(url_for('vp1',camid = ID))            
         elif request.form['action'] == "It's OK. Next Step...":
-            return redirect(url_for('calibration_step_1'))
+            return redirect(url_for('calibration_step_1',camid = ID))
 
 #================ calibration step 1 (Getting real mesurements of rectangular
 # =============== patern length and width, and camera heigth from user)=======
@@ -649,16 +658,38 @@ def vp1_view():
 @flask_login.login_required
 def calibration_step_1():    
     
+    W, L = 0, 0 # reset the calibration pattern real measurements
+    
     if request.method == 'POST':
-        print("Post")
+        ID =  request.args.get('camid')
+        W = request.form['int_W']
+        L = request.form['int_L']
+        h_camera_tmp = request.form['Cam_h'] # Getting camera height is optional for user
+        if h_camera_tmp != '': 
+            h_camera_real = float(h_camera_tmp)      #  ch_v0r96 (changed by m.taheri(change from np.float.float))
+        
+        if W != '' and L != '':
+            
+
+            #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" --> how to save them????
+
+
+            return redirect(url_for('calibration_step_2'))
+    
+
     else:        
         try:            
             #------------  ch_v0r85 -----------------------
-            ID = "1"
-            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+            #ID = r.get("ID")
+            ID =  request.args.get('camid')
+            #   Get h_rsz, w_rsz,vp1_x, vp1_y  -> from DB
+            print("CAMID : "+ID)
+            #row_cam = list(read_from_db("CAM_"+ID))
+            row_cam = Camera.query.filter_by(did=ID).first()
             return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, row=row_cam)   # ch_v0r91 row added)
         except:
             return redirect(url_for('roi'))
+
 #==============================================================
 @app.route('/calibration_step_2', methods=['GET','POST'])
 @flask_login.login_required
@@ -666,6 +697,7 @@ def calibration_step_2():
     
     if request.method == 'POST':
         print("Post")
+        return redirect(url_for('roi')) 
     else:        
         try:
             ID = "1"
@@ -676,19 +708,27 @@ def calibration_step_2():
             return redirect(url_for('roi')) 
   
 #===========================================================
-@app.route('/vp1')
+@app.route('/vp1'  , methods=['GET', 'POST'])
 @flask_login.login_required
 def vp1():
+
     try:
-        ID = "1"
-        row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-        return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam)   # ch_v0r91 row added)
+        #ID = r.get("ID")
+        ID =  request.args.get('camid')
+        print("CAM ID IS :"+ID)
+        # get VP1 from DB
+        h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
+
+        #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+        row_cam = Camera.query.filter_by(did=ID).first()
+        return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam, camid=ID)   # ch_v0r91 row added)
     except:
         return redirect(url_for('roi'))
+
     
     
 #===========================================================
-@app.route('/roi/<camid>',methods = ['POST', 'GET'])
+@app.route('/roi/<camid>',methods = ['POST','GET'])
 @flask_login.login_required
 def roi(camid):
     return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)

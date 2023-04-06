@@ -13,8 +13,13 @@
 	</div>
 	
     <div align="center" >
-		<input onclick="window.location = '/calibration_step_1';" id="myP" type="submit" name="submit" value="Next step ...">  
-     </div>
+		<div align="center" >
+			<form style="padding: 20px" action="calibration_step_1" method="GET">
+				<input  name="camid" value="{{camid}}" type="hidden">
+				<input  class="btn btn-primary"  id="myP" type="submit"  value="Next step ...">  
+			</form>
+		</div>
+	</div>
 {% endblock %}
 {% block script %}
 

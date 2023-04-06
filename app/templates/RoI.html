@@ -10,7 +10,13 @@
 	
 </div>
 <div align="center" >
-	<input onclick="window.location = '/vp1_view';" id="myP" type="submit" name="submit" value="Next step ..."> 
+	<!-- <input onclick="window.location = '/vp1_view';" id="myP" type="submit" name="submit" value="Next step ..."> -->
+	<form method="GET" action="{{ url_for('vp1_view') }}" style="padding: 20px;">			
+
+		<input  name="camid" value="{{camid}}" type="hidden">
+
+		<input class="btn btn-primary" id="myP" type="submit" value="Next step ...">
+	</form>
 </div>
 
 {% endblock %}

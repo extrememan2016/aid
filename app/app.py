@@ -676,6 +676,7 @@ def calibration_step_1():
     W, L = 0, 0 # reset the calibration pattern real measurements
     
     if request.method == 'POST':
+        print("Posted VAlue: "+ request.args.get('camid') )
         ID =  request.args.get('camid')
         W = request.form['int_W']
         L = request.form['int_L']
@@ -685,11 +686,9 @@ def calibration_step_1():
         
         if W != '' and L != '':
             
-
             #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" --> how to save them????
-
-
-            return redirect(url_for('calibration_step_2'))
+            
+            return redirect(url_for('calibration_step_2',camid = ID))
     
 
     else:        
@@ -701,7 +700,7 @@ def calibration_step_1():
             print("CAMID : "+ID)
             #row_cam = list(read_from_db("CAM_"+ID))
             row_cam = Camera.query.filter_by(did=ID).first()
-            return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, row=row_cam,camid = ID)   # ch_v0r91 row added)
+            return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, row=row_cam,camid = ID)   # ch_v0r91 row added)
         except:
             return redirect(url_for('roi'))
 
@@ -709,18 +708,30 @@ def calibration_step_1():
 @app.route('/calibration_step_2', methods=['GET','POST'])
 @flask_login.login_required
 def calibration_step_2():
-    
+   
     if request.method == 'POST':
-        print("Post")
-        return redirect(url_for('roi')) 
-    else:        
+        print("Posted VAlue: "+ request.form.getlist('camid')[0] )
+        member = int(request.form['member'])
+        for i in range(0, member):
+            i +=1 
+            L = float(request.form["L{0}".format(i)])
+            real_line_meseares.extend( [L] ) # seve this somewhere to use it in "mouse_click2"
+    
+        try:
+            points = points_roi[0]
+            return redirect(url_for('analytic')) 
+        except:
+            return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
+
+    else:
+        print("GETED VAlue: "+ request.args.get('camid') )    
         try:
             ID = "1"
             file_name = "file_name"
-            row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-            return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, file_name=file_name, row=row_cam)   # ch_v0r91 row added)
+            row_cam = Camera.query.filter_by(did=ID).first()
+            return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, file_name=file_name, row=row_cam)   # ch_v0r91 row added)
         except:
-            return redirect(url_for('roi')) 
+            return redirect(url_for('roi',camid=request.args.get('camid')))
   
 #===========================================================
 @app.route('/vp1'  , methods=['GET', 'POST'])

@@ -53,8 +53,10 @@
 	</div>
 
 	<input onclick="after_submit();" type="button" id="myP2" name="submit2" value="Next step ..." style="position:absolute; top:550px; left:480px; "/> 
+	
 	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; left:480px; display:none">
 		
+		<input  name="camid" value="{{camid}}" type="hidden">
 		<input  data-toggle="popover" data-content="How many lines are you going to specify?" type="text" id="member" name="member"  value="" placeholder="Number of Lines: (max. 6)" oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"/ style="display: block; width:270px; font-size:11px;"> <!-- Number of Lines input (just number is accepted)  -->
 		<input type="submit" id="myP22" name="submit22" style="display:none" value="" "/> <!-- submit button  -->
 		<a href="#" data-toggle="popover" data-content="Fill number of lines and then click here."  id="filldetails" onclick="addFields()">Click here to accept what you entered</a>
@@ -111,7 +113,7 @@
 			$.ajax({
 			  type: "POST",
 			  url: "/mouse_click2",
-			  data:{"lines_points_x": getCol(lines_codinates, 0),"lines_points_y": getCol(lines_codinates, 1)}
+			  data:{"camid": 2,"lines_points_x": getCol(lines_codinates, 0),"lines_points_y": getCol(lines_codinates, 1)}
 			   
 			});
 			  
@@ -505,7 +507,9 @@
 		
 		if (coordinates.length < 4 && arrow_finish == 1) {
 			
-			img.src = "{{ url_for('static', filename='images/'+file_name) }}"
+			//img.src = "{{ url_for('static', filename='images/'+file_name) }}"
+			img.src = "{{ url_for('static', filename='images/test.png') }}"
+
 			img.onload = run;
 			
 			if (step_2_view_finish == 0) {				
@@ -540,10 +544,11 @@
 		} else {
 
 			var fld_number =document.forms["myForm"]["member"].value;
-			
+
 			if (step_3_view_finish == 0 && addFields_finish == 1 ) {				
 				step_3_view_finish = 1;
-				img.src = "{{ url_for('static', filename='images/'+file_name) }}"
+				//img.src = "{{ url_for('static', filename='images/'+file_name) }}"
+				img.src = "{{ url_for('static', filename='images/test.png') }}"
 				img.onload = run;
 			} else if (addFields_finish == 1){
 				if (isOdd(lines_codinates.length)) {

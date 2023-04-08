@@ -631,8 +631,37 @@ def worker_SW():
 #================= Getting real measurements of some known length on the road == 
 #================= from user to improve camera calibration ====================
 @app.route('/mouse_click2', methods = ['POST'])
-@flask_login.login_required
 def worker_3():
+    # get real_line_meseares you were saved
+
+    if real_line_meseares != []: ## ch_v0r84
+        
+        #ID = r.get("ID") # ch_v0r85
+        ID = request.form.getlist('camid')[0]
+		# get focal, h_camera, VP1 and center from DB
+		# centre = int(row[9]), int(row[10]) or centre = w//2,h//2
+        Line_points_x, Line_points_y = '', ''
+        Line_points_x = request.form.getlist('lines_points_x[]') # x-cordinates of calibration lines
+        Line_points_y = request.form.getlist('lines_points_y[]') # x-cordinates of calibration lines
+        if Line_points_x:
+            line_points = np.zeros((len(Line_points_x), 2), dtype=float)
+            
+            x0 = np.array([focal,  h_camera])
+                
+            # Least square optimization to fine-tuning camera calibration partameters
+            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
+            
+            
+            cam_dict={'cam_focal': focal_length , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
+            write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
+
+            # write_to_db_CAM_ID(ID, '', road_camera_staff, '', '')  # ch_v0r85
+			# save to DB "road_camera_staff" like write_to_db_CAM_ID do!
+           
+    else: # ch_v0r84
+        print('\n'*2)
+        print('=======  Please enter the real line length in meter =======')
+        print('\n'*2)
     return 'OK'
 
 #================ calibration step 1 (Getting real measurements of rectangular
@@ -710,6 +739,7 @@ def calibration_step_1():
 def calibration_step_2():
    
     if request.method == 'POST':
+        pprint((request.form.getlist('camid')))
         print("Posted VAlue: "+ request.form.getlist('camid')[0] )
         member = int(request.form['member'])
         for i in range(0, member):
@@ -726,11 +756,12 @@ def calibration_step_2():
     else:
         print("GETED VAlue: "+ request.args.get('camid') )    
         try:
-            ID = "1"
+            ID = request.args.get('camid')
             file_name = "file_name"
             row_cam = Camera.query.filter_by(did=ID).first()
-            return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, file_name=file_name, row=row_cam)   # ch_v0r91 row added)
-        except:
+            return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, file_name=file_name, row=row_cam, camid = ID)   # ch_v0r91 row added)
+        except Exception as e:
+            print("ERROR IS : "+ str(e))
             return redirect(url_for('roi',camid=request.args.get('camid')))
   
 #===========================================================

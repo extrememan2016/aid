@@ -55,7 +55,7 @@ import os, glob
 
 import sys, traceback, importlib, threading # ch_v0r84 (added)
 from  your_app.config import config# ch_v0r84 (added)
-### import redis # ch_v0r85 (added)
+import redis # ch_v0r85 (added)
 ### from collections import deque # ch_v0r86 (added)
 
 ## from your_app.AID_Loop import AID_loop # ch_v0r89 (added)
@@ -82,7 +82,7 @@ kcw = [] # ch_v0r86 (added)
 
 # define REDIS connection information for Redis
 # Replaces with your configuration information
-### r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB) # ch_v0r89 (added)
+r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB) # ch_v0r89 (added)
 
 
 #================= Initializing flask app =====================================
@@ -462,17 +462,20 @@ def createcam():
 @app.route('/deletecam',methods=['POST'])
 @flask_login.login_required
 def deletecam():
-    if flask_login.current_user.username =='user':
-        return redirect(url_for('event'))
+    try:
+        if flask_login.current_user.username =='user':
+            return redirect(url_for('event'))
 
-    if request.method == 'POST':
-        camid = request.form['camid']
+        if request.method == 'POST':
+            camid = request.form['camid']
 
-    cam = Camera.query.filter_by(did=camid).first()
-    db.session.delete(cam)
-    db.session.commit()
+        cam = Camera.query.filter_by(did=camid).first()
+        db.session.delete(cam)
+        db.session.commit()
 
-    return jsonify(success=True)
+        return jsonify(success=True)
+    except:
+        return jsonify(error=True)
     #return redirect(url_for('home'))
 #============================= event =======================================
 @app.route('/event', methods=['GET', 'POST'])
@@ -573,8 +576,20 @@ def worker_2():
 #================= # ch_v0r90 Apply fine-tuning VP1   ====== 
 @app.route('/apply_VP1', methods = ['POST'])
 @flask_login.login_required
-def worker_vp1():   
-    return 'OK'
+def worker_vp1():
+    try:
+        print("starting")
+        camid = request.form.getlist('camid')[0]
+        vp1_x = request.form.getlist('vp1_x')[0]
+        vp1_y = request.form.getlist('vp1_y')[0]
+
+        cam_dict={'cam_VP1_X': vp1_x ,'cam_VP1_y': vp1_y } # ch_v0r96 (added by m.taheri)
+        write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
+        print("SUCCESS")
+        return jsonify(success=True)
+    except Exception as E:
+        print("ERROR: "+ str(E))
+        return jsonify(error=True),500
 
 #================= Getting Region of Intrest from user  ====== 
 @app.route('/roi_mouse_click', methods = ['POST'])           #### ch_v0r96 (added by m.taheri)
@@ -686,7 +701,7 @@ def calibration_step_1():
             print("CAMID : "+ID)
             #row_cam = list(read_from_db("CAM_"+ID))
             row_cam = Camera.query.filter_by(did=ID).first()
-            return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, row=row_cam)   # ch_v0r91 row added)
+            return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=100,vp1_y=100, row=row_cam,camid = ID)   # ch_v0r91 row added)
         except:
             return redirect(url_for('roi'))
 

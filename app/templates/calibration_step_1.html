@@ -37,7 +37,7 @@
 {% block content %}
 
 <div align="center" >
-	<h2>Preparing for calibration</h2>
+	<h2>Preparing for calibration Camera {{camid}}</h2>
 	
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
 	<img id='theImg' src="{{ url_for('static', filename='images/screen_pattern.png') }}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
@@ -55,7 +55,7 @@
                 
                       <div class="middle">
                         <button onclick="moveleft()" id="left" class="btn btn-light btn-sm"><i class="fa fa-chevron-left"  ></i></button>
-                        <button onclick="apply_VP1()" id="OK" class="btn btn-light btn-sm"><i class="fa fa-check-square"  ></i></button>
+                        <button onclick="apply_VP1({{camid}})" id="OK" class="btn btn-light btn-sm"><i class="fa fa-check-square"  ></i></button>
                         <button onclick="moveright()" id="right" class="btn btn-light btn-sm"><i class="fa fa-chevron-right"  ></i></button>
                       </div>
                 
@@ -86,7 +86,7 @@
 </div>
          <!-- ------------- ch_v0r90 (added) -->
 		 <div id="alert_it" class="alert alert-success" role="alert" style="text-align:center; display:none;margin: 10px;"> 
-			New Vanishing point position applied!
+			empty
 		  </div><!-- ------------- ch_v0r90 (added) -->
 {% endblock %}
 
@@ -142,17 +142,35 @@
 		  column.push(matrix[i][col]);
 	       }
 	       return column;
+		   
 	    }
 
-    function apply_VP1() {
+    function apply_VP1(camid) {
         coordinates = [];
         coordinates.push([parseInt(new_VP1_x),parseInt(new_VP1_y)]);
+
         $.ajax({
-        		type: "POST",
+        	type: "POST",
 			url: "/apply_VP1",
-			data:{"vp1_x": getCol(coordinates, 0),"vp1_y": getCol(coordinates, 1)}
+			data:{"vp1_x": getCol(coordinates, 0)[0],"vp1_y": getCol(coordinates, 1)[0],"camid":camid},
+			success: function(response) {
+			console.log(response);
+
+
+				if ( document.getElementById("alert_it").classList.contains('alert-danger') )
+					document.getElementById("alert_it").classList.remove('alert-danger');
+				document.getElementById("alert_it").classList.add('alert-success');
+				document.getElementById('alert_it').innerHTML = "New Vanishing point position applied!";
+				document.getElementById("alert_it").style.display = "block";  // ch_v0r90 (added)
+			},
+			error: function(error) {
+				if ( document.getElementById("alert_it").classList.contains('alert-success') )
+					document.getElementById("alert_it").classList.remove('alert-success');
+				document.getElementById("alert_it").classList.add('alert-danger');
+				document.getElementById('alert_it').innerHTML = "Fail to apply Vanishing point position!";
+				document.getElementById("alert_it").style.display = "block";  // ch_v0r90 (added)
+			}
 		});
-        document.getElementById("alert_it").style.display = "block";  // ch_v0r90 (added)
     }
 
     
@@ -214,13 +232,13 @@
 
 	}
 //---------------------------------------------------------------------------
-	function getCol(matrix, col) {
+/* 	function getCol(matrix, col) {        it was repeated
 	       var column = [];
 	       for(var i=0; i<matrix.length; i++){
 		  column.push(matrix[i][col]);
 	       }
 	       return column;
-	    }
+	    } */
 //---------------------------------------------------------------------------
 	function isEven(n) {
 	   return n % 2 == 0;

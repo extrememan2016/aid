@@ -445,6 +445,10 @@ def createcam():
     newcam.pingok = 1
     newcam.cam_VP1_X = 619.24
     newcam.cam_VP1_y = -116.37
+
+    newcam.cam_center_X = 640
+    newcam.cam_center_Y = 360
+
     db.session.add(newcam)
     db.session.commit()
     print("we decied"+str(newcam.did))
@@ -631,38 +635,7 @@ def worker_SW():
 #================= Getting real measurements of some known length on the road == 
 #================= from user to improve camera calibration ====================
 @app.route('/mouse_click2', methods = ['POST'])
-def worker_3():
-    # get real_line_meseares you were saved
 
-    if real_line_meseares != []: ## ch_v0r84
-        
-        #ID = r.get("ID") # ch_v0r85
-        ID = request.form.getlist('camid')[0]
-		# get focal, h_camera, VP1 and center from DB
-		# centre = int(row[9]), int(row[10]) or centre = w//2,h//2
-        Line_points_x, Line_points_y = '', ''
-        Line_points_x = request.form.getlist('lines_points_x[]') # x-cordinates of calibration lines
-        Line_points_y = request.form.getlist('lines_points_y[]') # x-cordinates of calibration lines
-        if Line_points_x:
-            line_points = np.zeros((len(Line_points_x), 2), dtype=float)
-            
-            x0 = np.array([focal,  h_camera])
-                
-            # Least square optimization to fine-tuning camera calibration partameters
-            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
-            
-            
-            cam_dict={'cam_focal': focal_length , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
-            write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
-
-            # write_to_db_CAM_ID(ID, '', road_camera_staff, '', '')  # ch_v0r85
-			# save to DB "road_camera_staff" like write_to_db_CAM_ID do!
-           
-    else: # ch_v0r84
-        print('\n'*2)
-        print('=======  Please enter the real line length in meter =======')
-        print('\n'*2)
-    return 'OK'
 
 #================ calibration step 1 (Getting real measurements of rectangular
 # =============== patern length and width, and camera height from user)=======
@@ -717,7 +690,7 @@ def calibration_step_1():
             
             #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" --> how to save them????
             
-            return redirect(url_for('calibration_step_2',camid = ID))
+            return redirect(url_for('calibration_step_2',camid = ID, W = W , L = L, h_camera_real = h_camera_real ))
     
 
     else:        
@@ -739,14 +712,19 @@ def calibration_step_1():
 def calibration_step_2():
    
     if request.method == 'POST':
-        pprint((request.form.getlist('camid')))
-        print("Posted VAlue: "+ request.form.getlist('camid')[0] )
+        camid = request.form.getlist('camid')[0]
+        lines_points_x = request.form.getlist('lines_points_x')[0]
+        lines_points_y = request.form.getlist('lines_points_y')[0]
         member = int(request.form['member'])
         for i in range(0, member):
             i +=1 
             L = float(request.form["L{0}".format(i)])
             real_line_meseares.extend( [L] ) # seve this somewhere to use it in "mouse_click2"
-    
+
+
+        # mouse_click2 must run here
+        worker_3(camid,lines_points_x,lines_points_y,real_line_meseares)
+
         try:
             points = points_roi[0]
             return redirect(url_for('analytic')) 
@@ -757,6 +735,10 @@ def calibration_step_2():
         print("GETED VAlue: "+ request.args.get('camid') )    
         try:
             ID = request.args.get('camid')
+            w = request.args.get('W')
+            l = request.args.get('L')
+            h_camera_real = request.args.get('h_camera_real')
+
             file_name = "file_name"
             row_cam = Camera.query.filter_by(did=ID).first()
             return render_template('calibration_step_2.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, file_name=file_name, row=row_cam, camid = ID)   # ch_v0r91 row added)
@@ -764,6 +746,43 @@ def calibration_step_2():
             print("ERROR IS : "+ str(e))
             return redirect(url_for('roi',camid=request.args.get('camid')))
   
+def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
+    # get real_line_meseares you were saved
+    if real_line_meseares != []: ## ch_v0r84
+        #ID = r.get("ID") # ch_v0r85
+        ID = camid
+        row_cam = Camera.query.filter_by(did=ID).first()
+
+		# get focal, h_camera, VP1 and center from DB
+		# centre = int(row[9]), int(row[10]) or centre = w//2,h//2
+        focal = row_cam.cam_focal
+        h_camera = row_cam.cam_height
+        centre = int(row_cam.cam_center_X), int(row_cam.cam_center_Y)
+        VP1 = int(row_cam.cam_VP1_X), int(row_cam.cam_VP1_y)
+
+        swing_angle = row_cam.cam_swing
+
+        if lines_points_x:
+            line_points = np.zeros((len(lines_points_x), 2), dtype=float)
+            
+            x0 = np.array([focal,  h_camera])
+                
+            # Least square optimization to fine-tuning camera calibration partameters
+            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
+            
+            
+            cam_dict={'cam_focal': focal_length , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
+            write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
+
+            print("Success")
+            # write_to_db_CAM_ID(ID, '', road_camera_staff, '', '')  # ch_v0r85
+			# save to DB "road_camera_staff" like write_to_db_CAM_ID do!
+           
+    else: # ch_v0r84
+        print('\n'*2)
+        print('=======  Please enter the real line length in meter =======')
+        print('\n'*2)
+    return 'OK'
 #===========================================================
 @app.route('/vp1'  , methods=['GET', 'POST'])
 @flask_login.login_required
@@ -772,12 +791,14 @@ def vp1():
     try:
         #ID = r.get("ID")
         ID =  request.args.get('camid')
-        print("CAM ID IS :"+ID)
-        # get VP1 from DB
-        h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
 
         #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
         row_cam = Camera.query.filter_by(did=ID).first()
+
+        # get VP1 from DB
+        h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
+
+
         return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam, camid=ID)   # ch_v0r91 row added)
     except:
         return redirect(url_for('roi'))

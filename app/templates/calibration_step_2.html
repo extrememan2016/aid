@@ -52,18 +52,21 @@
 	
 	</div>
 
-	<input onclick="after_submit();" type="button" id="myP2" name="submit2" value="Next step ..." style="position:absolute; top:550px; left:480px; "/> 
 	
-	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; left:480px; display:none">
+	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; left:480px; display:block">
 		
 		<input  name="camid" value="{{camid}}" type="hidden">
-		<input  data-toggle="popover" data-content="How many lines are you going to specify?" type="text" id="member" name="member"  value="" placeholder="Number of Lines: (max. 6)" oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"/ style="display: block; width:270px; font-size:11px;"> <!-- Number of Lines input (just number is accepted)  -->
-		<input type="submit" id="myP22" name="submit22" style="display:none" value="" "/> <!-- submit button  -->
+		<input disabled data-toggle="popover" data-content="How many lines are you going to specify?" type="text" id="member" name="member"  value="" placeholder="Number of Lines: (max. 6)" oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"/ style="display: block; width:270px; font-size:11px;"> <!-- Number of Lines input (just number is accepted)  -->
+		<input type="submit" id="myP22" name="submit22" style="display:none" value=" "/> <!-- submit button  -->
 		<a href="#" data-toggle="popover" data-content="Fill number of lines and then click here."  id="filldetails" onclick="addFields()">Click here to accept what you entered</a>
-	
-    		<div id="container"/>
-		
+
+    	<div id="container">
+			</div>
 	</form>	
+
+	<div align="center">
+		<input onclick="after_submit();" type="button" id="myP2" class="btn btn-primary" name="submit2" value="Next step ..." /> 
+	</div>
 </div>
 {% endblock %}
 {% block script %}
@@ -101,23 +104,39 @@
 
 //-----------------------  After submit  ---------------------------------------
 	function after_submit(){
-		//document.getElementById("myP22").click();// Form submission
-		//document.getElementById("line_num").submit();// Form submission	
+
 		var form = document.getElementById("line_num");
 		var isValidForm = form.checkValidity();
-		//if (isValidForm){
-			//form.submit();// Form submission
+		
+		console.log("itis:" + getCol(lines_codinates, 0));
+		console.log("itis:" + getCol(lines_codinates, 1));
+		if (line_finish == 1){
+			form.addEventListener("submit", function(e) {
+			var input = document.createElement("input");
+			input.setAttribute("type", "hidden");
+			input.setAttribute("name", "lines_points_x");
+			input.setAttribute("value", getCol(lines_codinates, 0));
+			this.appendChild(input);
+
+			var input = document.createElement("input");
+			input.setAttribute("type", "hidden");
+			input.setAttribute("name", "lines_points_y");
+			input.setAttribute("value", getCol(lines_codinates, 1));
+			this.appendChild(input);
+
+			});
+		}
 		document.getElementById("myP22").click();// Form submission
-		//}
+		/* 
 		if (line_finish == 1){
 			$.ajax({
 			  type: "POST",
 			  url: "/mouse_click2",
-			  data:{"camid": 2,"lines_points_x": getCol(lines_codinates, 0),"lines_points_y": getCol(lines_codinates, 1)}
+			  data:{"camid": {{camid}},"lines_points_x": getCol(lines_codinates, 0),"lines_points_y": getCol(lines_codinates, 1)}
 			   
 			});
 			  
-		}
+		} */
 	
 		
 
@@ -531,7 +550,8 @@
 				img.onload = run;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				zoomCtx.clearRect(0, 0, zoom.width, zoom.height);
-				document.getElementById("line_num").style.display = "block";
+				//document.getElementById("line_num").style.display = "block";
+				document.getElementById("member").disabled=false;
 				rect_finish = 1			    	
 				//drawPolygon();	
 				$.ajax({

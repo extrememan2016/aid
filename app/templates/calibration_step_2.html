@@ -4,6 +4,9 @@
 
 {% block overridecssjslinks %}
 
+<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
+
 <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
 <!-- <link href="{{ url_for('static', filename='material-icons/css/material-icons.css') }}" rel="stylesheet"> -->
@@ -15,9 +18,7 @@
 	
 {% endblock %}
 
-{% block sidebar%}
 
-{% endblock %}
 
 
 
@@ -43,17 +44,17 @@
 	<div align="center" >
 		<!--<h2> Calibration Step</h2>-->
 		
-		<canvas id='myCanvas2' style="cursor: crosshair; top:70px; left:180px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- image show canvas  -->
-		<canvas id='myCanvas' style="cursor: crosshair; top:70px; left:180px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- paint canvas  -->
+		<canvas id='myCanvas2' style="cursor: crosshair; top:70px; right:280px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- image show canvas  -->
+		<canvas id='myCanvas' style="cursor: crosshair; top:70px; right:280px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- paint canvas  -->
 		
-		<canvas id="zoom" width="200" height="100" style="position:absolute; top:70px; left:180px; display:none"></canvas> <!-- zoom canvas  -->
+		<canvas id="zoom" width="200" height="100" style="position:absolute; top:70px; right:280px; display:none"></canvas> <!-- zoom canvas  -->
 		
 		
 	
 	</div>
 
 	
-	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; left:480px; display:block">
+	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; right:580px; display:block;padding-bottom: 100px;">
 		
 		<input  name="camid" value="{{camid}}" type="hidden">
 		<input disabled data-toggle="popover" data-content="How many lines are you going to specify?" type="text" id="member" name="member"  value="" placeholder="Number of Lines: (max. 6)" oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"/ style="display: block; width:270px; font-size:11px;"> <!-- Number of Lines input (just number is accepted)  -->
@@ -64,7 +65,7 @@
 			</div>
 	</form>	
 
-	<div align="center">
+	<div align="center" style="position:absolute; top:590px; right: 20%; display:block">
 		<input onclick="after_submit();" type="button" id="myP2" class="btn btn-primary" name="submit2" value="Next step ..." /> 
 	</div>
 </div>

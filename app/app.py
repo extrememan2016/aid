@@ -387,30 +387,120 @@ def home():
 def analytic():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
-    # ---------------------- ch_v0r87 (POST method added)
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) 
-    # ----------------- ch_v0r91 (added) -------------------------------
-    classification_staff = make_classification_staff(row_cam) 
-    counting_list = []
-    for k in classification_staff.keys():
-        counting_list +=list(classification_staff[k])
-    counting_list[3] = 100 - counting_list[3]
-    print(counting_list)
-
-
+        # ---------------------- ch_v0r87 (POST method added)
+    ID = "3"
+    camid = ID
     if request.method == 'POST':
-        print("write to DB")
+
+        if "my_range" in request.form: # Detection Form
+            detection_condition = ["Very Low <br /> (Very low light condition or very blurry image)", "Low <br />(Low light condition or blurry image)", "Default <br />(Normal light with normal image quality)", "High <br />(High light condition and sharp image)"];
+            my_range = request.form['my_range']
+            for (i, text) in enumerate(detection_condition):
+                if text == my_range:
+                    break
+            try:
+                if str(request.form['draw_3d']) == 'on':
+                    draw_3d = 1
+            except:
+                draw_3d = 0
+
+
+            cam_dict={'detection_type': i, 'draw_3d': draw_3d }
+            #write_to_db_any("CAM_"+ID, cam_dict)
+            write_to_db_any(camid,cam_dict)
             
-    if True:        
-        detect_type_ind = 1
-        slow_vehicle_th = 40
-        stop_vehicle_th = 2
-        stop_vehicle_dur_th = 1
+        elif "stop_vehicle_th" in request.form: # Stop vehicle Form
+            stop_vehicle_th = int(request.form['stop_vehicle_th'])
+            stop_vehicle_dur_th = int(request.form['stop_vehicle_dur_th'])
+            try:
+                if str(request.form['disp_stop_roi']) == 'on': # display_roi_checkbox
+                    disp_stop_roi = 1
+            except Exception as e:
+                disp_stop_roi = 0
+                
+            cam_dict={'stop_vehicle_th': stop_vehicle_th, 'stop_vehicle_dur_th': stop_vehicle_dur_th, 'disp_stop_roi': disp_stop_roi } # disp_stop_roi # ch_v0r89 (added)
+            #write_to_db_any("CAM_"+ID, cam_dict)
+            write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
+
+
+        elif 'slow_vehicle_th' in request.form: 
+            slow_vehicle_th = int(request.form['slow_vehicle_th'])
+            cam_dict={'slow_vehicle_th': slow_vehicle_th }
+            #write_to_db_any("CAM_"+ID, cam_dict)
+            write_to_db_any(camid,cam_dict)
+        
+        elif 'roi_up_line' in request.form:
+            try:
+                if str(request.form['disp_dim']) == 'on': 
+                    disp_dimensions = 1
+            except:
+                disp_dimensions = 0
+            
+            roi_up_line    = int(request.form['roi_up_line'])
+            roi_low_line   = int(request.form['roi_low_line'])
+
+            W_low_bike     = float(request.form['W_low_bike'])
+            W_hi_bike      = float(request.form['W_hi_bike'])
+            L_low_bike     = float(request.form['L_low_bike'])
+            L_hi_bike      = float(request.form['L_hi_bike'])
+            H_low_bike     = float(request.form['H_low_bike'])
+            H_hi_bike      = float(request.form['H_hi_bike'])
+            W_low_car      = W_hi_bike
+            W_hi_car       = float(request.form['W_hi_car'])
+            L_low_car      = float(request.form['L_low_car'])
+            L_hi_car       = float(request.form['L_hi_car'])
+            H_low_car      = float(request.form['H_low_car'])
+            H_hi_car       = float(request.form['H_hi_car'])
+            W_low_truck   = float(request.form['W_low_truck'])
+            W_hi_truck    = float(request.form['W_hi_truck'])
+            L_low_truck   = L_hi_car
+            L_hi_truck    = float(request.form['L_hi_truck'])
+            H_low_truck   = float(request.form['H_low_truck'])
+            H_hi_truck    = float(request.form['H_hi_truck'])
+            
+            class_lines_roi= str(roi_up_line)+','+str(roi_low_line)+';'
+            bike_dimensions= str(W_low_bike)+','+str(W_hi_bike)+';'+str(L_low_bike)+','+str(L_hi_bike)+';'+str(H_low_bike)+','+str(H_hi_bike)+';'
+            car_dimensions= str(W_low_car)+','+str(W_hi_car)+';'+str(L_low_car)+','+str(L_hi_car)+';'+str(H_low_car)+','+str(H_hi_car)+';'
+            truck_dimensions= str(W_low_truck)+','+str(W_hi_truck)+';'+str(L_low_truck)+','+str(L_hi_truck)+';'+str(H_low_truck)+','+str(H_hi_truck)+';'
+            
+            cam_dict={'class_lines_roi': class_lines_roi, 'bike_dimensions':bike_dimensions, 'car_dimensions':car_dimensions, 'truck_dimensions':truck_dimensions, 'disp_dimensions': disp_dimensions} # disp_dimensions # ch_v0r91 (added)
+            #write_to_db_any("CAM_"+ID, cam_dict)
+            write_to_db_any(camid,cam_dict)
+    else:
+        try:
+            pprint(request.form)
+            print(request.args.get(is_apply_smoke_success))
+        except:
+
+            print("emptty")
+           
+    try:
+        #row_cam = list(read_from_db("CAM_"+ID))
+        cam = Camera.query.filter_by(did=ID).first()
+
+        # ----------------- ch_v0r91 (added) -------------------------------
+        classification_staff = make_classification_staff(cam) 
+        counting_list = []
+        for k in classification_staff.keys():
+            counting_list +=list(classification_staff[k])
+        counting_list[3] = 100 - counting_list[3]
+
+   
+        # detect_type_ind = 1
+        # slow_vehicle_th = 40
+        # stop_vehicle_th = 2
+        # stop_vehicle_dur_th = 1
+        detect_type_ind=cam.detection_type              #row_cam[16]
+        slow_vehicle_th=cam.slow_vehicle_th              #row_cam[17]
+        stop_vehicle_th=cam.stop_vehicle_th              #row_cam[18]
+        stop_vehicle_dur_th=cam.stop_vehicle_dur_th      #row_cam[22]
+        
         # --------------------   Notice: ROI should be returned to html ----------------------
-        return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=row_cam, counting_list=counting_list )
-    else:#except:
-        return redirect(url_for('roi'))
+        return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=cam, counting_list=counting_list )
+    except Exception as e:
+        print("ERROR IS: "+str(e))
+        return redirect(url_for('roi',camid=ID))
+        #return redirect(url_for('roi'))
     
 #============================= info ======================================= #### ch_v0r96 (edited by m.taheri)
 @app.route('/info')
@@ -452,9 +542,23 @@ def createcam():
 
     newcam.cam_focal = 873.57
     newcam.cam_height = 7.33
+
+
+
+    newcam.detection_type= 0
+    newcam.slow_vehicle_th = 40
+    newcam.stop_vehicle_th = 2
+    newcam.stop_vehicle_dur_th = 20
+
+    newcam.class_lines_roi = "58,45;"
+    newcam.bike_dimensions = "0.2,1.0;0.2,3.0;1.2,7.0;"
+    newcam.car_dimensions = "1.0,3.0;1.5,6.2;0.8,3.4;"
+    newcam.truck_dimensions = "1.7,3.2;6.2,18.0;3.0,5.0;"
+
+
     db.session.add(newcam)
     db.session.commit()
-    print("we decied"+str(newcam.did))
+    print("we decied to create cam with id : "+str(newcam.did))
 
 
     items = []
@@ -492,7 +596,6 @@ def event():
     row_cam = list(read_from_db("CAM_"+ID))
     error=''
     Num_of_cams = 5 # int(r.get("Num_of_cams"))
-    print(Num_of_cams)
     if request.method == "POST": # if the user postes a date filter
         # # ch_v0r91 added
         date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
@@ -633,6 +736,20 @@ def worker_0():
 @app.route('/SW_roi_mouse_click', methods = ['POST'])
 @flask_login.login_required
 def worker_SW():
+    if request.method == 'POST':
+        try:
+            camid = request.form['camid']
+            if request.form['key']=='smoke':
+
+                smoke_ROI_points = request.form['points_smoke_x'] + ';' + request.form['points_smoke_y'] +';'
+                cam_dict={'smoke_ROI_points': smoke_ROI_points }
+                write_to_db_any(camid,cam_dict)
+
+            #return redirect(url_for('analytic')) 
+        except Exception as e:
+            print("ERROR" + str(e))
+            return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
+
     return 'OK'
 
 #================= Getting real measurements of some known length on the road == 

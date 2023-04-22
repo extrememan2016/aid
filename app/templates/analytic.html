@@ -93,8 +93,9 @@
                                             <div class="col-sm-5"><b> Show ROI </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
                                                   <div class="col-sm-6">
                                                       <div class="form-check">
-                                                          <input id="disp_stop_roi" name="disp_stop_roi" type="checkbox" class="form-check-input" {% if row[23]==1 %} checked {% endif %}>
-                                                          <label for="disp_stop_roi" >
+                                                        <label>
+                                                          <input name="disp_stop_roi" type="checkbox" class="form-check-input" {% if row.disp_stop_roi == 1 %} checked {% endif %}>
+                                                          
                                                               Displaying The Road Region of Interest 
                                                           </label>                                                                
                                                  </div>
@@ -188,6 +189,7 @@
                                                 <div class="col-sm-5"><b> Smoke ROI </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
                                                       <div class="col-sm-4">
                                                           <div class="form-check">
+                                                              <input id="result" name="is_apply_smoke_success" hidden value="fault">
                                                               <input id="draw_smoke" name="draw_smoke" type="checkbox" class="form-check-input" >
                                                               <label for="draw_smoke" >
                                                                   Enable drawing The Smoke Region of Interest  
@@ -198,7 +200,7 @@
                                         
                                         <div class="form-group row"> <!-- submit -->
                                           <div class="col-sm-10">
-                                            <button type="submit" class="btn btn-success">Apply</button>
+                                            <button onclick="applysmoke()" id="applysmokebtn" type="submit" class="btn btn-success" disabled>Apply</button>
                                           </div>
                                         </div>
                                       </form>
@@ -217,7 +219,7 @@
                                          <div class="col-sm-5"><b> Display dimensions </b></div> <!-- Enable drawing the Road Region of Interest -->
                                               <div class="col-sm-6">
                                                   <div class="form-check">
-                                                      <input id="disp_dim" name="disp_dim" type="checkbox" class="form-check-input" {% if row[29]==1 %} checked {% endif %} > <!-- # ch_v0r89 (required removed) -->
+                                                      <input id="disp_dim" name="disp_dim" type="checkbox" class="form-check-input" {% if row.disp_dimensions ==1 %} checked {% endif %} > <!-- # ch_v0r89 (required removed) -->
                                                       <label for="disp_dim" >
                                                           Display vehicle detected dimensions 
                                                       </label>
@@ -483,7 +485,7 @@
                                                 <div class="col-sm-5"><b> Show 3D Detection </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
                                                       <div class="col-sm-4">
                                                           <div class="form-check">
-                                                              <input id="draw_3d" name="draw_3d" type="checkbox" class="form-check-input" {% if row[24]==1 %} checked {% endif %}>
+                                                              <input id="draw_3d" name="draw_3d" type="checkbox" class="form-check-input" {% if row.draw_3d ==1 %} checked {% endif %}>
                                                               <label for="draw_3d" >
                                                                   Displaying 3D Object 
                                                               </label>                                                                
@@ -624,50 +626,49 @@
         //$(".prev span").text(id_selected);
     
     //---------------------------------------------------------------------------
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            // here is the new selected tab id
-            var selectedTabId = e.target.id;
-            // document.getElementById(selectedTabId).style.color = 'rgba(15, 97, 0, 1)';
-            $(".act span").text(selectedTabId);
-            context.clearRect(0, 0, canvas.width, canvas.height); 
-            if (selectedTabId == 'Stop') {
-                id_selected = 0;
-                if (coordinates.length > 0){
-                    drawPolygon();
-                }
-            } else if (selectedTabId == 'Traffic' ) {
-                id_selected = 1; 
-                
-            } else if (selectedTabId == 'Wrong' ) {
-                id_selected = 2; 
-                 
-            } else if (selectedTabId == 'Pedestrian') {
-                id_selected = 3; 
-                if (coordinates_ped.length > 0){
-                    drawPolygon_ped();
-                    if (coordinates_ped2.length> 0){
-                        drawPolygon_ped_2();
-                    }
-                }
-            } else if (selectedTabId == 'Smoke' ) {
-                id_selected = 4;
-                if (coordinates_smoke.length > 0){
-                    drawSquare_smoke();
-                } 
-                
-                
-            } else if (selectedTabId == 'Counting' ) {
-                id_selected = 5;
-                roi_up_low_line_draw()
-            } else if (selectedTabId == 'Lost' ) {
-                id_selected = 6;
-                
-            } else if (selectedTabId == 'Detection' ) {
-                id_selected = 7;
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        // here is the new selected tab id
+        var selectedTabId = e.target.id;
+        // document.getElementById(selectedTabId).style.color = 'rgba(15, 97, 0, 1)';
+        $(".act span").text(selectedTabId);
+        context.clearRect(0, 0, canvas.width, canvas.height); 
+        if (selectedTabId == 'Stop') {
+            id_selected = 0;
+            if (coordinates.length > 0){
+                drawPolygon();
             }
+        } else if (selectedTabId == 'Traffic' ) {
+            id_selected = 1; 
             
-            $(".prev span").text(id_selected);
-        });
+        } else if (selectedTabId == 'Wrong' ) {
+            id_selected = 2; 
+                
+        } else if (selectedTabId == 'Pedestrian') {
+            id_selected = 3; 
+            if (coordinates_ped.length > 0){
+                drawPolygon_ped();
+                if (coordinates_ped2.length> 0){
+                    drawPolygon_ped_2();
+                }
+            }
+        } else if (selectedTabId == 'Smoke' ) {
+            id_selected = 4;
+            if (coordinates_smoke.length > 0){
+                drawSquare_smoke();
+            } 
+                
+        } else if (selectedTabId == 'Counting' ) {
+            id_selected = 5;
+            roi_up_low_line_draw()
+        } else if (selectedTabId == 'Lost' ) {
+            id_selected = 6;
+            
+        } else if (selectedTabId == 'Detection' ) {
+            id_selected = 7;
+        }
+        console.log("WE WIN");
+        $(".prev span").text(id_selected);
+    });
      //---------------------------------------------------------------------------
     function W_hi_bike_2_W_low_car() {		
         var inputOne = document.getElementById("W_hi_bike").value;
@@ -1119,7 +1120,7 @@
 
      
 //---------------------------------------------------------------------------
-	canvas.addEventListener('mousemove', function(evt) {
+	    canvas.addEventListener('mousemove', function(evt) {
         	 var mousePos = getMousePos(canvas, evt);
         	 var stop_en_roi = document.getElementById('stop_roi').checked
         	 var smoke_en_roi = document.getElementById('draw_smoke').checked // # ch_v0r92
@@ -1191,13 +1192,18 @@
         		if (coordinates_smoke.length < Max_point_roi_smoke) {
         			coordinates_smoke.push([parseInt(mousePos.x),parseInt(mousePos.y)]);
         			if (coordinates_smoke.length == Max_point_roi_smoke ) {
-        				rect_finish_smoke = 1			    	
-        				drawSquare_smoke();	
-        				$.ajax({
+        				 rect_finish_smoke = 1			    	
+        				drawSquare_smoke();
+                        console.log("It IS : "+getCol(coordinates_smoke, 0))
+                        
+                        document.querySelector('#applysmokebtn').disabled = false;
+
+
+        				/* $.ajax({  SET THE ROI WHEN APPLY BTN CLICKED
         				  type: "POST",
         				  url: "/SW_roi_mouse_click",
-        				  data:{"points_smoke_x": getCol(coordinates_smoke, 0),"points_smoke_y": getCol(coordinates_smoke, 1)}
-        				});
+        				  data:{"key": "smoke" ,"camid": 3 ,"points_smoke_x": getCol(coordinates_smoke, 0).toString(),"points_smoke_y": getCol(coordinates_smoke, 1).toString()}
+        				});  */
         			}
         		}
         	
@@ -1235,7 +1241,20 @@
         	}
 		
         }, false);
-        
+        function applysmoke(){
+            rect_finish_smoke = 1			    	
+            drawSquare_smoke();
+            $.ajax({
+                type: "POST",
+                url: "/SW_roi_mouse_click",
+                data:{"key": "smoke" ,"camid": 3 ,"points_smoke_x": getCol(coordinates_smoke, 0).toString(),"points_smoke_y": getCol(coordinates_smoke, 1).toString(),
+                success: function(response) {
+                    document.getElementById("is_apply_smoke_success").value = "success";
+                    console.log("Smoke Points writed Successfully");
+                }
+            }
+            });
+        }
         $(document).ready(function (){
       $("[data-toggle=tooltip]").tooltip()
     })

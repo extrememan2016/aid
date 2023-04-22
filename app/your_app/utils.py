@@ -1237,11 +1237,18 @@ def VP1_from_DB(ID, w_rsz, h_rsz):
     print(VP1,orig_VP1, w, h, w_rsz, h_rsz)
     return VP1, orig_VP1, row      
 #--------------- # ch_v0r91 (make classification staff) --------------------------------------- 
-def make_classification_staff(row):
-    class_lines_roi  = row[25]
+def make_classification_staff(cam):
+
+    """ class_lines_roi  = row[25]
     bike_dimensions  = row[26]
     car_dimensions   = row[27]
-    truck_dimensions = row[28]
+    truck_dimensions = row[28] """
+    
+    class_lines_roi  = cam.class_lines_roi
+    bike_dimensions  = cam.bike_dimensions
+    car_dimensions   = cam.car_dimensions
+    truck_dimensions = cam.truck_dimensions
+
     class_lines_roi_np  = poitsROIstr_to_pointsROInp(class_lines_roi, np.int32) # ch_v0r96 (added by m.taheri)
     bike_dimensions_np  = poitsROIstr_to_pointsROInp(bike_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
     car_dimensions_np   = poitsROIstr_to_pointsROInp(car_dimensions, np.float32)# ch_v0r96 (added by m.taheri)

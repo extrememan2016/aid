@@ -391,6 +391,23 @@ def analytic():
     ID = "3"
     camid = ID
     if request.method == 'POST':
+        if  "draw_smoke" in request.form:
+            pprint(request.form)
+            try:
+                
+                camid = request.form['camid']
+                smoke_ROI_points = request.form['points_smoke_x'] + ';' + request.form['points_smoke_y'] +';'
+                cam_dict={'smoke_ROI_points': smoke_ROI_points }
+                write_to_db_any(camid,cam_dict)
+                flash(u'Smoke Region Setting Applied!', 'success')
+                #return redirect(url_for('analytic')) 
+            except Exception as e:
+                print("ERROR" + str(e))
+                flash(u'Error! Cant Apply Smoke ROI Setting!', 'warning ')
+                #return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
+
+
+
 
         if "my_range" in request.form: # Detection Form
             detection_condition = ["Very Low <br /> (Very low light condition or very blurry image)", "Low <br />(Low light condition or blurry image)", "Default <br />(Normal light with normal image quality)", "High <br />(High light condition and sharp image)"];
@@ -659,8 +676,7 @@ def statistic():
         else:
             error_mes = 'Report duration is Out of Range!'
             table = ''
-            flash(error_mes, 'warning')
-        
+            flash(error_mes, 'warning')     
         print(table)
         return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # return for user post
     else:
@@ -733,7 +749,7 @@ def worker_0():
     return 'OK'
 
 #================= Getting Region of Interest from user  ====== ch_v0r87 (module added)
-@app.route('/SW_roi_mouse_click', methods = ['POST'])
+""" @app.route('/SW_roi_mouse_click', methods = ['POST'])
 @flask_login.login_required
 def worker_SW():
     if request.method == 'POST':
@@ -748,9 +764,9 @@ def worker_SW():
             #return redirect(url_for('analytic')) 
         except Exception as e:
             print("ERROR" + str(e))
-            return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
+            #return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
 
-    return 'OK'
+    return 'OK' """
 
 #================= Getting real measurements of some known length on the road == 
 #================= from user to improve camera calibration ====================

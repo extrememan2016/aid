@@ -4,7 +4,19 @@
 {% block content %}
 
 <div id="page-content-wrapper">
-          
+                    <!-- ---------------------   flash ------------------------------->  
+                    <div style="text-align:center;">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                             {% if messages %}
+                               <div class="alert alert-{{ messages.0.0 }}" role="alert">
+                                 {% for category, message in messages %}
+                                   {{ message }} </br>
+                                 {% endfor %}
+                               </div>
+                             {% endif %}
+                           {% endwith %}
+                       </div>
+                       <!-- ---------------------   flash ------------------------------->
           
     <!-- ------------------------- url_for Content -------------------------  -->
     <div class="container-fluid"  align="center">
@@ -184,23 +196,31 @@
                   <div id="smoke" class="container tab-pane fade"><br>
                     <div class="card" style="width: 90%;margin:0 auto ;" align="left">
                               <div class="card-body" style="font-size: 15px;">
-                                      <form class="was-validated" name="smoke_form" id="smoke_form" action="" method="post">
+                                      <form class="was-validated" name="smoke_form" id="smoke_form" onsubmit="applysmoke();" method="post">
                                             <div class="form-group row align-items-start">
                                                 <div class="col-sm-5"><b> Smoke ROI </b></div> <!-- # ch_v0r89 (added -> Displaying The Road Region of Interest) -->
                                                       <div class="col-sm-4">
                                                           <div class="form-check">
-                                                              <input id="result" name="is_apply_smoke_success" hidden value="fault">
-                                                              <input id="draw_smoke" name="draw_smoke" type="checkbox" class="form-check-input" >
-                                                              <label for="draw_smoke" >
-                                                                  Enable drawing The Smoke Region of Interest  
-                                                              </label>                                                                
+
+
+                                                                <input id="camid" name="camid" hidden value="3">
+                                                                <input id="points_smoke_x" name="points_smoke_x" hidden value="fault">
+                                                                <input id="points_smoke_y" name="points_smoke_y" hidden value="fault">
+
+
+
+
+                                                                <input id="draw_smoke" name="draw_smoke" type="checkbox" class="form-check-input" >
+                                                                <label for="draw_smoke" >
+                                                                    Enable drawing The Smoke Region of Interest  
+                                                                </label>                                                                
                                                      </div>
                                                 </div>
                                             </div>
                                         
                                         <div class="form-group row"> <!-- submit -->
                                           <div class="col-sm-10">
-                                            <button onclick="applysmoke()" id="applysmokebtn" type="submit" class="btn btn-success" disabled>Apply</button>
+                                            <button  id="applysmokebtn" type="submit" class="btn btn-success" disabled>Apply</button>
                                           </div>
                                         </div>
                                       </form>
@@ -1241,19 +1261,34 @@
         	}
 		
         }, false);
+
+
+        /* $('#smoke_form').submit(function(e) {
+            e.preventDefault();
+            applysmoke();
+
+            }) */
+
         function applysmoke(){
-            rect_finish_smoke = 1			    	
+            console.log("Run success");
+            rect_finish_smoke = 1	    	
             drawSquare_smoke();
-            $.ajax({
+            document.getElementById("points_smoke_x").value = getCol(coordinates_smoke, 0).toString();
+            document.getElementById("points_smoke_y").value = getCol(coordinates_smoke, 1).toString();
+            /* $.ajax({       # this part doint directly with FORM #smoke_form
                 type: "POST",
                 url: "/SW_roi_mouse_click",
                 data:{"key": "smoke" ,"camid": 3 ,"points_smoke_x": getCol(coordinates_smoke, 0).toString(),"points_smoke_y": getCol(coordinates_smoke, 1).toString(),
                 success: function(response) {
                     document.getElementById("is_apply_smoke_success").value = "success";
                     console.log("Smoke Points writed Successfully");
+                    alert("Smoke Points writed Successfully");
                 }
             }
-            });
+
+
+            }); */
+
         }
         $(document).ready(function (){
       $("[data-toggle=tooltip]").tooltip()

@@ -28,7 +28,7 @@ import re# ch_v0r85 (added)
 
 
 ### from your_app.man_calibration import man_calib
-### from your_app.least_squares import ls_fine_tune_parameters
+from your_app.least_squares import ls_fine_tune_parameters
 ### from your_app.calculateSpeeds import Speed_Calc
 
 
@@ -448,7 +448,10 @@ def createcam():
 
     newcam.cam_center_X = 640
     newcam.cam_center_Y = 360
+    newcam.cam_swing = 2.85
 
+    newcam.cam_focal = 873.57
+    newcam.cam_height = 7.33
     db.session.add(newcam)
     db.session.commit()
     print("we decied"+str(newcam.did))
@@ -764,9 +767,7 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
 
         if lines_points_x:
             line_points = np.zeros((len(lines_points_x), 2), dtype=float)
-            
             x0 = np.array([focal,  h_camera])
-                
             # Least square optimization to fine-tuning camera calibration partameters
             road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
             

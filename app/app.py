@@ -388,7 +388,7 @@ def analytic():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
         # ---------------------- ch_v0r87 (POST method added)
-    ID = "3"
+    ID = request.args.get('camid')
     camid = ID
     if request.method == 'POST':
         if  "draw_smoke" in request.form:
@@ -938,7 +938,12 @@ def vp1():
         return redirect(url_for('roi'))
 
     
-    
+
+@app.before_request
+def before_request():
+    CAMS = Camera.query.filter_by(isenable=1).all()
+    request.onlinecams = CAMS
+
 #===========================================================
 @app.route('/roi/<camid>',methods = ['POST','GET'])
 @flask_login.login_required
@@ -948,7 +953,7 @@ def roi(camid):
 #=========================================================== 
 @app.errorhandler(404)
 def page_not_found(e):
-    print( '404 page not found'+ str(e)) # ch_v0r90 (py3 change)
+    print( '404 page not found'+ str(request.path)) # ch_v0r90 (py3 change)
     ID = "1"
     row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
     return render_template('404.html', row=row_cam), 404 
@@ -966,3 +971,4 @@ def main():
 if __name__ == '__main__':
     main()
     
+

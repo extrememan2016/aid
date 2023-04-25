@@ -31,15 +31,27 @@
     <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     
-    <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script>   
-    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script> 
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.min.js') }}"></script>    changed with bellow versions on 04/25/2023
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script> -->
+
+    
+    <!-- for sidebar submenu -->
+    <script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery.slim.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.bundle.min.js') }}"></script>
+   <!-- for sidebar submenu -->
+
+
     <script type="text/javascript" src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
 
     
     <link href="{{ url_for('static', filename='simple-sidebar/css/simple-sidebar.css') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ url_for('static', filename='ion.rangeSlider/js/ion.rangeSlider.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap_4/js2/bootstrap.min.js') }}" ></script>
+    <!-- <script src="{{ url_for('static', filename='bootstrap_4/js2/bootstrap.min.js') }}" ></script> if seemd not working commented on 04/25/2023 -->
 
+
+
+
+    
 
     {% endblock %}
 
@@ -90,11 +102,21 @@
         {% block sidebar %}
 
             <!-- Sidebar -->
-            <div class="bg-white border-right" style="margin-top:55px" id="sidebar-wrapper" >
+              
+              <div class="bg-white border-right" style="margin-top:55px" id="sidebar-wrapper" >
                 <div class="list-group list-group-flush">
                   {% if session.username != 'user' %}
                     <a id = "home" class="list-group-item list-group-item-action bg-light"   style="color: rgba(0, 0, 0, 1);" href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
-                    <a id = "analytic" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </a>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+                    <div class="dropdown dropright">
+
+                      <button id = "analytic" class="list-group-item list-group-item-action bg-light btn btn-primary dropdown-toggle list-group" data-toggle="dropdown"   style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </button>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
+                      <div class="dropdown-menu">
+                        {% for item in request.onlinecams %}
+                        <a class="dropdown-item" href="{{ url_for('home') }}analytic?camid={{item.did}}">Camera {{ item.did }}</a>
+                        {% endfor %}
+
+                      </div>                    
+                    </div>
                     <a id = "counting" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('counting') }}"> <i class="fa fa-car">                                </i> Counting           </a>      <!-- # ch_v0r89  [   <i class="material-icons">directions_car</i> Counting</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
                     <a id = "event"class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('event') }}">      <i class="fa fa-list" >                            </i> Event Journal      </a>      <!-- # ch_v0r89  [   <i class="material-icons">insert_chart</i> Statistics</a> replaced with <i class="fa fa-list"></i>Event Journal </a> ] -->
                     <a id = "statistic" class="list-group-item list-group-item-action bg-light"               style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('statistic') }}"> <i class="fa fa-area-chart">                        </i> Traffic Data       </a>      <!-- # ch_v0r89  [   <i class="material-icons">event_note</i> Event notification</a> replaced with <<i class="fa fa-chart-area"></i> Traffic Data </a> ] -->
@@ -105,7 +127,10 @@
                   {% endif %}
 
                 </div>
-              </div>
+            </div>
+
+
+            
               <!-- /#sidebar-wrapper -->
 
         {% endblock %}

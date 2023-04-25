@@ -169,32 +169,32 @@
   <script>
     
     var url = window.location.href;
-    var lastPart = url.substr(url.lastIndexOf('/') + 1);
+    //var lastPart = url.substr(url.lastIndexOf('/') + 1);
+  
 
-
-      if (lastPart === "analytic"){
+      if (url.includes("analytic") || url.includes("roi")){
         $("#analytic").css("color", "rgba(15, 97, 0, 1);");
         $("#analytic").addClass("list-group-item list-group-item-action list-group-item-dark");
         $("#analytic").removeClass("bg-light");
 
       }
 
-      else if (lastPart === "counting"){
+      else if (url.includes("counting")){
       $("#counting").css("color", "rgba(15, 97, 0, 1);");
       $("#counting").addClass("list-group-item list-group-item-action list-group-item-dark");
       $("#counting").removeClass("bg-light");
       }
-      else  if (lastPart === "event"){
+      else  if (url.includes("event")){
         $("#event").css("color", "rgba(15, 97, 0, 1);");
         $("#event").addClass("list-group-item list-group-item-action list-group-item-dark");
         $("#event").removeClass("bg-light");
       }
-      else  if (lastPart === "statistic"){
+      else  if (url.includes("statistic")){
         $("#statistic").css("color", "rgba(15, 97, 0, 1);");
         $("#statistic").addClass("list-group-item list-group-item-action list-group-item-dark");
         $("#statistic").removeClass("bg-light");
       }
-      else  if (lastPart === "info"){
+      else  if (url.includes("info")){
         $("#info").css("color", "rgba(15, 97, 0, 1);");
         $("#info").addClass("list-group-item list-group-item-action list-group-item-dark");
         $("#info").removeClass("bg-light");

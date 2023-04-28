@@ -246,7 +246,13 @@
                           </div>`
 
           //$("#addcambtn").before(newhtml);
-          $("#item" + i).after(newhtml);
+          
+
+
+          if(i != 0)
+              $("#item" + i).after(newhtml);
+          else
+              $("#addcambtn").before(newhtml);
 
           $("#cfo").append(new_custom_modal_for_new_item);
 

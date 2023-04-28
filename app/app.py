@@ -397,6 +397,7 @@ def analytic():
                 
                 camid = request.form['camid']
                 smoke_ROI_points = request.form['points_smoke_x'] + ';' + request.form['points_smoke_y'] +';'
+
                 cam_dict={'smoke_ROI_points': smoke_ROI_points }
                 write_to_db_any(camid,cam_dict)
                 flash(u'Smoke Region Setting Applied!', 'success')
@@ -427,17 +428,26 @@ def analytic():
             write_to_db_any(camid,cam_dict)
             
         elif "stop_vehicle_th" in request.form: # Stop vehicle Form
-            stop_vehicle_th = int(request.form['stop_vehicle_th'])
-            stop_vehicle_dur_th = int(request.form['stop_vehicle_dur_th'])
             try:
-                if str(request.form['disp_stop_roi']) == 'on': # display_roi_checkbox
-                    disp_stop_roi = 1
-            except Exception as e:
-                disp_stop_roi = 0
                 
-            cam_dict={'stop_vehicle_th': stop_vehicle_th, 'stop_vehicle_dur_th': stop_vehicle_dur_th, 'disp_stop_roi': disp_stop_roi } # disp_stop_roi # ch_v0r89 (added)
-            #write_to_db_any("CAM_"+ID, cam_dict)
-            write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
+                camid = request.form['camid']
+                stop_vehicle_th = int(request.form['stop_vehicle_th'])
+                stop_vehicle_dur_th = int(request.form['stop_vehicle_dur_th'])
+
+                ################how to use points_stop_x and points_stop_y ????????????????
+
+                try:
+                    if str(request.form['disp_stop_roi']) == 'on': # display_roi_checkbox
+                        disp_stop_roi = 1
+                except Exception as e:
+                    disp_stop_roi = 0
+                    
+                cam_dict={'stop_vehicle_th': stop_vehicle_th, 'stop_vehicle_dur_th': stop_vehicle_dur_th, 'disp_stop_roi': disp_stop_roi } # disp_stop_roi # ch_v0r89 (added)
+                write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
+
+                flash(u'STOP Region Setting Applied!', 'success')
+            except:
+                flash(u'Error! Cant Apply STOP Setting!', 'warning ')
 
 
         elif 'slow_vehicle_th' in request.form: 
@@ -483,13 +493,13 @@ def analytic():
             cam_dict={'class_lines_roi': class_lines_roi, 'bike_dimensions':bike_dimensions, 'car_dimensions':car_dimensions, 'truck_dimensions':truck_dimensions, 'disp_dimensions': disp_dimensions} # disp_dimensions # ch_v0r91 (added)
             #write_to_db_any("CAM_"+ID, cam_dict)
             write_to_db_any(camid,cam_dict)
-    else:
+    """ else:
         try:
             pprint(request.form)
             print(request.args.get(is_apply_smoke_success))
         except:
 
-            print("emptty")
+            print("emptty") """
            
     try:
         #row_cam = list(read_from_db("CAM_"+ID))
@@ -516,6 +526,7 @@ def analytic():
         return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=cam, counting_list=counting_list )
     except Exception as e:
         print("ERROR IS: "+str(e))
+        #flash(u'Invalid URL provided', 'warning')
         return redirect(url_for('roi',camid=ID))
         #return redirect(url_for('roi'))
     

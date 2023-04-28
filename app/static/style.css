@@ -116,6 +116,10 @@ header{
     min-height: 500px;
   }
 
+  .internalcard{
+    width: 90%; margin:0 auto ;
+    
+  }
 
 
 

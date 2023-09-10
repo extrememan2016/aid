@@ -451,11 +451,17 @@ def analytic():
 
 
         elif 'slow_vehicle_th' in request.form: 
-            slow_vehicle_th = int(request.form['slow_vehicle_th'])
-            cam_dict={'slow_vehicle_th': slow_vehicle_th }
-            #write_to_db_any("CAM_"+ID, cam_dict)
-            write_to_db_any(camid,cam_dict)
-        
+            try:
+                camid = request.form['camid']
+
+                slow_vehicle_th = int(request.form['slow_vehicle_th'])
+                cam_dict={'slow_vehicle_th': slow_vehicle_th }
+
+                write_to_db_any(camid,cam_dict)
+                flash(u'Slow vehicle Threshold Setting Applied!', 'success')
+            except Exception as e:
+                flash(u'Error! Cant Apply Slow vehicle Threshold Setting!' + str(e) , 'warning ')
+
         elif 'roi_up_line' in request.form:
             try:
                 if str(request.form['disp_dim']) == 'on': 

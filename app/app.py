@@ -312,16 +312,19 @@ def home():
             
         if submit == 1:
 
+            try:
+                # If Cam Enable is 'ON'
+                if cam_en_val_temp == 'on':
+                    if cam_en_val == 0:
+                        cam_en_val = 1
+                        change_ind = 1
+                else: 
+                    if cam_en_val == 1:
+                        cam_en_val = 0
+                        change_ind = 1
+            except:
+                flash(u'error occured. please try again', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
 
-            # If Cam Enable is 'ON'
-            if cam_en_val_temp == 'on':
-                if cam_en_val == 0:
-                    cam_en_val = 1
-                    change_ind = 1
-            else: 
-                if cam_en_val == 1:
-                    cam_en_val = 0
-                    change_ind = 1
             # If url is not empty --> check for url validity 
             if key_url != '':
                 verify_indx, isfile = verify_url(key_url, 'Cam_'+ID)

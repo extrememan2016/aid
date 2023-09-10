@@ -323,7 +323,7 @@ def home():
                         cam_en_val = 0
                         change_ind = 1
             except:
-                flash(u'error occured. please try again', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
+                flash(u'Error occured. Please try again', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
 
             # If url is not empty --> check for url validity 
             if key_url != '':
@@ -546,14 +546,17 @@ def info():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
 
-    ID = r.get("ID") # ch_v0r91 added
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-    
-    uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()) #  ch_v0r92 (added)
-    uptime2 = check_output(["uptime"])    
-    
-    return render_template('info.html', row=row_cam, setting_class = "active",
-            uptime = str(uptime).split('.')[0], uptime2=uptime2)  # render a template # ch_v0r91 row added
+    try:
+        ID = r.get("ID") # ch_v0r91 added
+        row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+        
+        uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()) #  ch_v0r92 (added)
+        uptime2 = check_output(["uptime"])    
+        
+        return render_template('info.html', row=row_cam, setting_class = "active",
+                uptime = str(uptime).split('.')[0], uptime2=uptime2)  # render a template # ch_v0r91 row added
+    except:
+        flash(u'Error occured. Please contact Admin', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
 #============================= create new camera =======================================
 @app.route('/createcam',methods=['POST'])
 @flask_login.login_required

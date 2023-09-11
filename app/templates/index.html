@@ -137,7 +137,7 @@
 
           {% if validcam[2] ==1 %}
              <button id="calib_{{validcam.did}}" type="submit" name="actions" value="calib" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Calibration</button>
-             <button id="analytic" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Analytic</button>
+             <button id="analytic_{{validcam.did}}" type="submit" name="actions" value="analytic" class="btn btn-primary"  form="form{{validcam.did}}"  {% if validcams[1] ==0 or validcams[3] ==0 %} disabled{% endif %}>Analytic</button>
           {% endif %}
           <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
           <button type="submit" name="actions" value="submit" class="btn btn-primary" form="form{{validcam.did}}">Submit</button>

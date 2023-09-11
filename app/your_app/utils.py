@@ -5,6 +5,7 @@ Created on Tue Mar 12 11:20:57 2019
 
 @author: pi
 """
+from pprint import pprint
 import numpy as np
 import cv2
 import math, time, datetime, os, glob
@@ -1249,11 +1250,13 @@ def make_classification_staff(cam):
     car_dimensions   = cam.car_dimensions
     truck_dimensions = cam.truck_dimensions
 
-    class_lines_roi_np  = poitsROIstr_to_pointsROInp(class_lines_roi, np.int32) # ch_v0r96 (added by m.taheri)
+    
+    class_lines_roi_np  = poitsROIstr_to_pointsROInp(class_lines_roi, np.float32) # ch_v0r96 (added by m.taheri)(change from np.int32 to np.float32 due error opeing analytics page)
     bike_dimensions_np  = poitsROIstr_to_pointsROInp(bike_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
     car_dimensions_np   = poitsROIstr_to_pointsROInp(car_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
     truck_dimensions_np = poitsROIstr_to_pointsROInp(truck_dimensions, np.float32)# ch_v0r96 (added by m.taheri)
     classification_staff = {'lines_roi_up': (100 -class_lines_roi_np), 'bike_dimensions':bike_dimensions_np, 'car_dimensions':car_dimensions_np, 'truck_dimensions':truck_dimensions_np}
+    
     return classification_staff
     
 #--------------- # ch_v0r91 (reset_counter_and_speeds) --------------------------------------- 

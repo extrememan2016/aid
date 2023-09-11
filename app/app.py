@@ -255,9 +255,6 @@ def send_file(filename):
 def home():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
-# Read from DB 
-    #example = Camera.query.filter_by(did=1).first()
-    #print(camera.url_cam)
 
     ID = "1" # r.get("ID") # ch_v0r91 added
     #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r96 (commented by m.taheri)
@@ -379,7 +376,7 @@ def home():
             return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
         elif  submit == 3: # ch_v0r87 (added)
             # r.set("ID", str(ID)) # ch_v0r87 (added)
-            return redirect(url_for('analytic')) # ch_v0r87 (added)
+            return redirect(url_for('analytic',camid=request.form.getlist('camid')[0])) # ch_v0r87 (added)
             
     else:
         return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
@@ -394,6 +391,7 @@ def analytic():
     ID = request.args.get('camid')
     camid = ID
     if request.method == 'POST':
+        
         if  "draw_smoke" in request.form:
             pprint(request.form)
             try:
@@ -472,8 +470,8 @@ def analytic():
             except:
                 disp_dimensions = 0
             
-            roi_up_line    = int(request.form['roi_up_line'])
-            roi_low_line   = int(request.form['roi_low_line'])
+            roi_up_line    = int(float(request.form['roi_up_line']))
+            roi_low_line   = int(float(request.form['roi_low_line']))
 
             W_low_bike     = float(request.form['W_low_bike'])
             W_hi_bike      = float(request.form['W_hi_bike'])
@@ -513,7 +511,6 @@ def analytic():
     try:
         #row_cam = list(read_from_db("CAM_"+ID))
         cam = Camera.query.filter_by(did=ID).first()
-
         # ----------------- ch_v0r91 (added) -------------------------------
         classification_staff = make_classification_staff(cam) 
         counting_list = []
@@ -521,7 +518,6 @@ def analytic():
             counting_list +=list(classification_staff[k])
         counting_list[3] = 100 - counting_list[3]
 
-   
         # detect_type_ind = 1
         # slow_vehicle_th = 40
         # stop_vehicle_th = 2
@@ -530,7 +526,6 @@ def analytic():
         slow_vehicle_th=cam.slow_vehicle_th              #row_cam[17]
         stop_vehicle_th=cam.stop_vehicle_th              #row_cam[18]
         stop_vehicle_dur_th=cam.stop_vehicle_dur_th      #row_cam[22]
-        
         # --------------------   Notice: ROI should be returned to html ----------------------
         return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=cam, counting_list=counting_list )
     except Exception as e:

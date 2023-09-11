@@ -68,7 +68,7 @@
                   </li>
                   
                   <li class="nav-item">
-                    <a class="nav-link"        data-toggle="tab" href="#counting" id="Counting" style="font-size: 15px; font-weight:bold;"><i class="fa fa-tachometer"></i> &nbsp;Counting</a>
+                    <a class="nav-link"        data-toggle="tab" href="#counting0" id="Counting" style="font-size: 15px; font-weight:bold;"><i class="fa fa-tachometer"></i> &nbsp;Counting</a>
                   </li>
                   
                   <li class="nav-item">
@@ -85,7 +85,7 @@
             <!-- -------------------------  Tab panes ------------------------- find_in_page  directions_car-->
             <div class="tab-content">
                   <!-- ___________________________________________________________________________________________________________________ -->
-                  <div id="stop" class="container tab-pane active" align="center"><br>
+                    <div id="stop" class="container tab-pane active" align="center"><br>
                           <div class="card internalcard" align="left">
                               <div class="card-body" style="font-size: 15px;">
                                       <form class="was-validated"  name="stop_form" id="stop_form" onsubmit="applystop()" method="post">
@@ -152,7 +152,7 @@
                                       </form>
                              </div> <!-- card-body -->
                       </div><!-- card -->        
-                  </div> <!-- stop -->
+                    </div> <!-- stop -->
 
                   <!-- __________________________________ Slow vehicle _________________________________________________________________________________ -->
                   <div id="traffic" class="container tab-pane fade" align="center"><br>
@@ -235,8 +235,8 @@
                       </div><!-- card -->        
                   </div>
                   <!-- __________________________ counting _________________________________________________________________________________________ -->
-                  <div id="counting" class="container tab-pane fade"><br>
-                      <div class="card" style="width: 90%;margin:0 auto ;" align="left">
+                  <div id="counting0" class="container tab-pane fade"><br>
+                        <div class="card" style="width: 90%;margin:0 auto ;" align="left">
                               <div class="card-body" style="font-size: 15px;">
 
                                   <form class="was-validated"  name="counting_form" id="counting_form" action="" method="post">
@@ -494,10 +494,11 @@
                                         
                                   </form>
                               </div> <!-- card-body -->
-                      </div><!-- card --> 
+                        </div><!-- card --> 
 
                   </div>
                   
+
                   <div id="lost" class="container tab-pane fade"><br>
                     <h3>Menu 6</h3>
                     <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
@@ -656,6 +657,7 @@
     
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        
         console.log("HEEEEEEEEREEEEEEEE");
         // here is the new selected tab id
         var selectedTabId = e.target.id;

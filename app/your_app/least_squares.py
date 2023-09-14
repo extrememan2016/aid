@@ -23,7 +23,6 @@ def ImageToWorld(A, centre, tilt, focal, height):
     y_A = height*(focal - v*math.tan(tilt))/(v+focal*math.tan(tilt))
     return x_A, y_A
     
-    
 def line(p1, p2):
     A = (p1[1] - p2[1])
     B = (p2[0] - p1[0])

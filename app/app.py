@@ -568,8 +568,8 @@ def createcam():
             print("test "+str(newcam.did))
             break
     newcam.pingok = 1
-    newcam.cam_VP1_X = 619.24
-    newcam.cam_VP1_y = -116.37
+    newcam.cam_VP1_X = 200 #619.24
+    newcam.cam_VP1_y = 200 #-116.37
 
     newcam.cam_center_X = 640
     newcam.cam_center_Y = 360
@@ -832,7 +832,6 @@ def calibration_step_1():
     W, L = 0, 0 # reset the calibration pattern real measurements
     
     if request.method == 'POST':
-        print("Posted VAlue: "+ request.args.get('camid') )
         ID =  request.args.get('camid')
         W = request.form['int_W']
         L = request.form['int_L']
@@ -843,7 +842,6 @@ def calibration_step_1():
         if W != '' and L != '':
             
             #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" --> how to save them????
-            
             return redirect(url_for('calibration_step_2',camid = ID, W = W , L = L, h_camera_real = h_camera_real ))
     
 
@@ -853,9 +851,10 @@ def calibration_step_1():
             #ID = r.get("ID")
             ID =  request.args.get('camid')
             #   Get h_rsz, w_rsz,vp1_x, vp1_y  -> from DB
-            print("CAMID : "+ID)
-            #row_cam = list(read_from_db("CAM_"+ID))
+            
             row_cam = Camera.query.filter_by(did=ID).first()
+
+
             return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, row=row_cam,camid = ID)   # ch_v0r91 row added)
         except:
             return redirect(url_for('roi'))
@@ -877,8 +876,9 @@ def calibration_step_2():
 
 
         # mouse_click2 must run here
+        print("before error")
         worker_3(camid,lines_points_x,lines_points_y,real_line_meseares)
-
+        print("after error")
         try:
             points = points_roi[0]
             return redirect(url_for('analytic')) 
@@ -886,7 +886,6 @@ def calibration_step_2():
             return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
 
     else:
-        print("GETED VAlue: "+ request.args.get('camid') )    
         try:
             ID = request.args.get('camid')
             w = request.args.get('W')

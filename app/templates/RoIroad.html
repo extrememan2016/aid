@@ -4,16 +4,16 @@
 
       <!-- Navbar Content -->
 <div align="center" >
-	<h2> Calibrating Camera {{camid}} - Setting Region of Interest</h2>
+	<h2> Calibrating Camera {{camid}} - Setting Region of Interest for Road</h2>
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
 	<img id='theImg' src="{{ url_for('static', filename='images/screen_roi.png') }}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
 	
 </div>
 <div align="center" >
 	<!-- <input onclick="window.location = '/vp1_view';" id="myP" type="submit" name="submit" value="Next step ..."> -->
-	<form method="GET" action="{{ url_for('roiroad',camid=camid) }}" style="padding: 20px;">			
+	<form method="GET" action="{{ url_for('vp1_view')}}" style="padding: 20px;">			
 
-		<!-- <input  name="camid" value="{{camid}}" type="hidden"> -->
+		<input  name="camid" value="{{camid}}" type="hidden">
 
 		<input class="btn btn-primary" id="myP" type="submit" value="Next step ...">
 	</form>
@@ -31,7 +31,7 @@
 	var lines_codinates = [];
 	var rect_finish = 0;
 	var line_finish = 0;
-	var Max_point_roi = 6;
+	var Max_point_roi = 9;
 	var step_1_view_finish = 0
 	var step_2_view_finish = 0
 	var step_3_view_finish = 0
@@ -265,12 +265,12 @@
 		} else if (step_2_view_finish == 0) {
 			
 
-			str1 = "Step 0 ";
-			str2 = " Draw Region of Interest ";
+			str1 = "Step 1 ";
+			str2 = " Draw Region of Interest for Road";
 			str_2_shift = 200;
-			str_3 = "To draw the Region of Intrest you should click on the region corners";
+			str_3 = "To draw the Region of Intrest you should click on the road corners";
 			str_3_shift = 250;
-			str_4 = " (Just 6 points is allowed to be selected)";
+			str_4 = " (Just 9 points is allowed to be selected)";
 			str_4_shift = 150;
 			Step_by_step(str1,str2, str_2_shift, str_3, str_3_shift,str_4, str_4_shift);
 
@@ -298,7 +298,7 @@
 				drawPolygon();	
 				$.ajax({
 				  type: "POST",
-				  url: "/roi_mouse_click",
+				  url: "/roiroad_mouse_click",
 				  data:{"camid": camid ,"points_x": getCol(coordinates, 0),"points_y": getCol(coordinates, 1)}
 				});
 			document.getElementById("myP").disabled = false;						

@@ -443,6 +443,7 @@ def analytic():
                 except Exception as e:
                     disp_stop_roi = 0
                     
+                print("we do ::: "+request.form['points_stop_x'])    
                 cam_dict={'stop_vehicle_th': stop_vehicle_th, 'stop_vehicle_dur_th': stop_vehicle_dur_th, 'disp_stop_roi': disp_stop_roi } # disp_stop_roi # ch_v0r89 (added)
                 write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
 
@@ -766,6 +767,36 @@ def worker_0():
         # ---------------------- ch_v0r86  -----------------------------
     return 'OK'
 
+#================= Getting Region of Intrest for road from user  ====== 
+@app.route('/roiroad_mouse_click', methods = ['POST'])           #### ch_v0r96 (added by m.taheri)
+#@timing
+def worker_1():
+    camid = request.form.getlist('camid')[0]
+    points_x, points_y = '', ''
+    points_x = request.form.getlist('points_x[]') # x-cordinates of rectangular calibration pattern
+    points_y = request.form.getlist('points_y[]') # y-cordinates of rectangular calibration pattern
+    #print(points_x,points_y)
+    if points_x:
+        points_x_db_str=''
+        points_roi = np.zeros((len(points_x), 2), dtype=float) 
+        for i in range(0,len(points_x)):
+            points_roi[i,:] = ((int(points_x[i])  ,int(points_y[i])))
+        # ---------------------- ch_v0r86  (points_roi write to DB)-----------------------------
+            str_1=(int(points_roi[i,0])).__str__()+','+(int(points_roi[i,1])).__str__()
+            if i==0:
+                points_x_db_str = str_1+';'
+            else:
+                points_x_db_str = points_x_db_str+str_1+';'
+        
+        cam_dict={'road_points': points_x_db_str } # ch_v0r96 (added by m.taheri)
+
+        write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
+                
+        #ID = str(r.get("ID")) 
+        #write_to_db_roi(str(ID),points_x_db_str)
+        # ---------------------- ch_v0r86  -----------------------------
+    return 'OK'
+
 #================= Getting Region of Interest from user  ====== ch_v0r87 (module added)
 """ @app.route('/SW_roi_mouse_click', methods = ['POST'])
 @flask_login.login_required
@@ -965,7 +996,14 @@ def before_request():
 @app.route('/roi/<camid>',methods = ['POST','GET'])
 @flask_login.login_required
 def roi(camid):
+    print("camid is "+camid)
     return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)
+
+#===========================================================
+@app.route('/roiroad/<camid>',methods = ['POST','GET'])
+@flask_login.login_required
+def roiroad(camid):
+    return render_template('RoIroad.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)
 
 #=========================================================== 
 @app.errorhandler(404)

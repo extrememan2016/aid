@@ -897,6 +897,7 @@ def calibration_step_2():
    
     if request.method == 'POST':
         camid = request.form.getlist('camid')[0]
+        print("Error is : "+str(request.form.getlist('lines_points_x')[0]));
         lines_points_x = request.form.getlist('lines_points_x')[0]
         lines_points_y = request.form.getlist('lines_points_y')[0]
         member = int(request.form['member'])
@@ -948,6 +949,7 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
 
         if lines_points_x:
             line_points = np.zeros((len(lines_points_x), 2), dtype=float)
+
             x0 = np.array([focal,  h_camera])
             # Least square optimization to fine-tuning camera calibration partameters
             road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
@@ -957,8 +959,7 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
             write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
 
             print("Success")
-            # write_to_db_CAM_ID(ID, '', road_camera_staff, '', '')  # ch_v0r85
-			# save to DB "road_camera_staff" like write_to_db_CAM_ID do!
+
            
     else: # ch_v0r84
         print('\n'*2)

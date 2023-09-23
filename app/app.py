@@ -62,7 +62,7 @@ import redis # ch_v0r85 (added)
 from your_app import settings # ch_v0r89 (added)
 
 from your_app.models.camera import Camera
-
+from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
 
 
 #===============================  initializing calibration parameters =========
@@ -669,34 +669,112 @@ def counting():
     return render_template('counting.html', row=row_cam)  # render a template # ch_v0r91 row added:
 
 #============================= statistic  # ch_v0r91 added =======================================
+
+def labels_serializer(objlist):
+    result = [item.labels_serializer() for item in objlist]
+    return result
+def dataset_serializer(objlist):
+    result = [item.dataset_serializer() for item in objlist]
+    return result
+    
 @app.route('/statistic', methods=['GET', 'POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def statistic():
     ID = "1"
     row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-    print('row_cam', row_cam)
+    #print('row_cam', row_cam)
     error_mes = table =''
     
     if request.method == "POST": # if the user postes a date filter
         # get the filled from_to dates
         date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
         date_to   = request.form['dateTimePick2']
-        print(date_from,date_to)
+        pprint(request.form)
+        #print(date_from,date_to)
         
         check_week_ind = check_for_1_week_period(date_from,date_to, 7)
         if check_week_ind ==1:
-            if date_to !='': # if date_to is not empty
+            """ if date_to !='': # if date_to is not empty
                 query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
                 param = (date_from, date_to) 
             else: # if date_to is empty
                 query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
                 param = (date_from,)
-            table = list(read_from_db_all(query, param))
+            table = list(read_from_db_all(query, param)) """
+            
+            carsdata=""
+            motorbikesdata=""
+            trucksdata=""
+            totaldata=""
+
+            table = VEHICLE_INTERVAL_COUNTS.query.all()
+            if request.form.getlist('Car'):
+                carsdata    =   dataset_serializer(table)
+            if request.form.getlist('Truck'):
+                trucksdata  =   dataset_serializer(table)
+            if request.form.getlist('Motorbike'):
+                motorbikesdata  =   dataset_serializer(table)
+            
+            if carsdata == "" and trucksdata == "" and  motorbikesdata == "":
+                carsdata    =   dataset_serializer(table)
+                trucksdata    =   dataset_serializer(table)
+                motorbikesdata    =   dataset_serializer(table)
+                totaldata   =  dataset_serializer(table)
+
+            
+
+            labels=labels_serializer(table)
+            
+
+            #return labels
+            colors = ['#007bff','#28a745','#FFA500','#dc3545']; #blue, green, orange,red
+
+            
+            chartData = {
+                "labels": labels,
+                "datasets": [{
+                    "label": "Motorbikes",
+                    "data": motorbikesdata,
+                    "backgroundColor": 'transparent',
+                    "borderColor": colors[0],
+                    "borderWidth": 4,
+                    "pointBackgroundColor": colors[0]
+                },
+                {
+                    "label": "Cars",
+                    "data": carsdata,
+                    "backgroundColor": 'transparent',
+                    "borderColor": colors[1],
+                    "borderWidth": 4,
+                    "pointBackgroundColor": colors[1]
+                }, 
+                {
+                    "label": "Truck",
+                    "data": trucksdata,
+                    "backgroundColor": 'transparent',
+                    "borderColor": colors[2],
+                    "borderWidth": 4,
+                    "pointBackgroundColor": colors[2]
+                }, 
+                {
+                    "label": "Total",
+                    "data": totaldata,
+                    "backgroundColor": 'transparent',
+                    "borderColor": colors[3],
+                    "borderWidth": 4,
+                    "pointBackgroundColor": colors[3]
+                }
+                ]     
+                };
+
+
+
+            return render_template('statistic.html', error_mes=error_mes,chartdata=chartData)
         else:
+            print("its:wrong")
             error_mes = 'Report duration is Out of Range!'
             table = ''
             flash(error_mes, 'warning')     
-        print(table)
         return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # return for user post
     else:
         table = ''

@@ -122,10 +122,38 @@ header{
   }
 
 
+.checkbox-label{
+
+  position: absolute;
+  margin-top: .3rem;
+  margin-left: -1.25rem;
+
+}
+
+.inline-checkbox{
+  margin-right: 10px;
+}
 
 
+.date-label{
+margin-right: 4px;
+}
 
+.form-check-input {
+  position: absolute;
+  margin-top: .3rem;
+  margin-left: -1.25rem;
+}
 
+.vehicletype-class{
+
+  margin-bottom: 20px;
+}
+
+.buttons-class{
+
+   margin-top: 20px; 
+}
 
 
 

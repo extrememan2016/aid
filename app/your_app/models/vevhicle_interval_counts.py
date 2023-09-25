@@ -4,10 +4,10 @@ from datetime import datetime
 class VEHICLE_INTERVAL_COUNTS(db.Model):
     #__tablename__ = "VEHICLE_INTERVAL_COUNTS"
     interval_id=db.Column(db.Integer, primary_key=True)
-    cam_id = db.Column(db.Integer, primary_key=True)
+    cam_id = db.Column(db.Integer)
     interval_datetime = db.Column(db.DATETIME(timezone=True))
-    lkp_vehicle_type = db.Column(db.Integer, primary_key=True)
-    count = db.Column(db.Integer, primary_key=True) 
+    lkp_vehicle_type = db.Column(db.Integer)
+    vehicle_count = db.Column(db.Integer) 
     
     def labels_serializer(self):
         date_format = '%Y-%m-%d %H:%M:%S'
@@ -18,5 +18,5 @@ class VEHICLE_INTERVAL_COUNTS(db.Model):
 
     
     def dataset_serializer(self):
-        return self.count
+        return self.vehicle_count
         

@@ -61,9 +61,12 @@ import redis # ch_v0r85 (added)
 ## from your_app.AID_Loop import AID_loop # ch_v0r89 (added)
 from your_app import settings # ch_v0r89 (added)
 
+
+from sqlalchemy import func,select
+
 from your_app.models.camera import Camera
 from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
-
+from your_app.models.lkp_vehicle_type import LKP_VEHICLE_TYPE
 
 #===============================  initializing calibration parameters =========
 
@@ -706,80 +709,206 @@ def statistic():
             motorbikesdata=""
             trucksdata=""
             totaldata=""
+            charttype="line" #default type in line
 
-            table = VEHICLE_INTERVAL_COUNTS.query.all()
-            if request.form.getlist('Car'):
-                carsdata    =   dataset_serializer(table)
-            if request.form.getlist('Truck'):
-                trucksdata  =   dataset_serializer(table)
-            if request.form.getlist('Motorbike'):
-                motorbikesdata  =   dataset_serializer(table)
-            
-            if carsdata == "" and trucksdata == "" and  motorbikesdata == "":
-                carsdata    =   dataset_serializer(table)
-                trucksdata    =   dataset_serializer(table)
-                motorbikesdata    =   dataset_serializer(table)
-                totaldata   =  dataset_serializer(table)
+            carcheck=False
+            motorcheck=False
+            truckcheck=False
+            totalcheck=False
+
 
             
+            # Get the `students` table from the Metadata object
 
-            labels=labels_serializer(table)
+            carcount = truckcount= motorbikecount = totalcount = 0
+
+
+            totaltable = VEHICLE_INTERVAL_COUNTS.query.filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
+
+
+            
+            totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+            
+            totalselected = False
+            if (request.form.getlist('Car') == [] and request.form.getlist('Truck') == [] and  request.form.getlist('Motorbike') == []) or (request.form.getlist('Car')  and request.form.getlist('Truck') and  request.form.getlist('Motorbike') ):
+                totalselected = True
+                print("total calculated")
+                totaldata   =  dataset_serializer(totaltable)
+            else:
+                print("total not calculated")
+                
+            if request.form.getlist('Car') or totalselected:
+                carstable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="car",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
+                carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="car",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                carsdata = dataset_serializer(carstable)
+                carcheck=True
+            if request.form.getlist('Truck') or totalselected:
+                truckstable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="truck",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
+                truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="truck",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                trucksdata = dataset_serializer(truckstable)
+                truckcheck=True
+            if request.form.getlist('Motorbike') or totalselected:
+                Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="motorbike",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
+                motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="motorbike",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                motorbikesdata  =   dataset_serializer(Motorbikestable)
+                motorcheck=True
+            if request.form.getlist('total'):
+                totalcheck=True
+                
+
+            if 'Pie' in request.form.getlist('charttype'):
+                print("true")
+                charttype = "pie"
+
+
+        
+                
+
+            
+
+            labels=labels_serializer(totaltable)
             
 
             #return labels
             colors = ['#007bff','#28a745','#FFA500','#dc3545']; #blue, green, orange,red
 
-            
-            chartData = {
-                "labels": labels,
-                "datasets": [{
-                    "label": "Motorbikes",
-                    "data": motorbikesdata,
-                    "backgroundColor": 'transparent',
-                    "borderColor": colors[0],
-                    "borderWidth": 4,
-                    "pointBackgroundColor": colors[0]
-                },
-                {
+            datasets = []
+            if carsdata != "":
+                datasets.append({
                     "label": "Cars",
                     "data": carsdata,
                     "backgroundColor": 'transparent',
                     "borderColor": colors[1],
                     "borderWidth": 4,
                     "pointBackgroundColor": colors[1]
-                }, 
-                {
+                })
+            if motorbikesdata != "":
+                 datasets.append({
+                    "label": "Motorbikes",
+                    "data": motorbikesdata,
+                    "backgroundColor": 'transparent',
+                    "borderColor": colors[0],
+                    "borderWidth": 4,
+                    "pointBackgroundColor": colors[0]
+                })
+            if trucksdata != "":
+                 datasets.append({
                     "label": "Truck",
                     "data": trucksdata,
                     "backgroundColor": 'transparent',
                     "borderColor": colors[2],
                     "borderWidth": 4,
                     "pointBackgroundColor": colors[2]
-                }, 
-                {
+                })     
+            if trucksdata != "":
+                datasets.append({
                     "label": "Total",
                     "data": totaldata,
                     "backgroundColor": 'transparent',
                     "borderColor": colors[3],
                     "borderWidth": 4,
                     "pointBackgroundColor": colors[3]
-                }
-                ]     
+                })
+            chartData = {
+                "labels": labels,
+                "datasets": datasets
                 };
 
 
+            
 
-            return render_template('statistic.html', error_mes=error_mes,chartdata=chartData)
+            return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
+                                   charttype=charttype,carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
+                                   date_from=date_from,date_to=date_to,
+                                   carcount=carcount,motorbikecount=motorbikecount,truckcount=truckcount,totalcount=totalcount)
         else:
-            print("its:wrong")
             error_mes = 'Report duration is Out of Range!'
-            table = ''
             flash(error_mes, 'warning')     
         return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # return for user post
     else:
-        table = ''
-        return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # first opening the page (# ch_v0r91 row added)
+        carsdata=""
+        motorbikesdata=""
+        trucksdata=""
+        totaldata=""
+        charttype="line" #default type in line
 
+        carcheck=False
+        motorcheck=False
+        truckcheck=False
+        totalcheck=False
+
+
+
+        table = VEHICLE_INTERVAL_COUNTS.query.all()
+        if request.form.getlist('Car'):
+            carsdata    =   dataset_serializer(table)
+            carcheck=True
+        if request.form.getlist('Truck'):
+            trucksdata  =   dataset_serializer(table)
+            truckcheck=True
+        if request.form.getlist('Motorbike'):
+            motorbikesdata  =   dataset_serializer(table)
+            motorcheck=True
+        if request.form.getlist('total'):
+            totalcheck=True
+
+        if 'Pie' in request.form.getlist('charttype'):
+            print("true")
+            charttype = "pie"
+
+
+        if carsdata == "" and trucksdata == "" and  motorbikesdata == "":
+            carsdata    =   dataset_serializer(table)
+            trucksdata    =   dataset_serializer(table)
+            motorbikesdata    =   dataset_serializer(table)
+            totaldata   =  dataset_serializer(table)
+        
+
+        labels=labels_serializer(table)
+        
+
+        #return labels
+        colors = ['#007bff','#28a745','#FFA500','#dc3545']; #blue, green, orange,red
+
+        
+        chartData = {
+            "labels": labels,
+            "datasets": [{
+                "label": "Motorbikes",
+                "data": motorbikesdata,
+                "backgroundColor": 'transparent',
+                "borderColor": colors[0],
+                "borderWidth": 4,
+                "pointBackgroundColor": colors[0]
+            },
+            {
+                "label": "Cars",
+                "data": carsdata,
+                "backgroundColor": 'transparent',
+                "borderColor": colors[1],
+                "borderWidth": 4,
+                "pointBackgroundColor": colors[1]
+            }, 
+            {
+                "label": "Truck",
+                "data": trucksdata,
+                "backgroundColor": 'transparent',
+                "borderColor": colors[2],
+                "borderWidth": 4,
+                "pointBackgroundColor": colors[2]
+            }, 
+            {
+                "label": "Total",
+                "data": totaldata,
+                "backgroundColor": 'transparent',
+                "borderColor": colors[3],
+                "borderWidth": 4,
+                "pointBackgroundColor": colors[3]
+            }
+            ]     
+            };
+        #return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # first opening the page (# ch_v0r91 row added)
+        return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,charttype=charttype,carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck)
 #============================= status =======================================
 @app.route('/status')
 @flask_login.login_required

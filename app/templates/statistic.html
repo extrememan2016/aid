@@ -47,7 +47,7 @@
                              <small>
                              
                                 <!-- ---------------------  new row ------------------------------->
-                                <div class="row">
+                                <div class="row vehicletype-class">
                                     <div class="col-sm-3">
                                         Vehicle Class
                                     </div>
@@ -56,11 +56,17 @@
                                     
                                         <div class="checkbox">
                                            
-                                            <label><input type="checkbox"  name="Motorbike"  >Motorbike</label>
+                                            <label class="inline-checkbox"><input class="checkbox-label" type="checkbox"  name="Motorbike" {%if motorcheck%}
+                                                checked
+                                                {% endif %} >Motorbike</label>
                                             &nbsp &nbsp &nbsp
-                                            <label> <input type="checkbox" name="Car"  >Car</label>
+                                            <label class="inline-checkbox"> <input class="checkbox-label" type="checkbox" name="Car"  {%if carcheck%}
+                                                checked
+                                                {% endif %}>Car</label>
                                             &nbsp &nbsp &nbsp 
-                                            <label><input type="checkbox" name="Truck"  >Truck</label>
+                                            <label class="inline-checkbox"><input class="checkbox-label" type="checkbox" name="Truck"  {%if truckcheck%}
+                                                checked
+                                                {% endif %}>Truck</label>
 
                                         </div>
                                     </div>
@@ -113,16 +119,24 @@
                                     
                                         <div class="checkbox">
                                            
-                                            <label><input type="checkbox"  name="type" value="Line" onclick="filterMe()">Line</label>
+                                            <label><input type="radio" class="form-check-input" name="charttype" value="Line" onclick="filterMe()"
+                                                {%if charttype=='line'%}
+                                                    checked
+                                                {% endif %}
+                                                 >Line</label>
                                             &nbsp &nbsp &nbsp &nbsp
-                                            <label><input type="checkbox"  name="type" value="Pie" onclick="filterMe()">Pie</label>
+                                            <label><input type="radio" class="form-check-input"  name="charttype" value="Pie" onclick="filterMe()"
+                                                {%if charttype=='pie'%}
+                                                checked
+                                                {% endif %}
+                                                >Pie</label>
                                             
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <!-- ---------------------  new row  ------------------------------->
-                                <div class="row">
+                                <div class="row buttons-class">
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-auto">
                                         <button type="submit" class="btn btn-success btn-sm" >Apply</button>
@@ -144,7 +158,7 @@
                         <div class="col-sm-auto"> <!-- row 1 col 1-->
                           <span class="badge badge-primary statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-motorcycle"></i> 
-                              <span style="padding-left:1em"></span>128  
+                              <span style="padding-left:1em"></span>{{motorbikecount}}  
                               <p style="font-size:12px; text-align:right;">                                   
                                   MOTORBIKES
                               </p>  
@@ -154,7 +168,7 @@
                         <div class="col"> <!-- row 1 col 2-->
                           <span class="badge badge-success statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-car"></i> 
-                              <span style="padding-left:1em"></span>1280  
+                              <span style="padding-left:1em"></span>{{carcount}}    
                               <p style="font-size:12px; text-align:right;">                                   
                                   CARS
                               </p>  
@@ -169,7 +183,7 @@
                           <div class="col-sm-auto"> <!-- row 2 col 1-->
                               <span class="badge badge-warning statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-truck"></i> 
-                              <span style="padding-left:1em"></span>1020  
+                              <span style="padding-left:1em"></span>{{truckcount}}    
                               <p style="font-size:12px; text-align:right;">                                   
                                   TRUCK
                               </p>  
@@ -179,7 +193,7 @@
                           <div class="col"> <!-- row 2 col 2-->
                               <span class="badge badge-danger statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-calculator"></i> 
-                              <span style="padding-left:1em"></span>2428  
+                              <span style="padding-left:1em"></span>{{totalcount}}    
                               <p style="font-size:12px; text-align:right;">                                   
                                   TOTAL
                               </p>  
@@ -239,6 +253,7 @@
         maxDate:   'now',
         buttons:{showClear: true},
         icons: {clear: 'fa fa-trash'},
+        defaultDate:'{{date_from}}'
         
      });
      
@@ -247,6 +262,7 @@
          maxDate:   'now',
          buttons:{showClear: true},
          icons: {clear: 'fa fa-trash'  },
+         defaultDate:'{{date_to}}'
          // date: moment(),
      
      });
@@ -268,7 +284,7 @@
 
     if (chLine) {
       new Chart(chLine, {
-      type: 'line',
+      type: '{{charttype}}',
       data: chartData,
       options: {
         scales: {

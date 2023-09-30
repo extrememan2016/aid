@@ -119,13 +119,13 @@
                                     
                                         <div class="checkbox">
                                            
-                                            <label><input type="radio" class="form-check-input" name="charttype" value="Line" onclick="filterMe()"
+                                            <label><input type="radio" class="form-check-input" name="charttype" value="Line" "
                                                 {%if charttype=='line'%}
                                                     checked
                                                 {% endif %}
                                                  >Line</label>
                                             &nbsp &nbsp &nbsp &nbsp
-                                            <label><input type="radio" class="form-check-input"  name="charttype" value="Pie" onclick="filterMe()"
+                                            <label><input type="radio" class="form-check-input"  name="charttype" value="Pie" "
                                                 {%if charttype=='pie'%}
                                                 checked
                                                 {% endif %}
@@ -134,7 +134,31 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+                                <!-- ---------------------  new row  ------------------------------->
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Time Period
+                                    </div>
+                                    
+                                    <div class="col-sm-5">
+                                    
+                                        <div class="checkbox">
+                                           
+                                            <label><input type="radio" class="form-check-input" name="timeperiod" value="hour" "
+                                                {%if timeperiod=='Hour'%}
+                                                    checked
+                                                {% endif %}
+                                                 >Hour</label>
+                                            &nbsp &nbsp &nbsp &nbsp
+                                            <label><input type="radio" class="form-check-input"  name="timeperiod" value="day" "
+                                                {%if timeperiod=='Day'%}
+                                                checked
+                                                {% endif %}
+                                                >Day</label>
+                                            
+                                        </div>
+                                    </div>
+                                </div>                                
                                 <!-- ---------------------  new row  ------------------------------->
                                 <div class="row buttons-class">
                                     <div class="col-sm-3"></div>

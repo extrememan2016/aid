@@ -6,7 +6,7 @@
 <div align="center" >
 	<h2> Calibrating Camera {{camid}} - Setting Region of Interest for Road</h2>
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
-	<img id='theImg' src="{{ url_for('static', filename='images/screen_roi.png') }}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
+	<img id='theImg' src="{{ url_for('video_feed',camid=camid)}}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
 	
 </div>
 <div align="center" >
@@ -288,7 +288,7 @@
 				step_2_view_finish = 1;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				image = document.getElementById('theImg');
-				image.src = "{{ url_for('static', filename='images/screen_roi.png') }}" ;
+				image.src = "{{ url_for('video_feed',camid=camid)}}" ;
 				
 			} else {		
 				coordinates.push([parseInt(mousePos.x),parseInt(mousePos.y)]);

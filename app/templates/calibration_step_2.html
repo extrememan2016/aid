@@ -2,29 +2,11 @@
         
 {% extends "layout.html" %}
 
-{% block overridecssjslinks %}
-
-<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-
-
-<!-- Bootstrap core CSS -->
-<link href="{{ url_for('static', filename='bootstrap_4/css/bootstrap.min.css') }}" rel="stylesheet">
-<!-- <link href="{{ url_for('static', filename='material-icons/css/material-icons.css') }}" rel="stylesheet"> -->
-<link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
-
-<script type="text/javascript" src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='bootstrap_4/js/bootstrap.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='jQuery/jquery-3.3.1.js') }}"></script>  
-	
-{% endblock %}
-
-
-
 
 
 
 {% block content %}
-<div>
+
   <!-- FlashContent -->
    <div class="container" style="min-height:100% width:80%">
     	{% with messages = get_flashed_messages(with_categories=true) %}
@@ -43,18 +25,20 @@
   
 	<div align="center" >
 		<!--<h2> Calibration Step</h2>-->
+		<h2 >Preparing for calibration Camera 1 - step 2</h2>
+		<div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+			<canvas id='myCanvas2' class="position-absolute center-canvas" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- image show canvas  -->
+
+			<canvas id='myCanvas' class="position-absolute center-canvas"  width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- paint canvas  -->
 		
-		<canvas id='myCanvas2' style="cursor: crosshair; top:70px; right:280px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- image show canvas  -->
-		<canvas id='myCanvas' style="cursor: crosshair; top:70px; right:280px;" width={{w_rsz}} height={{h_rsz}} ></canvas> <!-- paint canvas  -->
-		
-		<canvas id="zoom" width="200" height="100" style="position:absolute; top:70px; right:280px; display:none"></canvas> <!-- zoom canvas  -->
-		
+			<canvas id="zoom" width="200" height="100" style="margin-left: 35%;" class="position-absolute center-canvas" ></canvas> <!-- zoom canvas  -->
+		</div>
 		
 	
 	</div>
 
 	
-	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:590px; right:580px; display:block;padding-bottom: 100px;">
+	<form  name="myForm" action="#" method="post" id="line_num" style="position:absolute; top:640px; left:630px; display:block;padding-bottom: 100px;">
 		
 		<input  name="camid" value="{{camid}}" type="hidden">
 		<input disabled data-toggle="popover" data-content="How many lines are you going to specify?" type="text" id="member" name="member"  value="" placeholder="Number of Lines: (max. 6)" oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');"/ style="display: block; width:270px; font-size:11px;"> <!-- Number of Lines input (just number is accepted)  -->
@@ -66,9 +50,9 @@
 	</form>	
 
 	<div align="center" style="position:absolute; top:590px; right: 20%; display:block">
-		<input onclick="after_submit();" type="button" id="myP2" class="btn btn-primary" name="submit2" value="Next step ..." /> 
+		<input style="margin-top: 45px;" onclick="after_submit();" type="button" id="myP2" class="btn btn-primary" name="submit2" value="Next step ..." /> 
 	</div>
-</div>
+
 {% endblock %}
 {% block script %}
 	
@@ -82,7 +66,7 @@
 	var zoomCtx = zoom.getContext("2d");
 	var zoom_num = 3;
 	var img = new Image();
-	img.src = "{{ url_for('static', filename='images/screen_pattern.png') }}"  
+	img.src = "{{ url_for('video_feed',camid=camid)}}"
 	img.onload = run;
 	var coordinates = [];
 	var arr_cordinates = [];
@@ -516,7 +500,7 @@
 		zoomCtx.drawImage(canvas, mousePos.x -zoom.width/(zoom_num*2) , mousePos.y-zoom.height/(zoom_num*2), zoom.width/zoom_num, zoom.height/zoom_num, 0,0, zoom.width, zoom.height);
 		zoom.style.top = canvas.style.top  + "px";
 		zoom.style.left = canvas.style.left + "px";
-		zoom.style.display = "block";
+		//zoom.style.display = "block";
 		
 		}, false);
 //----------------------------------- Do some jobs on mouse click ---------------------------------------
@@ -528,7 +512,7 @@
 		if (coordinates.length < 4 && arrow_finish == 1) {
 			
 			//img.src = "{{ url_for('static', filename='images/'+file_name) }}"
-			img.src = "{{ url_for('static', filename='images/test.png') }}"
+			img.src = "{{ url_for('video_feed',camid=camid)}}"
 
 			img.onload = run;
 			
@@ -547,7 +531,7 @@
 			} 
 			if (coordinates.length == 4 ) {
 				
-				img.src = "{{ url_for('static', filename='images/fine_tuning.png') }}"
+				img.src = "{{ url_for('video_feed',camid=camid)}}"
 				img.onload = run;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				zoomCtx.clearRect(0, 0, zoom.width, zoom.height);
@@ -569,7 +553,7 @@
 			if (step_3_view_finish == 0 && addFields_finish == 1 ) {				
 				step_3_view_finish = 1;
 				//img.src = "{{ url_for('static', filename='images/'+file_name) }}"
-				img.src = "{{ url_for('static', filename='images/test.png') }}"
+				img.src = "{{ url_for('video_feed',camid=camid)}}"
 				img.onload = run;
 			} else if (addFields_finish == 1){
 				if (isOdd(lines_codinates.length)) {

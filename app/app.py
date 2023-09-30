@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-### import cv2
+import cv2
+import get_video
 ### from AID.VideoStream.fps import FPS
 
 import time
@@ -85,6 +86,9 @@ kcw = [] # ch_v0r86 (added)
 
 # define REDIS connection information for Redis
 # Replaces with your configuration information
+
+
+
 r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB) # ch_v0r89 (added)
 
 
@@ -673,13 +677,29 @@ def counting():
 
 #============================= statistic  # ch_v0r91 added =======================================
 
-def labels_serializer(objlist):
-    result = [item.labels_serializer() for item in objlist]
+#=============================below functions create list for the chart==========================#
+def labels_serializer(objlist,timeperiod):
+    #result = [item.labels_serializer() for item in objlist]
+
+    #date_format = '%Y-%m-%d %H:%M:%S'
+    #result = [item.interval_datetime.strftime(date_format) for item in objlist]
+
+    date_format = '%Y-%m-%d'
+    if timeperiod == "Hour":
+        result = [item.Hour.strftime(date_format) for item in objlist]
+    else:
+        result = [item.Day.strftime(date_format) for item in objlist]
+
     return result
+
 def dataset_serializer(objlist):
-    result = [item.dataset_serializer() for item in objlist]
+    #result = [item.dataset_serializer() for item in objlist]
+    result = [int(item.vehicle_count) for item in objlist]
     return result
-    
+
+#==================================================================================================#
+
+
 @app.route('/statistic', methods=['GET', 'POST'])
 #@flask_login.login_required
 def statistic():
@@ -692,7 +712,7 @@ def statistic():
         # get the filled from_to dates
         date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
         date_to   = request.form['dateTimePick2']
-        pprint(request.form)
+
         #print(date_from,date_to)
         
         check_week_ind = check_for_1_week_period(date_from,date_to, 7)
@@ -710,22 +730,27 @@ def statistic():
             trucksdata=""
             totaldata=""
             charttype="line" #default type in line
+            timeperiod="Day"
+            timeperiodvar = func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime)
+
 
             carcheck=False
             motorcheck=False
             truckcheck=False
             totalcheck=False
 
-
+            if 'Pie' in request.form.getlist('charttype'):
+                charttype = "pie"                
+            if 'hour' in request.form.getlist('timeperiod'):
+                timeperiod = "Hour"
+                timeperiodvar = func.Hour(VEHICLE_INTERVAL_COUNTS.interval_datetime)
             
             # Get the `students` table from the Metadata object
 
             carcount = truckcount= motorbikecount = totalcount = 0
 
-
-            totaltable = VEHICLE_INTERVAL_COUNTS.query.filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
-
-
+            
+            totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),timeperiodvar.label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
             
             totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
             
@@ -738,27 +763,24 @@ def statistic():
                 print("total not calculated")
                 
             if request.form.getlist('Car') or totalselected:
-                carstable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="car",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
-                carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="car",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                carstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+                carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
                 carsdata = dataset_serializer(carstable)
                 carcheck=True
             if request.form.getlist('Truck') or totalselected:
-                truckstable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="truck",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
-                truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="truck",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                truckstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+                truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
                 trucksdata = dataset_serializer(truckstable)
                 truckcheck=True
             if request.form.getlist('Motorbike') or totalselected:
-                Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="motorbike",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).all()
-                motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).join(LKP_VEHICLE_TYPE, VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type == LKP_VEHICLE_TYPE.vehicle_id,isouter=False).filter(LKP_VEHICLE_TYPE.vehicle_type=="motorbike",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+                motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
                 motorbikesdata  =   dataset_serializer(Motorbikestable)
                 motorcheck=True
             if request.form.getlist('total'):
                 totalcheck=True
                 
 
-            if 'Pie' in request.form.getlist('charttype'):
-                print("true")
-                charttype = "pie"
 
 
         
@@ -766,7 +788,7 @@ def statistic():
 
             
 
-            labels=labels_serializer(totaltable)
+            labels=labels_serializer(totaltable,timeperiod)
             
 
             #return labels
@@ -800,7 +822,7 @@ def statistic():
                     "borderWidth": 4,
                     "pointBackgroundColor": colors[2]
                 })     
-            if trucksdata != "":
+            if totaldata != "":
                 datasets.append({
                     "label": "Total",
                     "data": totaldata,
@@ -818,7 +840,8 @@ def statistic():
             
 
             return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
-                                   charttype=charttype,carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
+                                   charttype=charttype,timeperiod=timeperiod,
+                                   carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
                                    date_from=date_from,date_to=date_to,
                                    carcount=carcount,motorbikecount=motorbikecount,truckcount=truckcount,totalcount=totalcount)
         else:
@@ -831,40 +854,58 @@ def statistic():
         trucksdata=""
         totaldata=""
         charttype="line" #default type in line
+        timeperiod="Day"
+        timeperiodvar = func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime)
 
         carcheck=False
         motorcheck=False
         truckcheck=False
         totalcheck=False
 
+        if 'Pie' in request.form.getlist('charttype'):
+            charttype = "pie"
 
+        if 'hour' in request.form.getlist('timeperiod'):
+            timeperiod = "Hour"
+            timeperiodvar = func.Hour(VEHICLE_INTERVAL_COUNTS.interval_datetime)
 
-        table = VEHICLE_INTERVAL_COUNTS.query.all()
-        if request.form.getlist('Car'):
-            carsdata    =   dataset_serializer(table)
+        carcount = truckcount= motorbikecount = totalcount = 0
+
+        
+        totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).group_by(timeperiod).all()
+        
+        totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).scalar()
+        
+        totalselected = False
+        if (request.form.getlist('Car') == [] and request.form.getlist('Truck') == [] and  request.form.getlist('Motorbike') == []) or (request.form.getlist('Car')  and request.form.getlist('Truck') and  request.form.getlist('Motorbike') ):
+            totalselected = True
+            print("total calculated")
+            totaldata   =  dataset_serializer(totaltable)
+        else:
+            print("total not calculated")
+            
+        if request.form.getlist('Car') or totalselected:
+            carstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1").group_by(timeperiod).all()
+            carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1").scalar()
+            carsdata = dataset_serializer(carstable)
             carcheck=True
-        if request.form.getlist('Truck'):
-            trucksdata  =   dataset_serializer(table)
+        if request.form.getlist('Truck') or totalselected:
+            truckstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3").group_by(timeperiod).all()
+            truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3").scalar()
+            trucksdata = dataset_serializer(truckstable)
             truckcheck=True
-        if request.form.getlist('Motorbike'):
-            motorbikesdata  =   dataset_serializer(table)
+        if request.form.getlist('Motorbike') or totalselected:
+            Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2").group_by(timeperiod).all()
+            motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2").scalar()
+            motorbikesdata  =   dataset_serializer(Motorbikestable)
             motorcheck=True
         if request.form.getlist('total'):
             totalcheck=True
-
-        if 'Pie' in request.form.getlist('charttype'):
-            print("true")
-            charttype = "pie"
+            
 
 
-        if carsdata == "" and trucksdata == "" and  motorbikesdata == "":
-            carsdata    =   dataset_serializer(table)
-            trucksdata    =   dataset_serializer(table)
-            motorbikesdata    =   dataset_serializer(table)
-            totaldata   =  dataset_serializer(table)
-        
 
-        labels=labels_serializer(table)
+        labels=labels_serializer(totaltable,timeperiod)
         
 
         #return labels
@@ -907,8 +948,10 @@ def statistic():
             }
             ]     
             };
-        #return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # first opening the page (# ch_v0r91 row added)
-        return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,charttype=charttype,carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck)
+
+        return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
+                               charttype=charttype,timeperiod=timeperiod,
+                               carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck)
 #============================= status =======================================
 @app.route('/status')
 @flask_login.login_required
@@ -1235,3 +1278,9 @@ if __name__ == '__main__':
     main()
     
 
+@app.route('/video_feed',methods = ['POST','GET'])      #Video streaming route. Put this in the src attribute of an img tag
+@flask_login.login_required
+def video_feed():   
+    camid=request.args.get('camid')
+    print("it is:"+camid)
+    return Response(get_video.videoLoop(camid), mimetype='multipart/x-mixed-replace; boundary=frame')

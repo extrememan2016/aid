@@ -28,7 +28,7 @@
                 </div>
           </div>
                 <canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
-                <img src="{{ url_for('static', filename='images/vp1_demo2.png') }}" width={{w_rsz}} height={{h_rsz}} id='theImg' alt="Camera Screen">
+                <img src="{{ url_for('video_feed',camid=camid)}}" width={{w_rsz}} height={{h_rsz}} id='theImg' alt="Camera Screen">
     </div>
     
     <!-- ------------------------- settings Content -------------------------  -->

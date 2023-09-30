@@ -79,7 +79,7 @@
         <!-- Camera registered -->  
         {% elif validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
              <div class="container item">
-                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}"  />
+                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}"  />
                 <div class="centered"><i class="fa fa-check-circle"></i>Camera {{validcam.did}} online</div>
               </div>
         {% else %} 
@@ -157,7 +157,7 @@
 
   <!-- refresh Cams script -->
   <script>
-    $(document).ready(function() {
+    /*$(document).ready(function() {
     var url_1 = "static/imgs/Cam_1.jpg?rnd="+Math.random();
     var url_2 = "static/imgs/Cam_2.jpg?rnd="+Math.random();
     var url_3 = "static/imgs/Cam_3.jpg?rnd="+Math.random();
@@ -190,7 +190,7 @@
     $("#cam_14").attr("src",url_14);
     $("#cam_15").attr("src",url_15);
     $("#cam_16").attr("src",url_16);
-    });
+    }); */
 </script>
 
 <script>

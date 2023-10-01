@@ -67,8 +67,13 @@ from sqlalchemy import func,select
 
 from your_app.models.camera import Camera
 from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
-from your_app.models.lkp_vehicle_type import LKP_VEHICLE_TYPE
 
+from your_app.models.vevhicle_interval_counts_VIW import CAR_DAILY_COUNT_VIW
+from your_app.models.vevhicle_interval_counts_VIW import MOTORBIKE_DAILY_COUNT_VIW
+from your_app.models.vevhicle_interval_counts_VIW import TRUCK_DAILY_COUNT_VIW
+from your_app.models.vevhicle_interval_counts_VIW import CAR_HOURLY_COUNT_VIW
+from your_app.models.vevhicle_interval_counts_VIW import MOTORBIKE_HOURLY_COUNT_VIW
+from your_app.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
 #===============================  initializing calibration parameters =========
 
 h_rsz, w_rsz = 480, 864; 
@@ -684,10 +689,12 @@ def labels_serializer(objlist,timeperiod):
     #date_format = '%Y-%m-%d %H:%M:%S'
     #result = [item.interval_datetime.strftime(date_format) for item in objlist]
 
-    date_format = '%Y-%m-%d'
+    
     if timeperiod == "Hour":
-        result = [item.Hour.strftime(date_format) for item in objlist]
+        date_format = '%Y-%m-%d %H'
+        result = [item.Hour for item in objlist]
     else:
+        date_format = '%Y-%m-%d'
         result = [item.Day.strftime(date_format) for item in objlist]
 
     return result
@@ -725,13 +732,12 @@ def statistic():
                 param = (date_from,)
             table = list(read_from_db_all(query, param)) """
             
-            carsdata=""
+            carstable=Motorbikestable=truckstable=carstable=""
             motorbikesdata=""
             trucksdata=""
             totaldata=""
             charttype="line" #default type in line
             timeperiod="Day"
-            timeperiodvar = func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime)
 
 
             carcheck=False
@@ -743,14 +749,23 @@ def statistic():
                 charttype = "pie"                
             if 'hour' in request.form.getlist('timeperiod'):
                 timeperiod = "Hour"
-                timeperiodvar = func.Hour(VEHICLE_INTERVAL_COUNTS.interval_datetime)
             
             # Get the `students` table from the Metadata object
 
             carcount = truckcount= motorbikecount = totalcount = 0
 
+            if timeperiod == 'Day':
+                CAR_COUNT_VIW=CAR_DAILY_COUNT_VIW
+                TRUCK_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
+                MOTORBIKE_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+            else:
+                CAR_COUNT_VIW=CAR_HOURLY_COUNT_VIW
+                TRUCK_COUNT_VIW=TRUCK_HOURLY_COUNT_VIW
+                MOTORBIKE_COUNT_VIW=MOTORBIKE_HOURLY_COUNT_VIW
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+
             
-            totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),timeperiodvar.label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
             
             totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
             
@@ -761,32 +776,25 @@ def statistic():
                 totaldata   =  dataset_serializer(totaltable)
             else:
                 print("total not calculated")
-                
+            
             if request.form.getlist('Car') or totalselected:
-                carstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
-                carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                carstable = CAR_COUNT_VIW.query.filter(CAR_COUNT_VIW.Moment.between(date_from,date_to)).all()
+                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
                 carsdata = dataset_serializer(carstable)
                 carcheck=True
             if request.form.getlist('Truck') or totalselected:
-                truckstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
-                truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+                truckstable = TRUCK_COUNT_VIW.query.filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to)).all()
+                truckcount =  db.session.query(func.sum(TRUCK_COUNT_VIW.vehicle_count)).filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
                 trucksdata = dataset_serializer(truckstable)
                 truckcheck=True
             if request.form.getlist('Motorbike') or totalselected:
-                Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
-                motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2",VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
-                motorbikesdata  =   dataset_serializer(Motorbikestable)
+                Motorbikestable = MOTORBIKE_COUNT_VIW.query.filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to)).all()
+                motorbikecount =  db.session.query(func.sum(MOTORBIKE_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
+                motorbikesdata  =  dataset_serializer(Motorbikestable)
                 motorcheck=True
             if request.form.getlist('total'):
                 totalcheck=True
                 
-
-
-
-        
-                
-
-            
 
             labels=labels_serializer(totaltable,timeperiod)
             
@@ -855,7 +863,6 @@ def statistic():
         totaldata=""
         charttype="line" #default type in line
         timeperiod="Day"
-        timeperiodvar = func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime)
 
         carcheck=False
         motorcheck=False
@@ -865,9 +872,9 @@ def statistic():
         if 'Pie' in request.form.getlist('charttype'):
             charttype = "pie"
 
-        if 'hour' in request.form.getlist('timeperiod'):
+        if 'hour' in request.form.getlist('Day'):
             timeperiod = "Hour"
-            timeperiodvar = func.Hour(VEHICLE_INTERVAL_COUNTS.interval_datetime)
+
 
         carcount = truckcount= motorbikecount = totalcount = 0
 
@@ -885,25 +892,22 @@ def statistic():
             print("total not calculated")
             
         if request.form.getlist('Car') or totalselected:
-            carstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1").group_by(timeperiod).all()
-            carcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="1").scalar()
+            carstable = CAR_DAILY_COUNT_VIW.query.all()
+            carcount =  db.session.query(func.sum(CAR_DAILY_COUNT_VIW.vehicle_count)).scalar()
             carsdata = dataset_serializer(carstable)
             carcheck=True
         if request.form.getlist('Truck') or totalselected:
-            truckstable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3").group_by(timeperiod).all()
-            truckcount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="3").scalar()
+            truckstable = TRUCK_DAILY_COUNT_VIW.query.all()
+            truckcount =  db.session.query(func.sum(TRUCK_DAILY_COUNT_VIW.vehicle_count)).scalar()
             trucksdata = dataset_serializer(truckstable)
             truckcheck=True
         if request.form.getlist('Motorbike') or totalselected:
-            Motorbikestable = VEHICLE_INTERVAL_COUNTS.query.with_entities(timeperiodvar, func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count')).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2").group_by(timeperiod).all()
-            motorbikecount =  db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.lkp_vehicle_type=="2").scalar()
+            Motorbikestable = MOTORBIKE_DAILY_COUNT_VIW.query.all()
+            motorbikecount =  db.session.query(func.sum(MOTORBIKE_DAILY_COUNT_VIW.vehicle_count)).scalar()
             motorbikesdata  =   dataset_serializer(Motorbikestable)
             motorcheck=True
         if request.form.getlist('total'):
             totalcheck=True
-            
-
-
 
         labels=labels_serializer(totaltable,timeperiod)
         
@@ -951,7 +955,8 @@ def statistic():
 
         return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
                                charttype=charttype,timeperiod=timeperiod,
-                               carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck)
+                               carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
+                               carcount=carcount,motorbikecount=motorbikecount,truckcount=truckcount,totalcount=totalcount)
 #============================= status =======================================
 @app.route('/status')
 @flask_login.login_required

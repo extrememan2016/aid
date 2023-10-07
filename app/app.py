@@ -65,6 +65,7 @@ from your_app import settings # ch_v0r89 (added)
 
 from sqlalchemy import func,select
 
+from your_app.models.user import User 
 from your_app.models.camera import Camera
 from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
 
@@ -103,14 +104,14 @@ app.secret_key = b'_5#y1L"F4Q8z\n\xec]/'
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=5)
 
 
-app.config['MYSQL_HOST'] = 'localhost'
+######################### in case of using mysql (not flask-sqlalchemy models!) #########################
+
+""" app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'raspberry'
 app.config['MYSQL_DB'] = 'pythonprogramming'
+mysql = MySQL(app) """
 
-
-
-mysql = MySQL(app)
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:raspberry@localhost/pythonprogramming"
@@ -133,21 +134,13 @@ login_manager.init_app(app)
 
 
 
-
-
-class User(flask_login.UserMixin,db.Model):
-    #__tablename__ = "user"
-    uid = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
-    username = db.Column(db.String(20))
-    password = db.Column(db.String(100))
-    #pass
-
-
-
 @login_manager.user_loader
 def user_loader(username):
-    
-    cursor = mysql.connection.cursor()
+    return  User.query.filter_by(username=username).first() 
+
+######################### in case of using mysql (not flask-sqlalchemy models!) #########################
+
+"""     cursor = mysql.connection.cursor()                                      
     cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
     user_data = cursor.fetchone()
     if user_data:
@@ -159,7 +152,7 @@ def user_loader(username):
         #return User(user_data[0], user_data[1], user_data[2])
         return user
     else:
-        return None
+        return None """
 
 
 @login_manager.request_loader

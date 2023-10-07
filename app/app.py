@@ -381,6 +381,7 @@ def home():
                 #write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID)) # ch_v0r96 (commented by m.taheri)
                 #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
                 validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
+
             return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
         elif  submit == 2:
             #session['ID'] = str(ID)
@@ -1210,7 +1211,7 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
             road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
             
             
-            cam_dict={'cam_focal': focal_length , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
+            cam_dict={'cam_focal': focal , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
             write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
 
             print("Success")

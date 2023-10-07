@@ -25,6 +25,12 @@
     color: rgba(0, 255, 0, 0.8);
   }
   
+  .container-red {
+    position: relative;
+    text-align: center;
+    color: rgba(255, 0, 0, 0.8);
+  }
+  
   /* Centered text */
   .centered {
     position: absolute;
@@ -34,6 +40,12 @@
     font-size: 16px;
   } 
 
+  .statuslabel{
+    background: rgba(90, 90, 90, 0.7);
+    padding: 0px 4px;
+    border-radius: 7px;
+    left: 5px;
+  }
 {% endblock %}
 
 {% block content %}
@@ -70,20 +82,25 @@
 <div class="col-xs-6 col-sm-3 placeholder" id="item{{validcam.did}}">
         <div>
         {% if validcam.url_cam == None %}
-        <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
-            &nbsp;Edit Camera {{validcam.did}}</button>  
-        <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam{{validcam.did}}" onclick="deletecam({{validcam.did}})" ><i class="fa fa-times" aria-hidden="true"></i>
-              &nbsp;Remove</button> 
-        {% elif validcam.isvalid ==0 %} <!-- Camera not registered -->  
-         <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
+            <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
+                &nbsp;Edit Camera {{validcam.did}}</button>  
+            <button  type="button" style ="height: 50%;" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" id="removecam{{validcam.did}}" onclick="deletecam({{validcam.did}})" ><i class="fa fa-times" aria-hidden="true"></i>
+                  &nbsp;Remove</button> 
+        {% elif validcam.isvalid == 0 %} <!-- Camera not registered -->  
+            <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
         <!-- Camera registered -->  
         {% elif validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
              <div class="container item">
-                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}"  />
-                <div class="centered"><i class="fa fa-check-circle"></i>Camera {{validcam.did}} online</div>
+                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
+                <div class="centered statuslabel"><i class="fa fa-check-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} online</div>
               </div>
+        {% elif validcam.isenable ==1 and validcam.pingok ==0 %} <!-- Camera is Enable and online -->
+              <div class="container-red  item">
+                 <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
+                 <div class="centered statuslabel"><i class="fa fa-times-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} offline</div>
+               </div>
         {% else %} 
-             <button  type="button" class="btn btn-outline-danger btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
+             <button  type="button" class="btn btn-outline-danger btn-lg btn-block btnitem"data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
             &nbsp;Camera offline</button>                 
         {% endif %}
         </div>
@@ -114,7 +131,7 @@
           <form method="post" role="form" action="/" id="form{{validcam.did}}">
                 <div class="form-group">
                     <label for="URL_{{validcam.did}}" class="control-label">Cam{{validcam.did}} URL:</label>
-                    <input type="text" class="form-control" id="URL_{{validcam.did}}" name="{{validcam.did}}_URL" placeholder="URL-Path"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
+                    <input type="text" class="form-control" id="URL_{{validcam.did}}" name="{{validcam.did}}_URL" placeholder="URL-Path" value="{{validcam.url_cam}}"> <!-- ch_v0r87 {rtsp or http}://{user}:{pass}@{IP-address}/{url-path}" >  -->                                       
                     {% if validcam[2] ==1 %}
                         <div class="input-group-prepend">                       
                             <span class="input-group-text"><input id="{{validcam.did}}_en" name="{{validcam.did}}_en" type="checkbox" aria-label="Checkbox for following text input" {% if validcam.isenable==1 %}checked{% endif %}>  Enable  </span>
@@ -191,6 +208,18 @@
     $("#cam_15").attr("src",url_15);
     $("#cam_16").attr("src",url_16);
     }); */
+
+    let values = [];
+    let elements = document.querySelectorAll('[id*=URL_]');
+    for (let element of elements) {
+      if (element) {
+        let urltext = element.value;
+        if (urltext.includes("static/videos/")){
+            let result = urltext.substring(urltext.lastIndexOf("/")+ 1);
+            element.setAttribute("value",result);  // Output: example
+        }
+      }
+    }
 </script>
 
 <script>

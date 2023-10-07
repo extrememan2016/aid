@@ -40,7 +40,7 @@
 	<h2>Preparing for calibration Camera {{camid}}</h2>
 	
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
-	<img id='theImg' src="{{ url_for('video_feed',camid=camid)}}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
+	<img id='theImg' src="{{ url_for('static', filename='images/screen_pattern.png') }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
     
 </div>
 
@@ -276,7 +276,7 @@
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				image = document.getElementById('theImg');
 				image.src = "{{ url_for('video_feed',camid=camid)}}";
-				drawMouseCircle(parseInt(new_VP1_x),parseInt(new_VP1_y)) // ch_v0r90 changed
+				drawMouseCircle(parseInt(new_VP1_x),parseInt(new_VP1_y)); // ch_v0r90 changed
 				LinesToVanish();
 
 				document.getElementById("myP").disabled = false;

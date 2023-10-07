@@ -6,7 +6,7 @@
 <div align="center" >
 	<h2> Calibrating Camera {{camid}} - Setting Region of Interest for Road</h2>
 	<canvas id='myCanvas' style="cursor: crosshair" width={{w_rsz}} height={{h_rsz}}></canvas> 
-	<img id='theImg' src="{{ url_for('video_feed',camid=camid)}}" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
+	<img id='theImg' src="{{ url_for('static', filename='images/screen_roi.png') }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" width={{w_rsz}} height={{h_rsz}} alt=""></img> 
 	
 </div>
 <div align="center" >

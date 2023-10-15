@@ -333,13 +333,11 @@
         success: function(response) {
 
           if(response.ispingok == true){
-              console.log("camera "+camid+" is online ");
               document.getElementById("pinglogocolor"+camid).className = "item container";
               document.getElementById("camstatetextid"+camid).innerHTML = "online";
               document.getElementById("camstatetexticon"+camid).className = "fa fa-check-circle";
             }
           else{
-              console.log("camera "+camid+" is offline ");
               document.getElementById("pinglogocolor"+camid).className = "item container-red";
               document.getElementById("camstatetextid"+camid).innerHTML = "offline";
               document.getElementById("camstatetexticon"+camid).className = "fa fa-times-circle";

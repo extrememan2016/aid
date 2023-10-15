@@ -630,6 +630,30 @@ def deletecam():
     except:
         return jsonify(error=True)
     #return redirect(url_for('home'))
+
+#============================= remove camera =======================================
+@app.route('/camisonline',methods=['POST'])
+@flask_login.login_required
+def camisonline():
+    try:
+        if flask_login.current_user.username =='user':
+            return redirect(url_for('event'))
+
+        if request.method == 'POST':
+            camid = request.form['camid']
+
+        cam = Camera.query.filter_by(did=camid).first()
+        
+        if cam.pingok==1:
+            return jsonify(ispingok=True)
+        elif cam.pingok==0:
+            return jsonify(ispingok=False)
+        
+        return jsonify(error=True)
+    except Exception as e:
+        print(str(e))
+        return jsonify(error=True)
+    #return redirect(url_for('home'))
 #============================= event =======================================
 @app.route('/event', methods=['GET', 'POST'])
 @flask_login.login_required

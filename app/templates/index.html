@@ -90,15 +90,19 @@
             <button  type="button" class="btn btn-outline-secondary btn-lg btn-block btnitem" data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-video-camera"></i>&nbsp;Cam {{validcam.did}}</button>                 
         <!-- Camera registered -->  
         {% elif validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
-             <div class="container item">
+             <div class="container item" id="pinglogocolor{{validcam.did}}">
+              
                 <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
-                <div class="centered statuslabel"><i class="fa fa-check-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} online</div>
+                <div class="centered statuslabel"><i id="camstatetexticon{{validcam.did}}" class="fa fa-check-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} <text id="camstatetextid{{validcam.did}}">online</text></div>
+              
               </div>
         {% elif validcam.isenable ==1 and validcam.pingok ==0 %} <!-- Camera is Enable and online -->
-              <div class="container-red  item">
+              <div class="container-red  item" id="pinglogocolor{{validcam.did}}">
+                
                  <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
-                 <div class="centered statuslabel"><i class="fa fa-times-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} offline</div>
-               </div>
+                 <div class="centered statuslabel"><i id="camstatetexticon{{validcam.did}}" class="fa fa-times-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} <text id="camstatetextid{{validcam.did}}">offline</text></div>
+                </div>
+              
         {% else %} 
              <button  type="button" class="btn btn-outline-danger btn-lg btn-block btnitem"data-toggle="modal" data-target="#editModal_{{validcam.did}}"><i class="fa fa-times" aria-hidden="true"></i>
             &nbsp;Camera offline</button>                 
@@ -321,7 +325,39 @@
       } 
 
 
+  function checkisonlineajax(camid) {
+        $.ajax({
+        url: '/camisonline',
+        type: 'POST',
+        data: {camid: camid},
+        success: function(response) {
 
+          if(response.ispingok == true){
+              console.log("camera "+camid+" is online ");
+              document.getElementById("pinglogocolor"+camid).className = "item container";
+              document.getElementById("camstatetextid"+camid).innerHTML = "online";
+              document.getElementById("camstatetexticon"+camid).className = "fa fa-check-circle";
+            }
+          else{
+              console.log("camera "+camid+" is offline ");
+              document.getElementById("pinglogocolor"+camid).className = "item container-red";
+              document.getElementById("camstatetextid"+camid).innerHTML = "offline";
+              document.getElementById("camstatetexticon"+camid).className = "fa fa-times-circle";
+            }
+
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+  } 
+  function checkisonline(camid) {
+    {% for validcam in validcams %}
+      checkisonlineajax({{validcam.did}});
+    {% endfor%}
+  }
+
+  setInterval(checkisonline, 5000); 
 
       
 

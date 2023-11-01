@@ -11,7 +11,6 @@ import cv2
 import math, time, datetime, os, glob
 import subprocess # ch_v0r90 (added)
 from flask import url_for #ch_v0r90 (added by m.taheri)
-#from imutils.object_detection import non_max_suppression # ch_v0r86 (commented)
 import sys # ch_v0r90 (added)
 if sys.version_info >= (3, 0): # ch_v0r90 (added to check python version)
     from .dbconnect import connection  # ch_v0r90 (py3 change dbconnect --> .dbconnect)
@@ -19,9 +18,6 @@ if sys.version_info >= (3, 0): # ch_v0r90 (added to check python version)
 else:
     from dbconnect import connection
 
-#import 
- # ch_v0r86 (added)
-#
 try:
     from  skimage.metrics import structural_similarity  as ssim # ch_v0r90 (will be added)
 except:
@@ -52,15 +48,11 @@ def non_max_suppression(boxes, probs=None, overlapThresh=0.3): # ch_v0r86 (added
     # initialize the list of picked indexes
     pick = []
 
-    # grab the coordinates of the bounding boxes
     x1 = boxes[:, 0]
     y1 = boxes[:, 1]
     x2 = boxes[:, 2]
     y2 = boxes[:, 3]
 
-    # compute the area of the bounding boxes and grab the indexes to sort
-    # (in the case that no probabilities are provided, simply sort on the
-    # bottom-left y-coordinate)
     area = (x2 - x1 + 1) * (y2 - y1 + 1)
     idxs = y2
 
@@ -1104,19 +1096,7 @@ def get_minute():
 #---------------------------------------------------------------------------# 
 # read from DB All    ch_v0r89 added
 #---------------------------------------------------------------------------# 
-def read_from_db_all(query, param):
-    table = ''
-    c, conn = connection()
-    data = c.execute(query, param) 
-           
-    if int(data) > 0:
-        table = c.fetchall()        
-        conn.commit()
-        c.close()
-        conn.close()
-        return table
-    else:
-        return ''
+
     
 def check_for_1_week_period(date_from, date_to, diff_days_duration): # ch_v0r91 diff_days_duration added)
     if date_to == '':

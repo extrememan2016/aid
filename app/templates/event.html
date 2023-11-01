@@ -133,20 +133,20 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for i in range(0,table| length)  %}
+                        {% for i in table  %}
                         <tr>
                     
-                            <td>{{ table[i][0] }}</td>
-                            <td>{{ table[i][1] }}</td>
-                            <td>{{ table[i][2]}}</td>
-                            <td>{{ table[i][3]}}</td>
-                            <td>{{ table[i][4]}}</td>
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.camera_name }}</td>
+                            <td>{{ i.videodatetime}}</td>
+                            <td>{{ i.name}}</td>
+                            <td>{{ i.type}}</td>
                             
                             <td>
                                 <div style="    text-align:center">
                                     <video class="embed-responsive-item" id="video1" width="110" controls>
-                                        <!-- <source src="static/videos/{{ table[i][5]}}" type="video/mp4"> -->
-                                        <source src="{{ url_for('send_file', filename= table[i][5] )}}" type="video/mp4">
+                                        <!-- <source src="static/videos/{{ i.video_path}}" type="video/mp4"> -->
+                                        <source src="{{ url_for('send_file', filename= i.video_path )}}" type="video/mp4">
                                         Your browser does not support HTML5 video.
                                     </video>
                                 </div>

@@ -1,72 +1,46 @@
 #!/usr/bin/env python3
-import cv2
 import get_video
-### from AID.VideoStream.fps import FPS
-
-import time
 
 import numpy as np
 
 import datetime
 
 from flask import Flask, render_template, Response, request, redirect, url_for
-from flask import flash, send_from_directory# ch_v0r90 (send_from_directory added)
+from flask import flash, send_from_directory
 from pprint import pprint
 from flask import jsonify
 
-import flask # ch_v0r96 (added by m.taheri)
-import flask_login # ch_v0r96 (added by m.taheri)
-from flask import session # ch_v0r96 (added by m.taheri)
-from datetime import timedelta # ch_v0r96 (added by m.taheri)
+import flask
+import flask_login
+from flask import session 
+from datetime import timedelta
 
 
-import pymysql # ch_v0r96 (added by m.taheri)
-pymysql.install_as_MySQLdb() # ch_v0r96 (added by m.taheri)
-from flask_mysqldb import MySQL # ch_v0r96 (added by m.taheri)
+import pymysql 
+pymysql.install_as_MySQLdb()
 from datetime import timedelta
 from your_app.extensions import db
-import re# ch_v0r85 (added)
+import re
 
 
-### from your_app.man_calibration import man_calib
 from your_app.least_squares import ls_fine_tune_parameters
-### from your_app.calculateSpeeds import Speed_Calc
 
 
-### from your_app.utils import add_remove_stopped_vehicle_2,  ROI_transparent  # ch_v0r90 (moved to AID_Loop)
-### from your_app.utils import scale_function# , camera_calib    # ch_v0r90 ('camera_calib' moved to AID_Loop)
-### from your_app.utils import getPrmLeast, getPrmDflt# , getPrmDfs_calib_1  # ch_v0r90 ('getPrmDfs_calib_1' moved to AID_Loop)
-### from your_app.utils import angle_between_points, camera_stop #, line_to_vanish  # ch_v0r90 ('line_to_vanish' moved to AID_Loop)
-### from your_app.utils import save_frame# , getPrmDfs_calib_2 # ch_v0r90 ('getPrmDfs_calib_2' moved to AID_Loop)
-from your_app.utils import verify_url, read_from_db, write_to_db_cams, write_to_db_CAM_ID, write_to_db_any, read_from_db_all, check_for_1_week_period # ch_v0r89 (read_from_db_all, check_for_1_week_period added)
-from your_app.utils import  write_to_db_roi, VP1_from_DB # ch_v0r90 (VP1_from_DB added)
+from your_app.utils import verify_url, write_to_db_any, check_for_1_week_period
 from your_app.utils import make_classification_staff ###, reset_counter_and_speeds # ch_v0r91 ('make_classification_staff', 'reset_counter_and_speeds' added)
 
-### from your_app.KeyClipWriter import KeyClipWriter # ch_v0r86 
 
-### from your_app.utils import poitsROIstr_to_pointsROInp#, point_inside_ROI # ch_v0r88 (added)
-from your_app.utils import get_lock   # ch_v0r88 (added)
-### from your_app.utils import points_roi_To_mask  # ch_v0r92 (added)
 
-### from your_app.utils import computeCameraCalibration  # ch_v0r87 added
+import redis 
 
-### from Kalman_filter.detectors import Detectors
-### from Kalman_filter.tracker import Tracker
-import os, glob
-
-import sys, traceback, importlib, threading # ch_v0r84 (added)
-from  your_app.config import config# ch_v0r84 (added)
-import redis # ch_v0r85 (added)
-### from collections import deque # ch_v0r86 (added)
-
-## from your_app.AID_Loop import AID_loop # ch_v0r89 (added)
 from your_app import settings # ch_v0r89 (added)
 
 
-from sqlalchemy import func,select
+from sqlalchemy import func
 
 from your_app.models.user import User 
 from your_app.models.camera import Camera
+from your_app.models.incidents import Incidents
 from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
 
 from your_app.models.vevhicle_interval_counts_VIW import CAR_DAILY_COUNT_VIW
@@ -78,23 +52,18 @@ from your_app.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
 #===============================  initializing calibration parameters =========
 
 h_rsz, w_rsz = 480, 864; 
-rsz_shape = (h_rsz, w_rsz)  # new size for the shown video
+rsz_shape = (h_rsz, w_rsz) 
 W, L = 0, 0
 swing_angle, focal, h_camera, h_camera_real = 0,0,0, 0.00 
 camera = video = fps =  None
-save_frame_global = None # ch_v0r85
-videoLoop = None  # ch_v0r84
+save_frame_global = None 
+videoLoop = None 
 VP1 = VP2 = VP3 = road_camera_staff = []
 calib = h = w = 0
 real_line_meseares = points_roi = []
-kcw = [] # ch_v0r86 (added)
+kcw = [] 
 
-
-# define REDIS connection information for Redis
 # Replaces with your configuration information
-
-
-
 r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB) # ch_v0r89 (added)
 
 
@@ -102,17 +71,6 @@ r = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=set
 app = Flask(__name__)
 app.secret_key = b'_5#y1L"F4Q8z\n\xec]/'
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=5)
-
-
-######################### in case of using mysql (not flask-sqlalchemy models!) #########################
-
-""" app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'raspberry'
-app.config['MYSQL_DB'] = 'pythonprogramming'
-mysql = MySQL(app) """
-
-
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:raspberry@localhost/pythonprogramming"
 
@@ -125,34 +83,13 @@ login_manager = flask_login.LoginManager()
 
 login_manager.init_app(app)
 
-# Our mock database.
-# user = {'foo@bar.tld': {'password': 'secret'}}
-
-
 
 #================= how to load a user from a Flask request and from its session ===================================== # ch_v0r96 (added by m.taheri)
-
 
 
 @login_manager.user_loader
 def user_loader(username):
     return  User.query.filter_by(username=username).first() 
-
-######################### in case of using mysql (not flask-sqlalchemy models!) #########################
-
-"""     cursor = mysql.connection.cursor()                                      
-    cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
-    user_data = cursor.fetchone()
-    if user_data:
-        # create a User object from the database data
-        user=User()
-        user.id=user_data[0]
-        user.username=user_data[1]
-        user.password=user_data[2]
-        #return User(user_data[0], user_data[1], user_data[2])
-        return user
-    else:
-        return None """
 
 
 @login_manager.request_loader
@@ -175,8 +112,6 @@ def request_loader(request):
             user.username=user_data[1]
             user.password=user_data[2]
             return user
-            #return User(user_data[0], user_data[1], user_data[2])
-            #return User(user_data['uid'], user_data['username'], user_data['password'])
     
     # return None if no valid header or token found
     return None
@@ -200,11 +135,6 @@ def login():
     username = flask.request.form['username']
     password = flask.request.form['password']
 
-    #cursor = mysql.connection.cursor()
-    #cursor = mysql.connection.cursor(pymysql.cursors.DictCursor)
-    #cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s', (username, password,))
-    #account = cursor.fetchone()
-    
     account =   User.query.filter_by(username=username).first()
 
     #if account:
@@ -253,7 +183,6 @@ def send_file(filename):
     print('filename -------------------> ', filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     
-# use decorators to link the function to a url
 
 @app.route('/', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -261,24 +190,17 @@ def home():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
 
-    ID = "1" # r.get("ID") # ch_v0r91 added
-    #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r96 (commented by m.taheri)
-    allcams = Camera.query.filter_by(did=ID).first() # ch_v0r96 (added by m.taheri)
-    del ID
-    #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
     validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()
     
-    #pprint(validcams)
-    # if request from html
+
     if request.method == "POST":
-        # verify the IP cam URL
         cam_remove_val = 'off'
         cam_en_val_temp = ''
         change_ind = 0
         verify_indx = -1
         submit = 0
         IP_add = key_url = ''
-        cam_num = Camera.query.count()
+
         vid_dirname = 'static/videos/' # ch_v0r87 (added)
        
         if str(request.form.getlist('actions')[0]) == 'submit':#if request.form.post['actions']# submit button clicked else calib button clicked
@@ -293,9 +215,6 @@ def home():
             for cam in validcams:
                 if key.startswith(str(cam.did)+'_'):
                     ID = str(cam.did) 
-                    """ ind_row = i+(i-1)*2
-                    cam_en_val = row[ind_row]
-                    cam_valid_val = row[ind_row+1] """
 
                     selectedcam=Camera.query.filter_by(did=cam.did).first()
 
@@ -341,13 +260,9 @@ def home():
             if cam_remove_val == 'on':
                 cam_valid_val = 0
                 change_ind = 1
-                #write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r89 commented
                 
                 db.session.delete(Camera.query.filter_by(did=ID).first()) # ch_v0r96 (added by m.taheri)
                 db.session.commit()
-
-                #cam_dict={'IP_cam': '', 'url_cam': '','cam_FPS': 0 }  # ch_v0r89 (added) # ch_v0r96 (commented by m.taheri)
-                # write_to_db_any("CAM_"+str(ID), cam_dict) # ch_v0r96 (commented by m.taheri)
 
                 flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
             elif verify_indx == 0: # Invalid URL
@@ -357,35 +272,28 @@ def home():
                 change_ind = 1
                 cam_en_val = 1
                 cam_valid_val = 1
-                # write_to_db_CAM_ID(str(ID), '', '',0, '')  # ch_v0r96 (commented by m.taheri)
                 
                 cam_dict={'cam_FPS': 0 } # ch_v0r96 (added by m.taheri)
                 write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
 
             # save the changes
             if change_ind == 1:
-                cam_en_str = "cam_"+str(ID)+"_enable"  # not using in ch_v0r96 (added by m.taheri)
-                cam_valid_str = "cam_"+str(ID)+"_valid" # not using in ch_v0r96 (added by m.taheri)
 
                 cam_dict={'isenable': cam_en_val , 'isvalid': cam_valid_val,'url_cam': key_url, 'IP_cam':IP_add } # ch_v0r96 (added by m.taheri)
 
                 write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
                 
-                #write_to_db_cams(cam_en_str,cam_en_val,cam_valid_str,cam_valid_val,key_url, IP_add, str(ID)) # ch_v0r96 (commented by m.taheri)
-                #row = list(read_from_db('CAMS_VALID')) # ch_v0r96 (commented by m.taheri)
                 validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
 
-            return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+            return render_template('index.html',validcams=validcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
         elif  submit == 2:
-            #session['ID'] = str(ID)
-            # r.set("ID", str(ID))
+
             return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
-        elif  submit == 3: # ch_v0r87 (added)
-            # r.set("ID", str(ID)) # ch_v0r87 (added)
-            return redirect(url_for('analytic',camid=request.form.getlist('camid')[0])) # ch_v0r87 (added)
+        elif  submit == 3: 
+            return redirect(url_for('analytic',camid=request.form.getlist('camid')[0])) 
             
     else:
-        return render_template('index.html',validcams=validcams, allcams=allcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+        return render_template('index.html',validcams=validcams )  
     
 #============================= analytic =======================================
 @app.route('/analytic',  methods=['GET', 'POST'])
@@ -393,7 +301,6 @@ def home():
 def analytic():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
-        # ---------------------- ch_v0r87 (POST method added)
     ID = request.args.get('camid')
     camid = ID
     if request.method == 'POST':
@@ -408,11 +315,9 @@ def analytic():
                 cam_dict={'smoke_ROI_points': smoke_ROI_points }
                 write_to_db_any(camid,cam_dict)
                 flash(u'Smoke Region Setting Applied!', 'success')
-                #return redirect(url_for('analytic')) 
             except Exception as e:
                 print("ERROR" + str(e))
                 flash(u'Error! Cant Apply Smoke ROI Setting!', 'warning ')
-                #return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
 
 
 
@@ -431,7 +336,6 @@ def analytic():
 
 
             cam_dict={'detection_type': i, 'draw_3d': draw_3d }
-            #write_to_db_any("CAM_"+ID, cam_dict)
             write_to_db_any(camid,cam_dict)
             
         elif "stop_vehicle_th" in request.form: # Stop vehicle Form
@@ -505,30 +409,18 @@ def analytic():
             truck_dimensions= str(W_low_truck)+','+str(W_hi_truck)+';'+str(L_low_truck)+','+str(L_hi_truck)+';'+str(H_low_truck)+','+str(H_hi_truck)+';'
             
             cam_dict={'class_lines_roi': class_lines_roi, 'bike_dimensions':bike_dimensions, 'car_dimensions':car_dimensions, 'truck_dimensions':truck_dimensions, 'disp_dimensions': disp_dimensions} # disp_dimensions # ch_v0r91 (added)
-            #write_to_db_any("CAM_"+ID, cam_dict)
             write_to_db_any(camid,cam_dict)
-    """ else:
-        try:
-            pprint(request.form)
-            print(request.args.get(is_apply_smoke_success))
-        except:
 
-            print("emptty") """
            
     try:
-        #row_cam = list(read_from_db("CAM_"+ID))
         cam = Camera.query.filter_by(did=ID).first()
-        # ----------------- ch_v0r91 (added) -------------------------------
         classification_staff = make_classification_staff(cam) 
         counting_list = []
         for k in classification_staff.keys():
             counting_list +=list(classification_staff[k])
         counting_list[3] = 100 - counting_list[3]
 
-        # detect_type_ind = 1
-        # slow_vehicle_th = 40
-        # stop_vehicle_th = 2
-        # stop_vehicle_dur_th = 1
+
         detect_type_ind=cam.detection_type              #row_cam[16]
         slow_vehicle_th=cam.slow_vehicle_th              #row_cam[17]
         stop_vehicle_th=cam.stop_vehicle_th              #row_cam[18]
@@ -539,7 +431,6 @@ def analytic():
         print("ERROR IS: "+str(e))
         #flash(u'Invalid URL provided', 'warning')
         return redirect(url_for('roi',camid=ID))
-        #return redirect(url_for('roi'))
     
 #============================= info ======================================= #### ch_v0r96 (edited by m.taheri)
 @app.route('/info')
@@ -549,13 +440,11 @@ def info():
         return redirect(url_for('event'))
 
     try:
-        ID = r.get("ID") # ch_v0r91 added
-        row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-        
+
         uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()) #  ch_v0r92 (added)
         uptime2 = check_output(["uptime"])    
         
-        return render_template('info.html', row=row_cam, setting_class = "active",
+        return render_template('info.html', setting_class = "active",
                 uptime = str(uptime).split('.')[0], uptime2=uptime2)  # render a template # ch_v0r91 row added
     except:
         flash(u'Error occured. Please contact Admin', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
@@ -609,8 +498,7 @@ def createcam():
     return jsonify({'items': items})
 
 
-    #return newcam.did
-    #return redirect(url_for('home'))
+
 #============================= remove camera =======================================
 @app.route('/deletecam',methods=['POST'])
 @flask_login.login_required
@@ -629,7 +517,6 @@ def deletecam():
         return jsonify(success=True)
     except:
         return jsonify(error=True)
-    #return redirect(url_for('home'))
 
 #============================= remove camera =======================================
 @app.route('/camisonline',methods=['POST'])
@@ -653,40 +540,38 @@ def camisonline():
     except Exception as e:
         print(str(e))
         return jsonify(error=True)
-    #return redirect(url_for('home'))
 #============================= event =======================================
 @app.route('/event', methods=['GET', 'POST'])
 @flask_login.login_required
 def event():
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID))
     error=''
-    Num_of_cams = 5 # int(r.get("Num_of_cams"))
-    if request.method == "POST": # if the user postes a date filter
-        # # ch_v0r91 added
-        date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
+    Num_of_cams = Camera.query.count()
+ 
+    if request.method == "POST": 
+        date_from = request.form['dateTimePick1'] 
         date_to   = request.form['dateTimePick2']
-        print(date_from,date_to)
         
         check_week_ind = check_for_1_week_period(date_from,date_to, 60) # ch_v0r91 diff_days_duration added)
         if check_week_ind ==1:
-            if date_to !='': # if date_to is not empty
+            if date_to !='': 
                 query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
-                param = (date_from, date_to) 
-            else: # if date_to is empty
+                param = (date_from, date_to)
+                table = Incidents.query.filter(Incidents.videodatetime.between(date_from,date_to)).all()
+
+            else: 
                 query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
                 param = (date_from,)
-            table = list(read_from_db_all(query, param))
+                table = Incidents.query.filter(Incidents.videodatetime >= date_from).all()
+                
         else:
             error_mes = 'Report duration is Out of Range!'
             table = ''
             flash(error_mes, 'warning')
-        print(table)
-        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1), row=row_cam)  # return for user post
+        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1))  # return for user post
     else:
         
         table = ''
-        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1), row=row_cam)  # first opening the page (# ch_v0r91 row added)
+        return render_template('event.html',table=table, error=error,Range=range(1,Num_of_cams+1))  # first opening the page (# ch_v0r91 row added)
     
 #============================= counting =======================================
 @app.route('/counting')
@@ -695,18 +580,14 @@ def counting():
     if flask_login.current_user.username =='user':
         return redirect(url_for('event'))
     ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
+    row_cam = Camera.query.filter_by(did=ID).first()
+
     return render_template('counting.html', row=row_cam)  # render a template # ch_v0r91 row added:
 
 #============================= statistic  # ch_v0r91 added =======================================
 
 #=============================below functions create list for the chart==========================#
 def labels_serializer(objlist,timeperiod):
-    #result = [item.labels_serializer() for item in objlist]
-
-    #date_format = '%Y-%m-%d %H:%M:%S'
-    #result = [item.interval_datetime.strftime(date_format) for item in objlist]
-
     
     if timeperiod == "Hour":
         date_format = '%Y-%m-%d %H'
@@ -718,7 +599,6 @@ def labels_serializer(objlist,timeperiod):
     return result
 
 def dataset_serializer(objlist):
-    #result = [item.dataset_serializer() for item in objlist]
     result = [int(item.vehicle_count) for item in objlist]
     return result
 
@@ -726,29 +606,16 @@ def dataset_serializer(objlist):
 
 
 @app.route('/statistic', methods=['GET', 'POST'])
-#@flask_login.login_required
+@flask_login.login_required
 def statistic():
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-    #print('row_cam', row_cam)
     error_mes = table =''
     
     if request.method == "POST": # if the user postes a date filter
-        # get the filled from_to dates
         date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
         date_to   = request.form['dateTimePick2']
-
-        #print(date_from,date_to)
         
         check_week_ind = check_for_1_week_period(date_from,date_to, 7)
         if check_week_ind ==1:
-            """ if date_to !='': # if date_to is not empty
-                query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
-                param = (date_from, date_to) 
-            else: # if date_to is empty
-                query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
-                param = (date_from,)
-            table = list(read_from_db_all(query, param)) """
             
             carstable=Motorbikestable=truckstable=carstable=""
             motorbikesdata=""
@@ -768,7 +635,6 @@ def statistic():
             if 'hour' in request.form.getlist('timeperiod'):
                 timeperiod = "Hour"
             
-            # Get the `students` table from the Metadata object
 
             carcount = truckcount= motorbikecount = totalcount = 0
 
@@ -873,7 +739,7 @@ def statistic():
         else:
             error_mes = 'Report duration is Out of Range!'
             flash(error_mes, 'warning')     
-        return render_template('statistic.html',table=table, error_mes=error_mes, row=row_cam)  # return for user post
+        return render_template('statistic.html',table=table, error_mes=error_mes)  # return for user post
     else:
         carsdata=""
         motorbikesdata=""
@@ -1017,7 +883,7 @@ def worker_0():
     points_x, points_y = '', ''
     points_x = request.form.getlist('points_x[]') # x-cordinates of rectangular calibration pattern
     points_y = request.form.getlist('points_y[]') # y-cordinates of rectangular calibration pattern
-    #print(points_x,points_y)
+
     if points_x:
         points_x_db_str=''
         points_roi = np.zeros((len(points_x), 2), dtype=float) 
@@ -1035,9 +901,7 @@ def worker_0():
 
         write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
                 
-        #ID = str(r.get("ID")) 
-        #write_to_db_roi(str(ID),points_x_db_str)
-        # ---------------------- ch_v0r86  -----------------------------
+
     return 'OK'
 
 #================= Getting Region of Intrest for road from user  ====== 
@@ -1048,7 +912,6 @@ def worker_1():
     points_x, points_y = '', ''
     points_x = request.form.getlist('points_x[]') # x-cordinates of rectangular calibration pattern
     points_y = request.form.getlist('points_y[]') # y-cordinates of rectangular calibration pattern
-    #print(points_x,points_y)
     if points_x:
         points_x_db_str=''
         points_roi = np.zeros((len(points_x), 2), dtype=float) 
@@ -1065,30 +928,9 @@ def worker_1():
 
         write_to_db_any(camid,cam_dict) # ch_v0r96 (added by m.taheri)
                 
-        #ID = str(r.get("ID")) 
-        #write_to_db_roi(str(ID),points_x_db_str)
-        # ---------------------- ch_v0r86  -----------------------------
+
     return 'OK'
 
-#================= Getting Region of Interest from user  ====== ch_v0r87 (module added)
-""" @app.route('/SW_roi_mouse_click', methods = ['POST'])
-@flask_login.login_required
-def worker_SW():
-    if request.method == 'POST':
-        try:
-            camid = request.form['camid']
-            if request.form['key']=='smoke':
-
-                smoke_ROI_points = request.form['points_smoke_x'] + ';' + request.form['points_smoke_y'] +';'
-                cam_dict={'smoke_ROI_points': smoke_ROI_points }
-                write_to_db_any(camid,cam_dict)
-
-            #return redirect(url_for('analytic')) 
-        except Exception as e:
-            print("ERROR" + str(e))
-            #return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
-
-    return 'OK' """
 
 #================= Getting real measurements of some known length on the road == 
 #================= from user to improve camera calibration ====================
@@ -1116,11 +958,6 @@ def vp1_view():
         option = request.form['options']
         if option == 'From_VP':
             To_VP = 0
-
-        # write to DB "To_VP" 
-        
-
-        # write_to_db_any -> "To_VP"
 
         if request.form['action'] == "Change it":
             return redirect(url_for('vp1',camid = ID))            
@@ -1152,9 +989,7 @@ def calibration_step_1():
     else:        
         try:            
             #------------  ch_v0r85 -----------------------
-            #ID = r.get("ID")
             ID =  request.args.get('camid')
-            #   Get h_rsz, w_rsz,vp1_x, vp1_y  -> from DB
             
             row_cam = Camera.query.filter_by(did=ID).first()
 
@@ -1180,10 +1015,8 @@ def calibration_step_2():
             real_line_meseares.extend( [L] ) # seve this somewhere to use it in "mouse_click2"
 
 
-        # mouse_click2 must run here
-        print("before error")
         worker_3(camid,lines_points_x,lines_points_y,real_line_meseares)
-        print("after error")
+
         try:
             points = points_roi[0]
             return redirect(url_for('analytic')) 
@@ -1207,7 +1040,6 @@ def calibration_step_2():
 def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
     # get real_line_meseares you were saved
     if real_line_meseares != []: ## ch_v0r84
-        #ID = r.get("ID") # ch_v0r85
         ID = camid
         row_cam = Camera.query.filter_by(did=ID).first()
 
@@ -1245,10 +1077,8 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
 def vp1():
 
     try:
-        #ID = r.get("ID")
         ID =  request.args.get('camid')
 
-        #row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
         row_cam = Camera.query.filter_by(did=ID).first()
 
         # get VP1 from DB
@@ -1283,13 +1113,10 @@ def roiroad(camid):
 @app.errorhandler(404)
 def page_not_found(e):
     print( '404 page not found'+ str(request.path)) # ch_v0r90 (py3 change)
-    ID = "1"
-    row_cam = list(read_from_db("CAM_"+ID)) # ch_v0r91 added
-    return render_template('404.html', row=row_cam), 404 
+    return render_template('404.html' ), 404 
 
 #========================================================================
 def calib_step_init(calib, framePluginInstance, fps_capture, CAM_ID):
-    """Video streaming generator function."""
     print("some initial condition")
     return "OK"
   

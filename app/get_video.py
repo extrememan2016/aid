@@ -69,18 +69,32 @@ class RedisShmem(object):
         return frame, grabbed, timestamp
 
 
-def videoLoop(camid):            # for use in app.py file!
-    cam_name = "camid"
-    cam_name = "CAM_01"
+
+
+
+def videoLoop(camid,ultimate):            # for use in app.py file!
+    cam_name = "camid"+camid
+    #cam_name = "CAM_01"
     shmem = RedisShmem(cam_name)
-    while True:
-        frame_web, grabbed, _ = shmem.getFrame()
-        if grabbed:
-            img = cv2.imencode('.jpg', frame_web)[1].tobytes()    
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-            #print(frame_web.shape)
-            #v2.imshow("Web View", frame_web)
+    rtimer = 50         # timer for preview stream for afew second
+    while True:# and rtimer>0:
+        if ultimate == False: # if stream isn't ultimate then trigger the flag
+            rtimer = rtimer-1
+        try: # stream is ok
+            frame_web, grabbed, _ = shmem.getFrame()
+            if grabbed and rtimer>0:
+                img = cv2.imencode('.jpg', frame_web)[1].tobytes()
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+                cv2.waitKey(1)
+        except: # stream error
+            rtimer = 50
+            img = 'static/images/nostream.jpg'      # nostream photo
+            img = cv2.imread(img)
+            _, encoded_img = cv2.imencode('.jpg', img)  # Encode the image
+            img_bytes = encoded_img.tobytes()
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img_bytes + b'\r\n')
             cv2.waitKey(1)
+
 
 def main():
     cam_name = "CAM_01"

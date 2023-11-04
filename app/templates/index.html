@@ -92,14 +92,14 @@
         {% elif validcam.isenable ==1 and validcam.pingok ==1 %} <!-- Camera is Enable and online -->
              <div class="container item" id="pinglogocolor{{validcam.did}}">
               
-                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
+                <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('tiny_video_feed',camid=validcam.did)}}"  />
                 <div class="centered statuslabel"><i id="camstatetexticon{{validcam.did}}" class="fa fa-check-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} <text id="camstatetextid{{validcam.did}}">online</text></div>
               
               </div>
         {% elif validcam.isenable ==1 and validcam.pingok ==0 %} <!-- Camera is Enable and online -->
               <div class="container-red  item" id="pinglogocolor{{validcam.did}}">
                 
-                 <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('video_feed',camid=validcam.did)}}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/nostream.png') }}'" />
+                 <img style="cursor:pointer;" class="img-responsive" id="cam_{{validcam.did}}" height="120" width="200" data-toggle="modal" data-target="#editModal_{{validcam.did}}" src="{{ url_for('tiny_video_feed',camid=validcam.did)}}"  />
                  <div class="centered statuslabel"><i id="camstatetexticon{{validcam.did}}" class="fa fa-times-circle" style="padding-right: 6px;" ></i>Camera {{validcam.did}} <text id="camstatetextid{{validcam.did}}">offline</text></div>
                 </div>
               

@@ -49,6 +49,10 @@ from your_app.models.vevhicle_interval_counts_VIW import TRUCK_DAILY_COUNT_VIW
 from your_app.models.vevhicle_interval_counts_VIW import CAR_HOURLY_COUNT_VIW
 from your_app.models.vevhicle_interval_counts_VIW import MOTORBIKE_HOURLY_COUNT_VIW
 from your_app.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
+
+
+
+
 #===============================  initializing calibration parameters =========
 
 h_rsz, w_rsz = 480, 864; 
@@ -1132,5 +1136,13 @@ if __name__ == '__main__':
 @flask_login.login_required
 def video_feed():   
     camid=request.args.get('camid')
-    print("it is:"+camid)
-    return Response(get_video.videoLoop(camid), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_video.videoLoop(camid,True), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/tiny_video_feed',methods = ['POST','GET'])      #Video streaming route. Put this in the src attribute of an img tag
+@flask_login.login_required
+def tiny_video_feed():   
+    camid=request.args.get('camid')
+    return Response(get_video.videoLoop(camid,False), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+

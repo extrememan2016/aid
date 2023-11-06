@@ -1,4 +1,4 @@
-from your_app.extensions import db
+from resources.extensions import db
 
 class LKP_VEHICLE_TYPE(db.Model):
     #__tablename__ = "LKP_VEHICLE_TYPE"

@@ -1,4 +1,4 @@
-from your_app.extensions import db
+from resources.extensions import db
 
 class Incidents(db.Model):
     #__tablename__ = "incidents"

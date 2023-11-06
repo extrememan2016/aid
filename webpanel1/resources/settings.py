@@ -17,10 +17,10 @@ videoCaptureProperties = '((cv2.CAP_PROP_FRAME_WIDTH, 864), (cv2.CAP_PROP_FRAME_
 
 # Frame grabber class:
 #
-# your_app.mjpegclient  = mjpegclient wrapper
-# your_app.videocapture = OpenCV cv2.VideoCapture wrapper
+# resources.mjpegclient  = mjpegclient wrapper
+# resources.videocapture = OpenCV cv2.VideoCapture wrapper
 
-framePlugin =  'your_app.videocapture' #'your_app.client_capture' #  ch_v0r90 ('your_app.videocapture' -->  'your_app.client_capture')
+framePlugin =  'resources.videocapture' #'resources.client_capture' #  ch_v0r90 ('resources.videocapture' -->  'resources.client_capture')
 
 
 # Socket timeout in seconds (only used for mjpegclient)

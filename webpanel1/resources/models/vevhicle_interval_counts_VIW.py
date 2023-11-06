@@ -1,4 +1,4 @@
-from your_app.extensions import db
+from resources.extensions import db
 from datetime import datetime
 
 class CAR_DAILY_COUNT_VIW(db.Model):

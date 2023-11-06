@@ -19,37 +19,38 @@ from datetime import timedelta
 import pymysql 
 pymysql.install_as_MySQLdb()
 from datetime import timedelta
-from your_app.extensions import db
+from resources.extensions import db
 import re
 
 
-from your_app.least_squares import ls_fine_tune_parameters
+from resources.least_squares import ls_fine_tune_parameters
 
 
-from your_app.utils import verify_url, write_to_db_any, check_for_1_week_period
-from your_app.utils import make_classification_staff ###, reset_counter_and_speeds # ch_v0r91 ('make_classification_staff', 'reset_counter_and_speeds' added)
+from resources.utils import verify_url, write_to_db_any, check_for_1_week_period
+from resources.utils import make_classification_staff ###, reset_counter_and_speeds # ch_v0r91 ('make_classification_staff', 'reset_counter_and_speeds' added)
 
 
 
 import redis 
 
-from your_app import settings # ch_v0r89 (added)
+from resources import settings # ch_v0r89 (added)
 
 
 from sqlalchemy import func
 
-from your_app.models.user import User 
-from your_app.models.camera import Camera
-from your_app.models.incidents import Incidents
-from your_app.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
+from resources.models.user import User 
+from resources.models.camera import Camera
+from resources.models.incidents import Incidents
+from resources.models.vevhicle_interval_counts import VEHICLE_INTERVAL_COUNTS
 
-from your_app.models.vevhicle_interval_counts_VIW import CAR_DAILY_COUNT_VIW
-from your_app.models.vevhicle_interval_counts_VIW import MOTORBIKE_DAILY_COUNT_VIW
-from your_app.models.vevhicle_interval_counts_VIW import TRUCK_DAILY_COUNT_VIW
-from your_app.models.vevhicle_interval_counts_VIW import CAR_HOURLY_COUNT_VIW
-from your_app.models.vevhicle_interval_counts_VIW import MOTORBIKE_HOURLY_COUNT_VIW
-from your_app.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import CAR_DAILY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import MOTORBIKE_DAILY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import TRUCK_DAILY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import CAR_HOURLY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import MOTORBIKE_HOURLY_COUNT_VIW
+from resources.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
 
+from gevent.pywsgi import WSGIServer
 
 
 
@@ -180,7 +181,7 @@ def unauthorized_handler():
         return render_template('401.html')
 
 #--------------- # ch_v0r90 (display video) ---------------------------------------
-app.config['UPLOAD_FOLDER'] = 'your_app/output'
+app.config['UPLOAD_FOLDER'] = 'resources/output'
 @app.route('/send_file/<filename>')
 @flask_login.login_required
 def send_file(filename):
@@ -1127,7 +1128,9 @@ def calib_step_init(calib, framePluginInstance, fps_capture, CAM_ID):
 #========================================================================
 def main():
     app.run(debug=False,host='0.0.0.0', threaded=True)
-    
+    #from waitress import serve
+    #serve(app, host="0.0.0.0", port=5000)
+
 if __name__ == '__main__':
     main()
     

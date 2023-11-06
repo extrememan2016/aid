@@ -1,4 +1,4 @@
-from your_app.extensions import db
+from resources.extensions import db
 import flask_login
 class User(flask_login.UserMixin,db.Model):
     #__tablename__ = "user"

@@ -31,7 +31,7 @@ from skimage.feature import graycomatrix, graycoprops  # ch_v0r92 (added) ch_v0r
 from collections import deque # ch_v0r92 (added)
 
 from .extensions import db
-from your_app.models.camera import Camera
+from resources.models.camera import Camera
 
 
 

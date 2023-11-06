@@ -76,7 +76,7 @@ def videoLoop(camid,ultimate):            # for use in app.py file!
     cam_name = "camid"+camid
     #cam_name = "CAM_01"
     shmem = RedisShmem(cam_name)
-    rtimer = 50         # timer for preview stream for afew second
+    rtimer = 50         # timer for preview stream for afew fps
     while True:# and rtimer>0:
         if ultimate == False: # if stream isn't ultimate then trigger the flag
             rtimer = rtimer-1

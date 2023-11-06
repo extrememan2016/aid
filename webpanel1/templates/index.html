@@ -351,7 +351,9 @@
   } 
   function checkisonline(camid) {
     {% for validcam in validcams %}
-      checkisonlineajax({{validcam.did}});
+      {% if validcam.did is not none %} 
+        checkisonlineajax({{validcam.did}});
+      {% endif%}
     {% endfor%}
   }
 

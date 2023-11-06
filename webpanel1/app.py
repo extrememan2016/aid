@@ -466,7 +466,6 @@ def createcam():
         cam = Camera.query.filter_by(did=i).with_entities(Camera.did).first()
         if cam is None:
             newcam.did = i
-            print("test "+str(newcam.did))
             break
     newcam.pingok = 1
     newcam.cam_VP1_X = 200 #619.24

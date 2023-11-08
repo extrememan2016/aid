@@ -182,10 +182,10 @@ def unauthorized_handler():
 
 #--------------- # ch_v0r90 (display video) ---------------------------------------
 app.config['UPLOAD_FOLDER'] = 'resources/output'
-@app.route('/send_file/<filename>')
+@app.route('/send_file/<filename>=')
 @flask_login.login_required
 def send_file(filename):
-    print('filename -------------------> ', filename)
+    print('filename ------------------->= ', filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     
 
@@ -251,13 +251,13 @@ def home():
             except:
                 flash(u'Error occured. Please try again', 'danger') # Categories: success (green), info (blue), warning (yellow), danger (red)
 
-            # If url is not empty --> check for url validity 
+            # If url is not empty -->= check for url validity 
             if key_url != '':
                 verify_indx, isfile = verify_url(key_url, 'Cam_'+ID)
                 if verify_indx == 1:
                     if isfile == 1: 
                         IP_add = '127.0.0.1'
-                        key_url = vid_dirname+key_url # ch_v0r87 ('key_url' --> 'vid_dirname+key_url')
+                        key_url = vid_dirname+key_url # ch_v0r87 ('key_url' -->= 'vid_dirname+key_url')
                     else:
                         IP_add = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', key_url).group()
 
@@ -272,7 +272,7 @@ def home():
                 flash(u'You have successfully removed the camera setting', 'success') # Categories: success (green), info (blue), warning (yellow), danger (red)
             elif verify_indx == 0: # Invalid URL
                 flash(u'Invalid URL provided', 'warning') # Categories: success (green), info (blue), warning (yellow), danger (red)
-            elif verify_indx == 1: # Valid URL --> save it
+            elif verify_indx == 1: # Valid URL -->= save it
                 flash(u'Valid URL provided', 'success')
                 change_ind = 1
                 cam_en_val = 1
@@ -290,7 +290,7 @@ def home():
                 
                 validcams = Camera.query.with_entities(Camera.did,Camera.url_cam,Camera.isenable,Camera.isvalid,Camera.pingok).all()  # ch_v0r96 (added by m.taheri)
 
-            return render_template('index.html',validcams=validcams )  # ch_v0r91 (row --> row_val and  'row=row_cam' added)
+            return render_template('index.html',validcams=validcams )  # ch_v0r91 (row -->= row_val and  'row=row_cam' added)
         elif  submit == 2:
 
             return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
@@ -328,7 +328,7 @@ def analytic():
 
 
         if "my_range" in request.form: # Detection Form
-            detection_condition = ["Very Low <br /> (Very low light condition or very blurry image)", "Low <br />(Low light condition or blurry image)", "Default <br />(Normal light with normal image quality)", "High <br />(High light condition and sharp image)"];
+            detection_condition = ["Very Low <br />= (Very low light condition or very blurry image)", "Low <br />=(Low light condition or blurry image)", "Default <br />=(Normal light with normal image quality)", "High <br />=(High light condition and sharp image)"];
             my_range = request.form['my_range']
             for (i, text) in enumerate(detection_condition):
                 if text == my_range:
@@ -560,7 +560,7 @@ def event():
             if date_to !='': 
                 query = ("SELECT * FROM Incidents WHERE videodatetime >= %s AND videodatetime <= %s") 
                 param = (date_from, date_to)
-                table = Incidents.query.filter(Incidents.videodatetime.between(date_from,date_to)).all()
+                table = Incidents.query.filter(Incidents.videodatetime<=date_to,Incidents.videodatetime>=date_from).all()
 
             else: 
                 query = "SELECT * FROM Incidents WHERE videodatetime >= %s"
@@ -594,7 +594,7 @@ def counting():
 def labels_serializer(objlist,timeperiod):
     
     if timeperiod == "Hour":
-        date_format = '%Y-%m-%d %H'
+        #date_format = '%Y-%m-%d %H'
         result = [item.Hour for item in objlist]
     else:
         date_format = '%Y-%m-%d'
@@ -647,19 +647,21 @@ def statistic():
             carcount = truckcount= motorbikecount = totalcount = 0
 
             if timeperiod == 'Day':
+                date_from = date_from[0:10]
+                date_to = date_to[0:10]
                 CAR_COUNT_VIW=CAR_DAILY_COUNT_VIW
                 TRUCK_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
-                MOTORBIKE_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
-                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
+                MOTORBIKE_COUNT_VIW=MOTORBIKE_DAILY_COUNT_VIW
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime<=date_to,VEHICLE_INTERVAL_COUNTS.interval_datetime>=date_from,VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
             else:
                 CAR_COUNT_VIW=CAR_HOURLY_COUNT_VIW
                 TRUCK_COUNT_VIW=TRUCK_HOURLY_COUNT_VIW
                 MOTORBIKE_COUNT_VIW=MOTORBIKE_HOURLY_COUNT_VIW
-                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H:00').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime<=date_to,VEHICLE_INTERVAL_COUNTS.interval_datetime>=date_from,VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
 
             
             
-            totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+            totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime<=date_to,VEHICLE_INTERVAL_COUNTS.interval_datetime>=date_from,VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             
             totalselected = False
             if (request.form.getlist('Car') == [] and request.form.getlist('Truck') == [] and  request.form.getlist('Motorbike') == []) or (request.form.getlist('Car')  and request.form.getlist('Truck') and  request.form.getlist('Motorbike') ):
@@ -670,18 +672,22 @@ def statistic():
                 print("total not calculated")
             
             if request.form.getlist('Car') or totalselected:
-                carstable = CAR_COUNT_VIW.query.filter(CAR_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+                carstable = CAR_COUNT_VIW.query.filter(CAR_COUNT_VIW.moment<=date_to,CAR_COUNT_VIW.moment>=date_from,CAR_COUNT_VIW.cam_id==camid).all()
+                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.cam_id==camid).scalar()
+                print("car count" + str(carcount))
+                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.moment<=date_to,CAR_COUNT_VIW.moment >= date_from,CAR_COUNT_VIW.cam_id==camid).scalar()
+                print("car count" + str(carcount) + str(date_from))
+
                 carsdata = dataset_serializer(carstable)
                 carcheck=True
             if request.form.getlist('Truck') or totalselected:
-                truckstable = TRUCK_COUNT_VIW.query.filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-                truckcount =  db.session.query(func.sum(TRUCK_COUNT_VIW.vehicle_count)).filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+                truckstable = TRUCK_COUNT_VIW.query.filter(TRUCK_COUNT_VIW.moment<=date_to,TRUCK_COUNT_VIW.moment>=date_from,TRUCK_COUNT_VIW.cam_id==camid).all()
+                truckcount =  db.session.query(func.sum(TRUCK_COUNT_VIW.vehicle_count)).filter(TRUCK_COUNT_VIW.moment<=date_to,TRUCK_COUNT_VIW.moment>=date_from,TRUCK_COUNT_VIW.cam_id==camid).scalar()
                 trucksdata = dataset_serializer(truckstable)
                 truckcheck=True
             if request.form.getlist('Motorbike') or totalselected:
-                Motorbikestable = MOTORBIKE_COUNT_VIW.query.filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-                motorbikecount =  db.session.query(func.sum(MOTORBIKE_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+                Motorbikestable = MOTORBIKE_COUNT_VIW.query.filter(MOTORBIKE_COUNT_VIW.moment<=date_to,MOTORBIKE_COUNT_VIW.moment>=date_from,MOTORBIKE_COUNT_VIW.cam_id==camid).all()
+                motorbikecount =  db.session.query(func.sum(MOTORBIKE_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_COUNT_VIW.moment<=date_to,MOTORBIKE_COUNT_VIW.moment>=date_from,MOTORBIKE_COUNT_VIW.cam_id==camid).scalar()
                 motorbikesdata  =  dataset_serializer(Motorbikestable)
                 motorcheck=True
             if request.form.getlist('total'):
@@ -737,7 +743,6 @@ def statistic():
                 };
 
 
-            
             validcamid = Camera.query.with_entities(Camera.did).all()
             return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,validcamid=validcamid,selectedcam=camid,
                                    charttype=charttype,timeperiod=timeperiod,
@@ -785,18 +790,18 @@ def statistic():
             print("total not calculated")
             
         if request.form.getlist('Car') or totalselected:
-            carstable = CAR_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-            carcount =  db.session.query(func.sum(CAR_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+            carstable = CAR_DAILY_COUNT_VIW.query.filter(CAR_DAILY_COUNT_VIW.cam_id==camid).all()
+            carcount =  db.session.query(func.sum(CAR_DAILY_COUNT_VIW.vehicle_count)).filter(CAR_DAILY_COUNT_VIW.cam_id==camid).scalar()
             carsdata = dataset_serializer(carstable)
             carcheck=True
         if request.form.getlist('Truck') or totalselected:
-            truckstable = TRUCK_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-            truckcount =  db.session.query(func.sum(TRUCK_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+            truckstable = TRUCK_DAILY_COUNT_VIW.query.filter(TRUCK_DAILY_COUNT_VIW.cam_id==camid).all()
+            truckcount =  db.session.query(func.sum(TRUCK_DAILY_COUNT_VIW.vehicle_count)).filter(TRUCK_DAILY_COUNT_VIW.cam_id==camid).scalar()
             trucksdata = dataset_serializer(truckstable)
             truckcheck=True
         if request.form.getlist('Motorbike') or totalselected:
-            Motorbikestable = MOTORBIKE_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
-            motorbikecount =  db.session.query(func.sum(MOTORBIKE_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
+            Motorbikestable = MOTORBIKE_DAILY_COUNT_VIW.query.filter(MOTORBIKE_DAILY_COUNT_VIW.cam_id==camid).all()
+            motorbikecount =  db.session.query(func.sum(MOTORBIKE_DAILY_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_DAILY_COUNT_VIW.cam_id==camid).scalar()
             motorbikesdata  =   dataset_serializer(Motorbikestable)
             motorcheck=True
         if request.form.getlist('total'):
@@ -954,7 +959,7 @@ def vp1_view():
     #ID = r.get("ID")
     ID = request.args.get('camid')
 
-    h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
+    h_rsz, w_rsz= (480, 864) # ---->= you can get this from DB (new records)
     if request.method == 'GET':        
         try:
             row_cam = Camera.query.filter_by(did=ID).first()
@@ -991,7 +996,7 @@ def calibration_step_1():
         
         if W != '' and L != '':
             
-            #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" --> how to save them????
+            #   W, L, h_camera_real are needed for "man_calib" and "ls_fine_tune_parameters" -->= how to save them????
             return redirect(url_for('calibration_step_2',camid = ID, W = W , L = L, h_camera_real = h_camera_real ))
     
 
@@ -1066,7 +1071,7 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
 
             x0 = np.array([focal,  h_camera])
             # Least square optimization to fine-tuning camera calibration partameters
-            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 --> orig_VP1)
+            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 -->= orig_VP1)
             
             
             cam_dict={'cam_focal': focal , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
@@ -1091,7 +1096,7 @@ def vp1():
         row_cam = Camera.query.filter_by(did=ID).first()
 
         # get VP1 from DB
-        h_rsz, w_rsz= (480, 864) # ----> you can get this from DB (new records)
+        h_rsz, w_rsz= (480, 864) # ---->= you can get this from DB (new records)
 
 
         return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam, camid=ID)   # ch_v0r91 row added)
@@ -1106,14 +1111,14 @@ def before_request():
     request.onlinecams = CAMS
 
 #===========================================================
-@app.route('/roi/<camid>',methods = ['POST','GET'])
+@app.route('/roi/<camid>=',methods = ['POST','GET'])
 @flask_login.login_required
 def roi(camid):
     print("camid is "+camid)
     return render_template('RoI.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)
 
 #===========================================================
-@app.route('/roiroad/<camid>',methods = ['POST','GET'])
+@app.route('/roiroad/<camid>=',methods = ['POST','GET'])
 @flask_login.login_required
 def roiroad(camid):
     return render_template('RoIroad.html',h_rsz=h_rsz, w_rsz=w_rsz, camid=camid)   # ch_v0r91 row added) # ch_v0r96 (changed by m.taheri)

@@ -615,6 +615,10 @@ def statistic():
     error_mes = table =''
     
     if request.method == "POST": # if the user postes a date filter
+        try:
+            camid   = request.form['camid']
+        except:
+            camid = 1
         date_from = request.form['dateTimePick1'] # date_from cannot be empty because it is considered as required field.
         date_to   = request.form['dateTimePick2']
         
@@ -646,16 +650,16 @@ def statistic():
                 CAR_COUNT_VIW=CAR_DAILY_COUNT_VIW
                 TRUCK_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
                 MOTORBIKE_COUNT_VIW=TRUCK_DAILY_COUNT_VIW
-                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.Date(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
             else:
                 CAR_COUNT_VIW=CAR_HOURLY_COUNT_VIW
                 TRUCK_COUNT_VIW=TRUCK_HOURLY_COUNT_VIW
                 MOTORBIKE_COUNT_VIW=MOTORBIKE_HOURLY_COUNT_VIW
-                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).group_by(timeperiod).all()
+                totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
 
             
             
-            totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to)).scalar()
+            totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             
             totalselected = False
             if (request.form.getlist('Car') == [] and request.form.getlist('Truck') == [] and  request.form.getlist('Motorbike') == []) or (request.form.getlist('Car')  and request.form.getlist('Truck') and  request.form.getlist('Motorbike') ):
@@ -666,18 +670,18 @@ def statistic():
                 print("total not calculated")
             
             if request.form.getlist('Car') or totalselected:
-                carstable = CAR_COUNT_VIW.query.filter(CAR_COUNT_VIW.Moment.between(date_from,date_to)).all()
-                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
+                carstable = CAR_COUNT_VIW.query.filter(CAR_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+                carcount =  db.session.query(func.sum(CAR_COUNT_VIW.vehicle_count)).filter(CAR_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
                 carsdata = dataset_serializer(carstable)
                 carcheck=True
             if request.form.getlist('Truck') or totalselected:
-                truckstable = TRUCK_COUNT_VIW.query.filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to)).all()
-                truckcount =  db.session.query(func.sum(TRUCK_COUNT_VIW.vehicle_count)).filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
+                truckstable = TRUCK_COUNT_VIW.query.filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+                truckcount =  db.session.query(func.sum(TRUCK_COUNT_VIW.vehicle_count)).filter(TRUCK_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
                 trucksdata = dataset_serializer(truckstable)
                 truckcheck=True
             if request.form.getlist('Motorbike') or totalselected:
-                Motorbikestable = MOTORBIKE_COUNT_VIW.query.filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to)).all()
-                motorbikecount =  db.session.query(func.sum(MOTORBIKE_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to)).scalar()
+                Motorbikestable = MOTORBIKE_COUNT_VIW.query.filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+                motorbikecount =  db.session.query(func.sum(MOTORBIKE_COUNT_VIW.vehicle_count)).filter(MOTORBIKE_COUNT_VIW.Moment.between(date_from,date_to),VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
                 motorbikesdata  =  dataset_serializer(Motorbikestable)
                 motorcheck=True
             if request.form.getlist('total'):
@@ -734,8 +738,8 @@ def statistic():
 
 
             
-
-            return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
+            validcamid = Camera.query.with_entities(Camera.did).all()
+            return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,validcamid=validcamid,selectedcam=camid,
                                    charttype=charttype,timeperiod=timeperiod,
                                    carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
                                    date_from=date_from,date_to=date_to,
@@ -745,6 +749,7 @@ def statistic():
             flash(error_mes, 'warning')     
         return render_template('statistic.html',table=table, error_mes=error_mes)  # return for user post
     else:
+        camid = 1
         carsdata=""
         motorbikesdata=""
         trucksdata=""
@@ -767,9 +772,9 @@ def statistic():
         carcount = truckcount= motorbikecount = totalcount = 0
 
         
-        totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).group_by(timeperiod).all()
+        totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE(VEHICLE_INTERVAL_COUNTS.interval_datetime).label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
         
-        totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).scalar()
+        totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count),VEHICLE_INTERVAL_COUNTS.cam_id==camid).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
         
         totalselected = False
         if (request.form.getlist('Car') == [] and request.form.getlist('Truck') == [] and  request.form.getlist('Motorbike') == []) or (request.form.getlist('Car')  and request.form.getlist('Truck') and  request.form.getlist('Motorbike') ):
@@ -780,18 +785,18 @@ def statistic():
             print("total not calculated")
             
         if request.form.getlist('Car') or totalselected:
-            carstable = CAR_DAILY_COUNT_VIW.query.all()
-            carcount =  db.session.query(func.sum(CAR_DAILY_COUNT_VIW.vehicle_count)).scalar()
+            carstable = CAR_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+            carcount =  db.session.query(func.sum(CAR_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             carsdata = dataset_serializer(carstable)
             carcheck=True
         if request.form.getlist('Truck') or totalselected:
-            truckstable = TRUCK_DAILY_COUNT_VIW.query.all()
-            truckcount =  db.session.query(func.sum(TRUCK_DAILY_COUNT_VIW.vehicle_count)).scalar()
+            truckstable = TRUCK_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+            truckcount =  db.session.query(func.sum(TRUCK_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             trucksdata = dataset_serializer(truckstable)
             truckcheck=True
         if request.form.getlist('Motorbike') or totalselected:
-            Motorbikestable = MOTORBIKE_DAILY_COUNT_VIW.query.all()
-            motorbikecount =  db.session.query(func.sum(MOTORBIKE_DAILY_COUNT_VIW.vehicle_count)).scalar()
+            Motorbikestable = MOTORBIKE_DAILY_COUNT_VIW.query.filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).all()
+            motorbikecount =  db.session.query(func.sum(MOTORBIKE_DAILY_COUNT_VIW.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             motorbikesdata  =   dataset_serializer(Motorbikestable)
             motorcheck=True
         if request.form.getlist('total'):
@@ -840,8 +845,8 @@ def statistic():
             }
             ]     
             };
-
-        return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,
+        validcamid = Camera.query.with_entities(Camera.did).all()
+        return render_template('statistic.html', error_mes=error_mes,chartdata=chartData,validcamid=validcamid,
                                charttype=charttype,timeperiod=timeperiod,
                                carcheck=carcheck,truckcheck=truckcheck,motorcheck=motorcheck,totalcheck=totalcheck,
                                carcount=carcount,motorbikecount=motorbikecount,truckcount=truckcount,totalcount=totalcount)

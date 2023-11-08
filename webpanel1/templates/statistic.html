@@ -43,131 +43,133 @@
                         
                         <div class="card-header" > <i class="fa fa-cogs"></i> &nbsp Filter Setting  </div>
                         <div class="card-body" > <!-- ----  Card  body ------------->
-                            <form name="stop_form" id="stop_form" action="" method="post">
-                             <small>
-                             
-                                <!-- ---------------------  new row ------------------------------->
-                                <div class="row vehicletype-class">
-                                    <div class="col-sm-3">
-                                        Vehicle Class
-                                    </div>
-                                    
-                                    <div class="col-sm-5">
-                                    
-                                        <div class="checkbox">
-                                           
-                                            <label class="inline-checkbox"><input class="checkbox-label" type="checkbox"  name="Motorbike" {%if motorcheck%}
-                                                checked
-                                                {% endif %} >Motorbike</label>
-                                            &nbsp &nbsp &nbsp
-                                            <label class="inline-checkbox"> <input class="checkbox-label" type="checkbox" name="Car"  {%if carcheck%}
-                                                checked
-                                                {% endif %}>Car</label>
-                                            &nbsp &nbsp &nbsp 
-                                            <label class="inline-checkbox"><input class="checkbox-label" type="checkbox" name="Truck"  {%if truckcheck%}
-                                                checked
-                                                {% endif %}>Truck</label>
-
+                            <form name="stop_form" class="form-inline ml-2" id="stop_form" action="" method="post">
+                             <div>
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <div class="col-auto">
+                                            <label class="col-form-label">Camera</label>
                                         </div>
                                     </div>
+                                    <div class="form-group d-flex align-items-center">
+                                        <select class="form-control" id="FormControlSelect1" name="camid">
+                                        {% for cam in validcamid %}
+                                            {% if cam.did is not none %}                                                
+                                            <option {%if cam.did|safe == selectedcam|safe %} selected {% endif %}>{{cam.did}}</option>
+                                            {% endif%}
+                                        {% endfor%}
+                                        
+                                        </select>
+                                    </div>
                                 </div>
-                                
-                                <!-- ---------------------  new row ------------------------------->
-                                <div class="row">
-                                    <div class="col-sm-3">Period</div>
-                                    
-                                    <div class="col-sm-5">
-                                        <div class="form-group form-inline">
-                                            <span id="date-label-to" class="date-label">From&nbsp:</span>
-                                            <div class="input-group date" id="dateTimePickerFrom" data-target-input="nearest">
-                                                <input style="font-size: 14px" id="dateTimePick1" name="dateTimePick1" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerFrom" data-toggle="datetimepicker"  required/>
-                                                
 
-                                                <div class="input-group-append" data-target="#dateTimePickerFrom" data-toggle="datetimepicker">
-                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                                </div>
+
+                                <!-- ---------------------  new row ------------------------------->
+                                <div class="form-row mt-3">
+                                    <div class="input-group">
+                                        <div class="col-auto">
+                                            <label class="col-form-label">Vehicle Class</label>
+                                        </div>
+                                    </div>
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input class="custom-control-input" type="checkbox" id="customCheck1" name="Motorbike" {%if motorcheck%}
+                                        checked
+                                        {% endif %} >
+                                        <label class="custom-control-label" for="customCheck1">Motorbike</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input class="custom-control-input" type="checkbox" id="customCheck2" name="Car"  {%if carcheck%}
+                                            checked
+                                            {% endif %}>
+                                        <label class="custom-control-label" for="customCheck2"> Car</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input class="custom-control-input" type="checkbox" id="customCheck3" name="Truck"  {%if truckcheck%}
+                                            checked
+                                            {% endif %}>
+                                        <label class="custom-control-label" for="customCheck3">Truck</label>
+                                    </div>
+
+                                </div>
+                                <!-- ---------------------  new row ------------------------------->
+                                <div class="form-row mt-3">
+                                    <div class="input-group">
+                                        <div class="col-auto">
+                                        <label for="dateTimePick1" class="col-form-label">Period</label>
+                                        </div>
+
+                                        <div class="input-group date" id="dateTimePickerFrom" data-target-input="nearest">
+                                            <input style="font-size: 14px" placeholder="From" id="dateTimePick1" name="dateTimePick1" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerFrom" data-toggle="datetimepicker"  required/>
+                                            <div class="input-group-append" data-target="#dateTimePickerFrom" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>                                        
+
+                                        
+                                        <div class="input-group date ml-4" id="dateTimePickerTo" data-target-input="nearest">
+                                            <input style="font-size: 14px" placeholder="To" id="dateTimePick2" name="dateTimePick2" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerTo" data-toggle="datetimepicker" />
+                                            <div class="input-group-append" data-target="#dateTimePickerTo" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                             </div>
                                         </div>
-                                    </div>
-                                    
+
+                                      </div>
                                 </div>
-                                
-                                <!-- ---------------------  new row ------------------------------->
-                                <div class="row">
-                                    <div class="col-sm-3">&nbsp</div> 
-                                    
-                                    <div class="col-sm-5">
-                                        <div class="form-group form-inline ">
-                                            <span id="date-label-to" class="date-label">To&nbsp&nbsp&nbsp&nbsp&nbsp: </span>
-                                            <div class="input-group date" id="dateTimePickerTo" data-target-input="nearest">
-                                                <input style="font-size: 14px" id="dateTimePick2" name="dateTimePick2" type="text" onkeydown="event.preventDefault()" class="form-control datetimepicker-input" data-target="#dateTimePickerTo" data-toggle="datetimepicker" />
-                                                <div class="input-group-append" data-target="#dateTimePickerTo" data-toggle="datetimepicker">
-                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
+                               
                                 <!-- ---------------------  new row  ------------------------------->
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        Chart Type
-                                    </div>
-                                    
-                                    <div class="col-sm-5">
-                                    
-                                        <div class="checkbox">
-                                           
-                                            <label><input type="radio" class="form-check-input" name="charttype" value="Line" "
-                                                {%if charttype=='line'%}
-                                                    checked
-                                                {% endif %}
-                                                 >Line</label>
-                                            &nbsp &nbsp &nbsp &nbsp
-                                            <label><input type="radio" class="form-check-input"  name="charttype" value="Pie" "
-                                                {%if charttype=='pie'%}
-                                                checked
-                                                {% endif %}
-                                                >Pie</label>
-                                            
+                                <div class="form-row mt-3">
+                                    <div class="input-group">
+                                        <div class="col-auto">
+                                        <label  class="col-form-label">Chart Type</label>
                                         </div>
                                     </div>
+                                    <label><input type="radio" class="form-control form-check-input"  name="charttype" value="Line" "
+                                        {%if charttype=='line'%}
+                                            checked
+                                        {% endif %}
+                                         >Line</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="radio" class="form-control form-check-input"  name="charttype" value="Pie" "
+                                        {%if charttype=='pie'%}
+                                        checked
+                                        {% endif %}
+                                        >Pie</label>
+
                                 </div>
+
                                 <!-- ---------------------  new row  ------------------------------->
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        Time Period
-                                    </div>
-                                    
-                                    <div class="col-sm-5">
-                                    
-                                        <div class="checkbox">
-                                           
-                                            <label><input type="radio" class="form-check-input" name="timeperiod" value="hour" "
-                                                {%if timeperiod=='Hour'%}
-                                                    checked
-                                                {% endif %}
-                                                 >Hour</label>
-                                            &nbsp &nbsp &nbsp &nbsp
-                                            <label><input type="radio" class="form-check-input"  name="timeperiod" value="day" "
-                                                {%if timeperiod=='Day'%}
-                                                checked
-                                                {% endif %}
-                                                >Day</label>
-                                            
+                                <div class="form-row mt-3">
+                                    <div class="input-group">
+                                        <div class="col-auto">
+                                        <label  class="col-form-label">Time Period</label>
                                         </div>
                                     </div>
+                                    
+
+                                           
+                                    <label><input type="radio" class="form-check-input" name="timeperiod" value="hour" "
+                                        {%if timeperiod=='Hour'%}
+                                            checked
+                                        {% endif %}
+                                            >Hour</label>
+                                    &nbsp &nbsp &nbsp &nbsp
+                                    <label><input type="radio" class="form-check-input"  name="timeperiod" value="day" "
+                                        {%if timeperiod=='Day'%}
+                                        checked
+                                        {% endif %}
+                                        >Day</label>
+
                                 </div>                                
                                 <!-- ---------------------  new row  ------------------------------->
-                                <div class="row buttons-class">
-                                    <div class="col-sm-3"></div>
+                                <div class="form-row mt-3 float-right">
                                     <div class="col-sm-auto">
                                         <button type="submit" class="btn btn-success btn-sm" >Apply</button>
                                         <button type="button" class="btn btn-warning btn-sm" onclick="csvMe1()" id="csvButton" >Download CSV</button>
                                     </div>
                                 </div>
-                            </small> 
+                            </div> 
                             </form> 
                                
                         </div> <!-- /# card-body -->
@@ -176,10 +178,10 @@
                 </div>
                 
                 
-                <div class="col-sm-6">
+                <div class="col-sm-6 align-items-center justify-content-center">
                 
                     <div class="row"> <!-- row 1 -->
-                        <div class="col-sm-auto"> <!-- row 1 col 1-->
+                        <div class="col-sm-auto mt-5"> <!-- row 1 col 1-->
                           <span class="badge badge-primary statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-motorcycle"></i> 
                               <span style="padding-left:1em"></span>{{motorbikecount}}  
@@ -189,7 +191,7 @@
                           </span>
                         </div>
                         
-                        <div class="col"> <!-- row 1 col 2-->
+                        <div class="col-sm-auto mt-5"> <!-- row 1 col 2-->
                           <span class="badge badge-success statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-car"></i> 
                               <span style="padding-left:1em"></span>{{carcount}}    
@@ -201,10 +203,9 @@
                         
                       </div> <!-- /row 1 -->
                       
-                      <span style="padding-left:1em"></span>                  
                       
                       <div class="row"> <!-- row 2 -->
-                          <div class="col-sm-auto"> <!-- row 2 col 1-->
+                          <div class="col-sm-auto mt-5"> <!-- row 2 col 1-->
                               <span class="badge badge-warning statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-truck"></i> 
                               <span style="padding-left:1em"></span>{{truckcount}}    
@@ -214,7 +215,7 @@
                           </span>
                           </div>
                         
-                          <div class="col"> <!-- row 2 col 2-->
+                          <div class="col-sm-auto mt-5"> <!-- row 2 col 2-->
                               <span class="badge badge-danger statistic-items" style="font-size:42px; text-align:left; ">
                               <i  class="fa fa fa-calculator"></i> 
                               <span style="padding-left:1em"></span>{{totalcount}}    

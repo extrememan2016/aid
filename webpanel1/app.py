@@ -658,8 +658,6 @@ def statistic():
                 TRUCK_COUNT_VIW=TRUCK_HOURLY_COUNT_VIW
                 MOTORBIKE_COUNT_VIW=MOTORBIKE_HOURLY_COUNT_VIW
                 totaltable = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count).label('vehicle_count'),func.DATE_FORMAT(VEHICLE_INTERVAL_COUNTS.interval_datetime,'%Y-%m-%d %H:00').label(timeperiod)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime<=date_to,VEHICLE_INTERVAL_COUNTS.interval_datetime>=date_from,VEHICLE_INTERVAL_COUNTS.cam_id==camid).group_by(timeperiod).all()
-
-            
             
             totalcount = db.session.query(func.sum(VEHICLE_INTERVAL_COUNTS.vehicle_count)).filter(VEHICLE_INTERVAL_COUNTS.interval_datetime<=date_to,VEHICLE_INTERVAL_COUNTS.interval_datetime>=date_from,VEHICLE_INTERVAL_COUNTS.cam_id==camid).scalar()
             

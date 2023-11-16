@@ -50,7 +50,7 @@ from resources.models.vevhicle_interval_counts_VIW import CAR_HOURLY_COUNT_VIW
 from resources.models.vevhicle_interval_counts_VIW import MOTORBIKE_HOURLY_COUNT_VIW
 from resources.models.vevhicle_interval_counts_VIW import TRUCK_HOURLY_COUNT_VIW
 
-from gevent.pywsgi import WSGIServer
+# from gevent.pywsgi import WSGIServer
 
 
 
@@ -998,17 +998,16 @@ def calibration_step_1():
             return redirect(url_for('calibration_step_2',camid = ID, W = W , L = L, h_camera_real = h_camera_real ))
     
 
-    else:        
+    else:  
+        #------------  ch_v0r85 -----------------------
+        ID =  request.args.get('camid')      
         try:            
-            #------------  ch_v0r85 -----------------------
-            ID =  request.args.get('camid')
-            
             row_cam = Camera.query.filter_by(did=ID).first()
 
 
             return render_template('calibration_step_1.html',h_rsz=h_rsz, w_rsz=w_rsz,vp1_x=row_cam.cam_VP1_X,vp1_y=row_cam.cam_VP1_y, row=row_cam,camid = ID)   # ch_v0r91 row added)
         except:
-            return redirect(url_for('roi'))
+            return redirect(url_for('roi',camid=ID))
 
 #==============================================================
 @app.route('/calibration_step_2', methods=['GET','POST'])
@@ -1018,8 +1017,8 @@ def calibration_step_2():
     if request.method == 'POST':
         camid = request.form.getlist('camid')[0]
         print("Error is : "+str(request.form.getlist('lines_points_x')[0]));
-        lines_points_x = request.form.getlist('lines_points_x')[0]
-        lines_points_y = request.form.getlist('lines_points_y')[0]
+        lines_points_x = (request.form.getlist('lines_points_x')[0]).split(",")
+        lines_points_y = (request.form.getlist('lines_points_y')[0]).split(",")
         member = int(request.form['member'])
         for i in range(0, member):
             i +=1 
@@ -1063,16 +1062,28 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
         VP1 = int(row_cam.cam_VP1_X), int(row_cam.cam_VP1_y)
 
         swing_angle = row_cam.cam_swing
-
         if lines_points_x:
             line_points = np.zeros((len(lines_points_x), 2), dtype=float)
+            for i in range(0,len(lines_points_x)):
+                line_points[i,:] = (lines_points_x[i],lines_points_y[i])
 
             x0 = np.array([focal,  h_camera])
             # Least square optimization to fine-tuning camera calibration partameters
-            road_camera_staff = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 -->= orig_VP1)
-            
-            
-            cam_dict={'cam_focal': focal , 'cam_height': cam_height,'cam_swing': swing, 'cam_tilt':tilt *( 180 / np.pi), 'cam_center_X':original_centre[0], 'cam_center_Y': original_centre[1] , 'cam_VP2_X' : round(original_vp2[0],3)  , 'cam_VP2_y' :round(original_vp2[1],2)} # ch_v0r96 (added by m.taheri)
+            camera_calibration = ls_fine_tune_parameters(centre, VP1, real_line_meseares, line_points, swing_angle, x0, h_camera, 0.0, 1)  # ch_v0r90 (vp1 -->= orig_VP1)
+            focal = camera_calibration.get("focal")
+            cam_height = camera_calibration.get("height")
+            swing = camera_calibration.get("swing")
+            tilt = camera_calibration.get("tilt")
+            original_centre = camera_calibration.get("centre")
+            original_vp2 = camera_calibration.get("vp2")
+            cam_dict = {
+                'cam_focal': float(focal),
+                'cam_height': float(cam_height),
+                'cam_swing': swing,
+                'cam_tilt': round(tilt * (180 / np.pi), 3),
+                'cam_VP2_X': float(round(original_vp2[0], 3)),
+                'cam_VP2_y': float(round(original_vp2[1], 2)),
+                }
             write_to_db_any(ID,cam_dict) # ch_v0r96 (added by m.taheri)
 
             print("Success")
@@ -1087,10 +1098,8 @@ def worker_3(camid,lines_points_x,lines_points_y,real_line_meseares):
 @app.route('/vp1'  , methods=['GET', 'POST'])
 @flask_login.login_required
 def vp1():
-
+    ID =  request.args.get('camid')
     try:
-        ID =  request.args.get('camid')
-
         row_cam = Camera.query.filter_by(did=ID).first()
 
         # get VP1 from DB
@@ -1099,7 +1108,7 @@ def vp1():
 
         return render_template('vp1.html',h_rsz=h_rsz, w_rsz=w_rsz, row=row_cam, camid=ID)   # ch_v0r91 row added)
     except:
-        return redirect(url_for('roi'))
+        return redirect(url_for('roi',camid=ID))
 
     
 

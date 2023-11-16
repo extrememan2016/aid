@@ -419,6 +419,7 @@ def analytic():
            
     try:
         cam = Camera.query.filter_by(did=ID).first()
+        #pprint(cam)
         classification_staff = make_classification_staff(cam) 
         counting_list = []
         for k in classification_staff.keys():
@@ -431,7 +432,10 @@ def analytic():
         stop_vehicle_th=cam.stop_vehicle_th              #row_cam[18]
         stop_vehicle_dur_th=cam.stop_vehicle_dur_th      #row_cam[22]
         # --------------------   Notice: ROI should be returned to html ----------------------
+        
         return render_template('analytic.html',h_rsz=h_rsz, w_rsz=w_rsz, detect_type_ind=detect_type_ind, slow_vehicle_th=slow_vehicle_th, stop_vehicle_th=stop_vehicle_th, stop_vehicle_dur_th=stop_vehicle_dur_th, row=cam, counting_list=counting_list )
+        
+
     except Exception as e:
         print("ERROR IS: "+str(e))
         #flash(u'Invalid URL provided', 'warning')
@@ -1029,8 +1033,8 @@ def calibration_step_2():
         worker_3(camid,lines_points_x,lines_points_y,real_line_meseares)
 
         try:
-            points = points_roi[0]
-            return redirect(url_for('analytic')) 
+            return redirect(url_for('analytic',camid=camid))
+            
         except:
             return redirect(url_for('roi',camid=request.form.getlist('camid')[0]))
 

@@ -65,14 +65,10 @@
 	var zoom = document.getElementById("zoom");
 	var zoomCtx = zoom.getContext("2d");
 	var zoom_num = 3;
+
 	var img = new Image();
-	img.src = "{{ url_for('video_feed',camid=camid)}}";
-	img.onerror = function(){
-		console.log("img src error");
-		img.onerror = null;
-		img.src = "{{ url_for('static', filename='images/nostream.png') }}";
-	};
-	
+	img.src = "{{ url_for('static', filename='images/screen_pattern.png') }}"  
+
 	img.onload = run;
 	var coordinates = [];
 	var arr_cordinates = [];
@@ -540,12 +536,10 @@
 			} 
 			if (coordinates.length == 4 ) {
 				
-				img.src = "{{ url_for('video_feed',camid=camid)}}";
-				img.onerror = function(){
-					console.log("img src error");
-					img.onerror = null;
-					img.src = "{{ url_for('static', filename='images/nostream.png') }}";
-				};
+
+
+				img.src = "{{ url_for('static', filename='images/fine_tuning.png') }}"
+
 				img.onload = run;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				zoomCtx.clearRect(0, 0, zoom.width, zoom.height);

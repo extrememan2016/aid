@@ -101,6 +101,7 @@ header{
 
   .item{
     background-color: #dddddd;
+    border-radius: .55rem;
   }
   .btnitem{
   height: 100px;

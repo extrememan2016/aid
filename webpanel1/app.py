@@ -1144,16 +1144,7 @@ def page_not_found(e):
 def calib_step_init(calib, framePluginInstance, fps_capture, CAM_ID):
     print("some initial condition")
     return "OK"
-  
-#========================================================================
-def main():
-    app.run(debug=False,host='0.0.0.0', threaded=True)
-    #from waitress import serve
-    #serve(app, host="0.0.0.0", port=5000)
-
-if __name__ == '__main__':
-    main()
-    
+   
 
 @app.route('/video_feed',methods = ['POST','GET'])      #Video streaming route. Put this in the src attribute of an img tag
 @flask_login.login_required
@@ -1169,3 +1160,14 @@ def tiny_video_feed():
 
 
 
+
+
+
+#========================================================================
+def main():
+    app.run(debug=False,host='0.0.0.0', threaded=True)
+    #from waitress import serve
+    #serve(app, host="0.0.0.0", port=5000)
+
+if __name__ == '__main__':
+    main()

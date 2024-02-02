@@ -110,7 +110,7 @@
                 <div class="list-group list-group-flush">
                   {% if session.username != 'user' %}
                     <a id = "home" class="list-group-item list-group-item-action bg-light"   style="color: rgba(0, 0, 0, 1);" href="{{ url_for('home') }}" >    <i class="fa fa-wrench fa-lg">                       </i> General Settings   </a>      <!-- # ch_v0r89  [  <i class="material-icons">settings_applications</i> replaced with <i class="fa fa-wrench  fa-lg"></i> ] -->
-                    <div class="dropdown dropright">
+                    <div class="list-group-item dropdown dropright" style="padding: 0px;">
 
                       <button id = "analytic" class="list-group-item list-group-item-action bg-light btn btn-primary dropdown-toggle list-group" data-toggle="dropdown"   style="color: rgba(0, 0, 0, 1);"   href="{{ url_for('analytic') }}"> <i class="fa fa-cubes ">                           </i> Analytics Settings </button>      <!-- # ch_v0r89  [   <i class="material-icons">format_shapes</i> replaced with <i class="fa fa-cubes fa-lg"></i> ] -->                 
                       <div class="dropdown-menu">

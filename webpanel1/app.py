@@ -5,6 +5,8 @@ import numpy as np
 
 import datetime
 
+import subprocess,psutil
+
 from flask import Flask, render_template, Response, request, redirect, url_for
 from flask import flash, send_from_directory
 from pprint import pprint
@@ -451,7 +453,7 @@ def info():
     try:
 
         uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()) #  ch_v0r92 (added)
-        uptime2 = check_output(["uptime"])    
+        uptime2 = subprocess.check_output(["uptime"])    
         
         return render_template('info.html', setting_class = "active",
                 uptime = str(uptime).split('.')[0], uptime2=uptime2)  # render a template # ch_v0r91 row added
